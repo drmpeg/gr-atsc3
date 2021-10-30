@@ -1,0 +1,50 @@
+/* -*- c++ -*- */
+/*
+ * Copyright 2021 Ron Economos.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+#ifndef INCLUDED_ATSC3_BCH_BB_IMPL_H
+#define INCLUDED_ATSC3_BCH_BB_IMPL_H
+
+#include <atsc3/bch_bb.h>
+#include "atsc3_defines.h"
+#include <bitset>
+
+namespace gr {
+  namespace atsc3 {
+
+    class bch_bb_impl : public bch_bb
+    {
+     private:
+      int kbch;
+      int nbch;
+      int frame_size;
+
+      std::bitset<MAX_BCH_PARITY_BITS> crc_table[256];
+      unsigned int num_parity_bits;
+      std::bitset<MAX_BCH_PARITY_BITS> polynome;
+
+      void calculate_crc_table();
+      int poly_mult(const int*, int, const int*, int, int*);
+      void bch_poly_build_tables(void);
+
+     public:
+      bch_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
+      ~bch_bb_impl();
+
+      // Where all the action really happens
+      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+
+      int general_work(int noutput_items,
+           gr_vector_int &ninput_items,
+           gr_vector_const_void_star &input_items,
+           gr_vector_void_star &output_items);
+
+    };
+
+  } // namespace atsc3
+} // namespace gr
+
+#endif /* INCLUDED_ATSC3_BCH_BB_IMPL_H */

@@ -1,0 +1,40 @@
+id: atsc3_modulator_bc
+label: ATSC3.0 Modulator
+category: '[ATSC3.0]'
+
+templates:
+  imports: import atsc3
+  make: atsc3.modulator_bc(${framesize.val}, ${rate.val}, ${constellation.val})
+
+parameters:
+-   id: framesize
+    label: FECFRAME size
+    dtype: enum
+    options: [FECFRAME_NORMAL, FECFRAME_SHORT]
+    option_labels: [Normal, Short]
+    option_attributes:
+        val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
+-   id: rate
+    label: Code rate
+    dtype: enum
+    options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
+    option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
+    option_attributes:
+        val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
+-   id: constellation
+    label: Constellation
+    dtype: enum
+    options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
+    option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
+    option_attributes:
+        val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
+
+inputs:
+-   domain: stream
+    dtype: byte
+
+outputs:
+-   domain: stream
+    dtype: complex
+
+file_format: 1

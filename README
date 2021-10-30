@@ -1,0 +1,46 @@
+# Copyright 2021 Ron Economos
+#
+# This file is part of gr-atsc3
+#
+# gr-atsc3 is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# gr-atsc3 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with gr-atsc3; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 51 Franklin Street,
+# Boston, MA 02110-1301, USA.
+
+gr-atsc3
+======
+
+Author: Ron Economos
+Email: <w6rz@comcast.net>
+
+The goal of this project is to build a software-defined ATSC 3.0
+transmitter, based A322 Physical Layer Protocol and A321 System
+Discovery and Signaling specifications.
+
+https://muygs2x2vhb2pjk6g160f1s8-wpengine.netdna-ssl.com/wp-content/uploads/2021/04/A322-2021-Physical-Layer-Protocol.pdf
+
+https://muygs2x2vhb2pjk6g160f1s8-wpengine.netdna-ssl.com/wp-content/uploads/2021/04/A321-2016-System-Discovery-and-Signaling.pdf
+
+This project is currently a work in progress.
+
+Build instructions:
+
+    mkdir build
+    cd build
+    cmake ../
+    make
+    sudo make install
+    sudo ldconfig
+
+Contributions are welcome!
+
