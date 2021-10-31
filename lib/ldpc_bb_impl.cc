@@ -223,78 +223,78 @@ namespace gr {
     {
       if (frame_size_type == FECFRAME_NORMAL) {
         if (code_rate == C2_15) {
-          ldpc_bf(ldpc_tab_2_15N);
+          ldpc_bf_type_a(ldpc_tab_2_15N);
         }
         if (code_rate == C3_15) {
-          ldpc_bf(ldpc_tab_3_15N);
+          ldpc_bf_type_a(ldpc_tab_3_15N);
         }
         if (code_rate == C4_15) {
-          ldpc_bf(ldpc_tab_4_15N);
+          ldpc_bf_type_a(ldpc_tab_4_15N);
         }
         if (code_rate == C5_15) {
-          ldpc_bf(ldpc_tab_5_15N);
+          ldpc_bf_type_a(ldpc_tab_5_15N);
         }
         if (code_rate == C6_15) {
-          ldpc_bf(ldpc_tab_6_15N);
+          ldpc_bf_type_b(ldpc_tab_6_15N);
         }
         if (code_rate == C7_15) {
-          ldpc_bf(ldpc_tab_7_15N);
+          ldpc_bf_type_a(ldpc_tab_7_15N);
         }
         if (code_rate == C8_15) {
-          ldpc_bf(ldpc_tab_8_15N);
+          ldpc_bf_type_b(ldpc_tab_8_15N);
         }
         if (code_rate == C9_15) {
-          ldpc_bf(ldpc_tab_9_15N);
+          ldpc_bf_type_b(ldpc_tab_9_15N);
         }
         if (code_rate == C10_15) {
-          ldpc_bf(ldpc_tab_10_15N);
+          ldpc_bf_type_b(ldpc_tab_10_15N);
         }
         if (code_rate == C11_15) {
-          ldpc_bf(ldpc_tab_11_15N);
+          ldpc_bf_type_b(ldpc_tab_11_15N);
         }
         if (code_rate == C12_15) {
-          ldpc_bf(ldpc_tab_12_15N);
+          ldpc_bf_type_b(ldpc_tab_12_15N);
         }
         if (code_rate == C13_15) {
-          ldpc_bf(ldpc_tab_13_15N);
+          ldpc_bf_type_b(ldpc_tab_13_15N);
         }
       }
       else if (frame_size_type == FECFRAME_SHORT) {
         if (code_rate == C2_15) {
-          ldpc_bf(ldpc_tab_2_15S);
+          ldpc_bf_type_a(ldpc_tab_2_15S);
         }
         if (code_rate == C3_15) {
-          ldpc_bf(ldpc_tab_3_15S);
+          ldpc_bf_type_a(ldpc_tab_3_15S);
         }
         if (code_rate == C4_15) {
-          ldpc_bf(ldpc_tab_4_15S);
+          ldpc_bf_type_a(ldpc_tab_4_15S);
         }
         if (code_rate == C5_15) {
-          ldpc_bf(ldpc_tab_5_15S);
+          ldpc_bf_type_a(ldpc_tab_5_15S);
         }
         if (code_rate == C6_15) {
-          ldpc_bf(ldpc_tab_6_15S);
+          ldpc_bf_type_b(ldpc_tab_6_15S);
         }
         if (code_rate == C7_15) {
-          ldpc_bf(ldpc_tab_7_15S);
+          ldpc_bf_type_b(ldpc_tab_7_15S);
         }
         if (code_rate == C8_15) {
-          ldpc_bf(ldpc_tab_8_15S);
+          ldpc_bf_type_b(ldpc_tab_8_15S);
         }
         if (code_rate == C9_15) {
-          ldpc_bf(ldpc_tab_9_15S);
+          ldpc_bf_type_b(ldpc_tab_9_15S);
         }
         if (code_rate == C10_15) {
-          ldpc_bf(ldpc_tab_10_15S);
+          ldpc_bf_type_b(ldpc_tab_10_15S);
         }
         if (code_rate == C11_15) {
-          ldpc_bf(ldpc_tab_11_15S);
+          ldpc_bf_type_b(ldpc_tab_11_15S);
         }
         if (code_rate == C12_15) {
-          ldpc_bf(ldpc_tab_12_15S);
+          ldpc_bf_type_b(ldpc_tab_12_15S);
         }
         if (code_rate == C13_15) {
-          ldpc_bf(ldpc_tab_13_15S);
+          ldpc_bf_type_b(ldpc_tab_13_15S);
         }
       }
     }
@@ -311,19 +311,45 @@ namespace gr {
       unsigned char* p;
       // Calculate the number of parity bits
       int plen = frame_size - nbch;
-      d = in;
       p = &out[nbch];
       int consumed = 0;
+      const unsigned int q1 = q1_val;
+      const unsigned int q2 = q2_val;
+      const unsigned int m1 = m1_val;
+      const unsigned int m2 = m2_val;
 
       for (int i = 0; i < noutput_items; i += frame_size) {
         // copy the information bits
         memcpy(&out[i], &in[consumed], sizeof(unsigned char) * nbch);
         consumed += nbch;
         if (ldpc_type == LDPC_TYPE_A) {
+          // First zero all the parity bits
+          memset(buffer, 0, sizeof(unsigned char)*plen);
           // now do the parity checking
+          d = out;
+          for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
+            buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
+          }
+          for(int j = 1; j < m1; j++) {
+            buffer[j] ^= buffer[j-1];
+          }
+          for (int t = 0; t < q1; t++) {
+            for (int s = 0; s < 360; s++) {
+              out[nbch + (360 * t) + s] = buffer[(q1 * s) + t];
+            }
+          }
+          for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
+            buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
+          }
+          for (int t = 0; t < q2; t++) {
+            for (int s = 0; s < 360; s++) {
+              out[nbch + m1 + (360 * t) + s] = buffer[(m1 + q2 * s) + t];
+            }
+          }
         }
         else {
           // now do the parity checking
+          d = in;
           for (int i_p = 0; i_p < plen; i_p++) {
             unsigned char pbit = 0;
             for (int i_d = 1; i_d < ldpc_lut[i_p][0]; i_d++) {

@@ -11,6 +11,12 @@
 #include <atsc3/ldpc_bb.h>
 #include "atsc3_defines.h"
 
+typedef struct{
+    int table_length;
+    int d[LDPC_ENCODE_TABLE_LENGTH];
+    int p[LDPC_ENCODE_TABLE_LENGTH];
+}ldpc_encode_table;
+
 namespace gr {
   namespace atsc3 {
 
@@ -28,13 +34,16 @@ namespace gr {
       int m1_val;
       int m2_val;
       int ldpc_lut_index[FRAME_SIZE_NORMAL];
+      unsigned char buffer[FRAME_SIZE_NORMAL];
       void ldpc_lookup_generate(void);
+      ldpc_encode_table ldpc_encode_1st;
+      ldpc_encode_table ldpc_encode_2nd;
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
 
       template <typename entry_t, size_t rows, size_t cols>
-      void ldpc_bf(entry_t (&table)[rows][cols])
+      void ldpc_bf_type_b(entry_t (&table)[rows][cols])
       {
         size_t max_lut_arraysize = 0;
         const unsigned int pbits = (frame_size) - nbch;
@@ -88,6 +97,68 @@ namespace gr {
             im++;
           }
         }
+      }
+
+      template <typename entry_t, size_t rows, size_t cols>
+      void ldpc_bf_type_a(entry_t (&table)[rows][cols])
+      {
+        int im = 0;
+        int index = 0;
+        int row;
+        for (row = 0; row < rows; row++) {
+          if (im == nbch) {
+            break;
+          }
+          for (int n = 0; n < 360; n++) {
+            for (int col = 1; col <= table[row][0]; col++) {
+              if ((im % 360) == 0) {
+                ldpc_encode_1st.p[index] = table[row][col];
+                ldpc_encode_1st.d[index] = im;
+                index++;
+              }
+              else {
+                if (table[row][col] < m1_val) {
+                  ldpc_encode_1st.p[index] = (table[row][col] + (n * q1_val)) % m1_val;
+                  ldpc_encode_1st.d[index] = im;
+                  index++;
+                }
+                else {
+                  ldpc_encode_1st.p[index] = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
+                  ldpc_encode_1st.d[index] = im;
+                  index++;
+                }
+              }
+            }
+            im++;
+          }
+        }
+        ldpc_encode_1st.table_length = index;
+        index = 0;
+        for (;row < rows; row++) {
+          for (int n = 0; n < 360; n++) {
+            for (int col = 1; col <= table[row][0]; col++) {
+              if ((im % 360) == 0) {
+                ldpc_encode_2nd.p[index] = table[row][col];
+                ldpc_encode_2nd.d[index] = im;
+                index++;
+              }
+              else {
+                if (table[row][col] < m1_val) {
+                  ldpc_encode_2nd.p[index] = (table[row][col] + (n * q1_val)) % m1_val;
+                  ldpc_encode_2nd.d[index] = im;
+                  index++;
+                }
+                else {
+                  ldpc_encode_2nd.p[index] = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
+                  ldpc_encode_2nd.d[index] = im;
+                  index++;
+                }
+              }
+            }
+            im++;
+          }
+        }
+        ldpc_encode_2nd.table_length = index;
       }
 
       const static uint16_t ldpc_tab_2_15N[29][21];
