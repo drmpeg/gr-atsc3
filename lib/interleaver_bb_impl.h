@@ -22,6 +22,7 @@ namespace gr {
       int signal_constellation;
       int code_rate;
       int ldpc_type;
+      int block_type;
       int nbch;
       int q_val;
       int mod;

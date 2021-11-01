@@ -19,6 +19,10 @@
 #define LDPC_TYPE_A 0
 #define LDPC_TYPE_B 1
 
+// Block interleaver type
+#define BLOCK_TYPE_A 0
+#define BLOCK_TYPE_B 1
+
 #define LDPC_ENCODE_TABLE_LENGTH (FRAME_SIZE_NORMAL * 10)
 
 #endif /* INCLUDED_ATSC3_DEFINES_H */

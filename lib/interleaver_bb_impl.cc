@@ -41,18 +41,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_2_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_2_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_2_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_2_15N_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_2_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -62,18 +67,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_3_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_3_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_3_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_3_15N_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_3_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -83,18 +93,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_4_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_4_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_4_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_4_15N_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_4_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -104,18 +119,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_5_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_5_15N_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_5_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_5_15N_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_5_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -126,18 +146,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_6_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_6_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_6_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_6_15N_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_6_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -147,18 +172,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_7_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_7_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_7_15N_64QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_7_15N_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_7_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -169,18 +199,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_8_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_8_15N_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_8_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_8_15N_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_8_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -191,18 +226,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_9_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_9_15N_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_9_15N_64QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_9_15N_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_9_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -213,18 +253,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_10_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_10_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_10_15N_64QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_10_15N_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_10_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -235,18 +280,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_11_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_11_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_11_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_11_15N_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_11_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -257,18 +307,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_12_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_12_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_12_15N_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_12_15N_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_12_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -279,18 +334,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_13_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_13_15N_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_13_15N_64QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_13_15N_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_13_15N_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -309,18 +369,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_2_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_2_15S_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_2_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_2_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_2_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -330,18 +395,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_3_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_3_15S_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_3_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_3_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_3_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -351,18 +421,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_4_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_4_15S_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_4_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_4_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_4_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -372,18 +447,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_5_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_5_15S_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_5_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_5_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_5_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -394,18 +474,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_6_15S_QPSK[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_6_15S_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_6_15S_64QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_6_15S_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_6_15S_QPSK[0];
+                block_type = BLOCK_TYPE_B;
                 break;
             }
             break;
@@ -416,18 +501,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_7_15S_QPSK[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_7_15S_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_7_15S_64QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_7_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_7_15S_QPSK[0];
+                block_type = BLOCK_TYPE_B;
                 break;
             }
             break;
@@ -438,18 +528,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_8_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_8_15S_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_8_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_8_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_8_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -460,18 +555,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_9_15S_QPSK[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_9_15S_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_9_15S_64QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_9_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_9_15S_QPSK[0];
+                block_type = BLOCK_TYPE_B;
                 break;
             }
             break;
@@ -482,18 +582,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_10_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_10_15S_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_10_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_10_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_10_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -504,18 +609,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_11_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_11_15S_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_11_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_11_15S_256QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               default:
                 group_table = &group_tab_11_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -526,18 +636,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_12_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_12_15S_16QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_12_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_12_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_12_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
@@ -548,18 +663,23 @@ namespace gr {
             switch (constellation) {
               case MOD_QPSK:
                 group_table = &group_tab_13_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_16QAM:
                 group_table = &group_tab_13_15S_16QAM[0];
+                block_type = BLOCK_TYPE_B;
                 break;
               case MOD_64QAM:
                 group_table = &group_tab_13_15S_64QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               case MOD_256QAM:
                 group_table = &group_tab_13_15S_256QAM[0];
+                block_type = BLOCK_TYPE_A;
                 break;
               default:
                 group_table = &group_tab_13_15S_QPSK[0];
+                block_type = BLOCK_TYPE_A;
                 break;
             }
             break;
