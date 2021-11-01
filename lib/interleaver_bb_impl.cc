@@ -751,22 +751,33 @@ namespace gr {
             const unsigned char *c1, *c2;
             c1 = &tempv[0];
             c2 = &tempv[rows];
-            if (ldpc_type == LDPC_TYPE_B) {
-              for (int k = 0; k < nbch; k++) {
-                tempu[k] = *in++;
-              }
-              for (int t = 0; t < q_val; t++) {
-                for (int s = 0; s < 360; s++) {
-                  tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+            if (block_type == BLOCK_TYPE_A) {
+              if (ldpc_type == LDPC_TYPE_A) {
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexv = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[indexv++] = *in++;
+                  }
                 }
               }
-              in = in + (q_val * 360);
-              index = 0;
-              for (int j = 0; j < group_size; j++) {
-                block = group_table[j];
-                indexv = block * 360;
-                for (int k = 0; k < 360; k++) {
-                  tempv[indexv++] = tempu[index++];
+              else {
+                for (int k = 0; k < nbch; k++) {
+                  tempu[k] = *in++;
+                }
+                for (int t = 0; t < q_val; t++) {
+                  for (int s = 0; s < 360; s++) {
+                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                  }
+                }
+                in = in + (q_val * 360);
+                index = 0;
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexv = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[indexv++] = tempu[index++];
+                  }
                 }
               }
               index = 0;
@@ -782,10 +793,7 @@ namespace gr {
               }
             }
             else {
-              for (int j = 0; j < rows; j++) {
-                out[produced] = in[consumed++] << 1;
-                out[produced++] |= in[consumed++];
-              }
+              /* block type B */
             }
           }
           break;
