@@ -691,26 +691,56 @@ namespace gr {
       switch (constellation) {
         case MOD_QPSK:
           mod = 2;
+          if (framesize == FECFRAME_NORMAL) {
+            nr2 = 0;
+          }
+          else if (framesize == FECFRAME_SHORT) {
+            nr2 = 180;
+          }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
           break;
         case MOD_16QAM:
           mod = 4;
+          if (framesize == FECFRAME_NORMAL) {
+            nr2 = 0;
+          }
+          else if (framesize == FECFRAME_SHORT) {
+            nr2 = 90;
+          }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
           break;
         case MOD_64QAM:
           mod = 6;
+          if (framesize == FECFRAME_NORMAL) {
+            nr2 = 0;
+          }
+          else if (framesize == FECFRAME_SHORT) {
+            nr2 = 180;
+          }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
           break;
         case MOD_256QAM:
           mod = 8;
+          if (framesize == FECFRAME_NORMAL) {
+            nr2 = 180;
+          }
+          else if (framesize == FECFRAME_SHORT) {
+            nr2 = 225;
+          }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
           break;
         default:
           mod = 1;
+          if (framesize == FECFRAME_NORMAL) {
+            nr2 = 0;
+          }
+          else if (framesize == FECFRAME_SHORT) {
+            nr2 = 180;
+          }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
           break;
@@ -740,26 +770,27 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
       int consumed = 0;
       int produced = 0;
-      int rows, offset, index, block, indexv;
+      int rows, rows2, index, block, indexb;
       unsigned int pack;
-      const int *mux;
 
       switch (signal_constellation) {
         case MOD_QPSK:
           for (int i = 0; i < noutput_items; i += packed_items) {
-            rows = frame_size / 2;
+            rows = (frame_size / 2) - nr2;
             const unsigned char *c1, *c2;
             c1 = &tempv[0];
             c2 = &tempv[rows];
             if (block_type == BLOCK_TYPE_A) {
               if (ldpc_type == LDPC_TYPE_A) {
+                index = 0;
                 for (int j = 0; j < group_size; j++) {
                   block = group_table[j];
-                  indexv = block * 360;
+                  indexb = block * 360;
                   for (int k = 0; k < 360; k++) {
-                    tempv[indexv++] = *in++;
+                    tempv[index++] = in[indexb++];;
                   }
                 }
+                in += frame_size;
               }
               else {
                 for (int k = 0; k < nbch; k++) {
@@ -774,9 +805,9 @@ namespace gr {
                 index = 0;
                 for (int j = 0; j < group_size; j++) {
                   block = group_table[j];
-                  indexv = block * 360;
+                  indexb = block * 360;
                   for (int k = 0; k < 360; k++) {
-                    tempv[indexv++] = tempu[index++];
+                    tempv[index++] = tempu[indexb++];
                   }
                 }
               }
@@ -785,11 +816,20 @@ namespace gr {
                 tempu[index++] = c1[j];
                 tempu[index++] = c2[j];
               }
+              if (nr2) {
+                rows2 = frame_size - (nr2 * mod);
+                c1 = &tempv[rows2];
+                c2 = &tempv[rows2 + nr2];
+                for (int j = 0; j < nr2; j++) {
+                  tempu[index++] = c1[j];
+                  tempu[index++] = c2[j];
+                }
+              }
               index = 0;
-              for (int j = 0; j < rows; j++) {
+              for (int j = 0; j < rows + nr2; j++) {
                 out[produced] = tempu[index++] << 1;
                 out[produced++] |= tempu[index++];
-                consumed += 2;
+                consumed += mod;
               }
             }
             else {
@@ -799,7 +839,163 @@ namespace gr {
           break;
         case MOD_16QAM:
           for (int i = 0; i < noutput_items; i += packed_items) {
-            rows = frame_size / (mod * 2);
+            rows = (frame_size / mod) - nr2;
+            const unsigned char *c1, *c2, *c3, *c4;
+            c1 = &tempv[0];
+            c2 = &tempv[rows];
+            c3 = &tempv[rows * 2];
+            c4 = &tempv[rows * 3];
+            if (block_type == BLOCK_TYPE_A) {
+              if (ldpc_type == LDPC_TYPE_A) {
+                index = 0;
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexb = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[index++] = in[indexb++];;
+                  }
+                }
+                in += frame_size;
+              }
+              else {
+                for (int k = 0; k < nbch; k++) {
+                  tempu[k] = *in++;
+                }
+                for (int t = 0; t < q_val; t++) {
+                  for (int s = 0; s < 360; s++) {
+                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                  }
+                }
+                in = in + (q_val * 360);
+                index = 0;
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexb = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[index++] = tempu[indexb++];
+                  }
+                }
+              }
+              index = 0;
+              for (int j = 0; j < rows; j++) {
+                tempu[index++] = c1[j];
+                tempu[index++] = c2[j];
+                tempu[index++] = c3[j];
+                tempu[index++] = c4[j];
+              }
+              if (nr2) {
+                rows2 = frame_size - (nr2 * mod);
+                c1 = &tempv[rows2];
+                c2 = &tempv[rows2 + nr2];
+                c3 = &tempv[rows2 + (nr2 * 2)];
+                c4 = &tempv[rows2 + (nr2 * 3)];
+                for (int j = 0; j < nr2; j++) {
+                  tempu[index++] = c1[j];
+                  tempu[index++] = c2[j];
+                  tempu[index++] = c3[j];
+                  tempu[index++] = c4[j];
+                }
+              }
+              index = 0;
+              for (int j = 0; j < rows + nr2; j++) {
+                pack = 0;
+                for (int e = 3; e >= 0 ; e--) {
+                  pack |= tempu[index++] << e;
+                }
+                out[produced++] = pack & 0xf;
+                consumed += mod;
+              }
+            }
+            else {
+              /* block type B */
+            }
+          }
+          break;
+        case MOD_64QAM:
+          for (int i = 0; i < noutput_items; i += packed_items) {
+            rows = (frame_size / mod) - nr2;
+            const unsigned char *c1, *c2, *c3, *c4, *c5, *c6;
+            c1 = &tempv[0];
+            c2 = &tempv[rows];
+            c3 = &tempv[rows * 2];
+            c4 = &tempv[rows * 3];
+            c5 = &tempv[rows * 4];
+            c6 = &tempv[rows * 5];
+            if (block_type == BLOCK_TYPE_A) {
+              if (ldpc_type == LDPC_TYPE_A) {
+                index = 0;
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexb = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[index++] = in[indexb++];;
+                  }
+                }
+                in += frame_size;
+              }
+              else {
+                for (int k = 0; k < nbch; k++) {
+                  tempu[k] = *in++;
+                }
+                for (int t = 0; t < q_val; t++) {
+                  for (int s = 0; s < 360; s++) {
+                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                  }
+                }
+                in = in + (q_val * 360);
+                index = 0;
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexb = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[index++] = tempu[indexb++];
+                  }
+                }
+              }
+              index = 0;
+              for (int j = 0; j < rows; j++) {
+                tempu[index++] = c1[j];
+                tempu[index++] = c2[j];
+                tempu[index++] = c3[j];
+                tempu[index++] = c4[j];
+                tempu[index++] = c5[j];
+                tempu[index++] = c6[j];
+              }
+              if (nr2) {
+                rows2 = frame_size - (nr2 * mod);
+                c1 = &tempv[rows2];
+                c2 = &tempv[rows2 + nr2];
+                c3 = &tempv[rows2 + (nr2 * 2)];
+                c4 = &tempv[rows2 + (nr2 * 3)];
+                c5 = &tempv[rows2 + (nr2 * 4)];
+                c6 = &tempv[rows2 + (nr2 * 5)];
+                for (int j = 0; j < nr2; j++) {
+                  tempu[index++] = c1[j];
+                  tempu[index++] = c2[j];
+                  tempu[index++] = c3[j];
+                  tempu[index++] = c4[j];
+                  tempu[index++] = c5[j];
+                  tempu[index++] = c6[j];
+                }
+              }
+              index = 0;
+              for (int j = 0; j < rows + nr2; j++) {
+                pack = 0;
+                for (int e = 5; e >= 0 ; e--) {
+                  pack |= tempu[index++] << e;
+                }
+                out[produced++] = pack & 0x3f;
+                consumed += mod;
+              }
+            }
+            else {
+              /* block type B */
+            }
+          }
+          break;
+        case MOD_256QAM:
+          for (int i = 0; i < noutput_items; i += packed_items) {
+            rows = (frame_size / mod) - nr2;
             const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
             c1 = &tempv[0];
             c2 = &tempv[rows];
@@ -809,176 +1005,37 @@ namespace gr {
             c6 = &tempv[rows * 5];
             c7 = &tempv[rows * 6];
             c8 = &tempv[rows * 7];
-            for (int k = 0; k < nbch; k++) {
-              tempu[k] = *in++;
-            }
-            for (int t = 0; t < q_val; t++) {
-              for (int s = 0; s < 360; s++) {
-                tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+            if (block_type == BLOCK_TYPE_A) {
+              if (ldpc_type == LDPC_TYPE_A) {
+                index = 0;
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexb = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[index++] = in[indexb++];;
+                  }
+                }
+                in += frame_size;
               }
-            }
-            in = in + (q_val * 360);
-            index = 0;
-            for (int j = 0; j < rows; j++) {
-              tempu[index++] = c1[j];
-              tempu[index++] = c2[j];
-              tempu[index++] = c3[j];
-              tempu[index++] = c4[j];
-              tempu[index++] = c5[j];
-              tempu[index++] = c6[j];
-              tempu[index++] = c7[j];
-              tempu[index++] = c8[j];
-            }
-            index = 0;
-            for (int d = 0; d < frame_size / (mod * 2); d++) {
-              pack = 0;
-              for (int e = 0; e < (mod * 2); e++) {
-                offset = mux[e];
-                pack |= tempu[index++] << (((mod * 2) - 1) - offset);
-              }
-              out[produced++] = pack >> 4;
-              out[produced++] = pack & 0xf;
-              consumed += (mod * 2);
-            }
-          }
-          break;
-        case MOD_64QAM:
-          for (int i = 0; i < noutput_items; i += packed_items) {
-            rows = frame_size / (mod * 2);
-            const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8, *c9, *c10, *c11, *c12;
-            c1 = &tempv[0];
-            c2 = &tempv[rows];
-            c3 = &tempv[rows * 2];
-            c4 = &tempv[rows * 3];
-            c5 = &tempv[rows * 4];
-            c6 = &tempv[rows * 5];
-            c7 = &tempv[rows * 6];
-            c8 = &tempv[rows * 7];
-            c9 = &tempv[rows * 8];
-            c10 = &tempv[rows * 9];
-            c11 = &tempv[rows * 10];
-            c12 = &tempv[rows * 11];
-            for (int k = 0; k < nbch; k++) {
-              tempu[k] = *in++;
-            }
-            for (int t = 0; t < q_val; t++) {
-              for (int s = 0; s < 360; s++) {
-                tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
-              }
-            }
-            in = in + (q_val * 360);
-            index = 0;
-            for (int j = 0; j < rows; j++) {
-              tempu[index++] = c1[j];
-              tempu[index++] = c2[j];
-              tempu[index++] = c3[j];
-              tempu[index++] = c4[j];
-              tempu[index++] = c5[j];
-              tempu[index++] = c6[j];
-              tempu[index++] = c7[j];
-              tempu[index++] = c8[j];
-              tempu[index++] = c9[j];
-              tempu[index++] = c10[j];
-              tempu[index++] = c11[j];
-              tempu[index++] = c12[j];
-            }
-            index = 0;
-            for (int d = 0; d < frame_size / (mod * 2); d++) {
-              pack = 0;
-              for (int e = 0; e < (mod * 2); e++) {
-                offset = mux[e];
-                pack |= tempu[index++] << (((mod * 2) - 1) - offset);
-              }
-              out[produced++] = pack >> 6;
-              out[produced++] = pack & 0x3f;
-              consumed += (mod * 2);
-            }
-          }
-          break;
-        case MOD_256QAM:
-          if (frame_size == FRAME_SIZE_NORMAL) {
-            for (int i = 0; i < noutput_items; i += packed_items) {
-              rows = frame_size / (mod * 2);
-              const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
-              const unsigned char *c9, *c10, *c11, *c12, *c13, *c14, *c15, *c16;
-              c1 = &tempv[0];
-              c2 = &tempv[rows];
-              c3 = &tempv[rows * 2];
-              c4 = &tempv[rows * 3];
-              c5 = &tempv[rows * 4];
-              c6 = &tempv[rows * 5];
-              c7 = &tempv[rows * 6];
-              c8 = &tempv[rows * 7];
-              c9 = &tempv[rows * 8];
-              c10 = &tempv[rows * 9];
-              c11 = &tempv[rows * 10];
-              c12 = &tempv[rows * 11];
-              c13 = &tempv[rows * 12];
-              c14 = &tempv[rows * 13];
-              c15 = &tempv[rows * 14];
-              c16 = &tempv[rows * 15];
-              for (int k = 0; k < nbch; k++) {
-                tempu[k] = *in++;
-              }
-              for (int t = 0; t < q_val; t++) {
-                for (int s = 0; s < 360; s++) {
-                  tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+              else {
+                for (int k = 0; k < nbch; k++) {
+                  tempu[k] = *in++;
+                }
+                for (int t = 0; t < q_val; t++) {
+                  for (int s = 0; s < 360; s++) {
+                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                  }
+                }
+                in = in + (q_val * 360);
+                index = 0;
+                for (int j = 0; j < group_size; j++) {
+                  block = group_table[j];
+                  indexb = block * 360;
+                  for (int k = 0; k < 360; k++) {
+                    tempv[index++] = tempu[indexb++];
+                  }
                 }
               }
-              in = in + (q_val * 360);
-              index = 0;
-              for (int j = 0; j < rows; j++) {
-                tempu[index++] = c1[j];
-                tempu[index++] = c2[j];
-                tempu[index++] = c3[j];
-                tempu[index++] = c4[j];
-                tempu[index++] = c5[j];
-                tempu[index++] = c6[j];
-                tempu[index++] = c7[j];
-                tempu[index++] = c8[j];
-                tempu[index++] = c9[j];
-                tempu[index++] = c10[j];
-                tempu[index++] = c11[j];
-                tempu[index++] = c12[j];
-                tempu[index++] = c13[j];
-                tempu[index++] = c14[j];
-                tempu[index++] = c15[j];
-                tempu[index++] = c16[j];
-              }
-              index = 0;
-              for (int d = 0; d < frame_size / (mod * 2); d++) {
-                pack = 0;
-                for (int e = 0; e < (mod * 2); e++) {
-                  offset = mux[e];
-                  pack |= tempu[index++] << (((mod * 2) - 1) - offset);
-                }
-                out[produced++] = pack >> 8;
-                out[produced++] = pack & 0xff;
-                consumed += (mod * 2);
-              }
-            }
-          }
-          else {
-            for (int i = 0; i < noutput_items; i += packed_items) {
-              rows = frame_size / mod;
-              const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
-              c1 = &tempv[0];
-              c2 = &tempv[rows];
-              c3 = &tempv[rows * 2];
-              c4 = &tempv[rows * 3];
-              c5 = &tempv[rows * 4];
-              c6 = &tempv[rows * 5];
-              c7 = &tempv[rows * 6];
-              c8 = &tempv[rows * 7];
-              for (int k = 0; k < nbch; k++) {
-                tempu[k] = *in++;
-              }
-              for (int t = 0; t < q_val; t++) {
-                for (int s = 0; s < 360; s++) {
-                  tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
-                }
-              }
-              in = in + (q_val * 360);
               index = 0;
               for (int j = 0; j < rows; j++) {
                 tempu[index++] = c1[j];
@@ -990,16 +1047,39 @@ namespace gr {
                 tempu[index++] = c7[j];
                 tempu[index++] = c8[j];
               }
+              if (nr2) {
+                rows2 = frame_size - (nr2 * mod);
+                c1 = &tempv[rows2];
+                c2 = &tempv[rows2 + nr2];
+                c3 = &tempv[rows2 + (nr2 * 2)];
+                c4 = &tempv[rows2 + (nr2 * 3)];
+                c5 = &tempv[rows2 + (nr2 * 4)];
+                c6 = &tempv[rows2 + (nr2 * 5)];
+                c7 = &tempv[rows2 + (nr2 * 6)];
+                c8 = &tempv[rows2 + (nr2 * 7)];
+                for (int j = 0; j < nr2; j++) {
+                  tempu[index++] = c1[j];
+                  tempu[index++] = c2[j];
+                  tempu[index++] = c3[j];
+                  tempu[index++] = c4[j];
+                  tempu[index++] = c5[j];
+                  tempu[index++] = c6[j];
+                  tempu[index++] = c7[j];
+                  tempu[index++] = c8[j];
+                }
+              }
               index = 0;
-              for (int d = 0; d < frame_size / mod; d++) {
+              for (int j = 0; j < rows + nr2; j++) {
                 pack = 0;
-                for (int e = 0; e < mod; e++) {
-                  offset = mux[e];
-                  pack |= tempu[index++] << ((mod - 1) - offset);
+                for (int e = 7; e >= 0 ; e--) {
+                  pack |= tempu[index++] << e;
                 }
                 out[produced++] = pack & 0xff;
                 consumed += mod;
               }
+            }
+            else {
+              /* block type B */
             }
           }
           break;

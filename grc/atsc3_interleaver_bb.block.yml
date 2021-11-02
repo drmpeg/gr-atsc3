@@ -27,7 +27,7 @@ parameters:
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
     option_attributes:
-        val: [atsc3.MOD_QPSK, atsc3.16QAM, atsc3.64QAM, atsc3.256QAM]
+        val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
 
 inputs:
 -   domain: stream
