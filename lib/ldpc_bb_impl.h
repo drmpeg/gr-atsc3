@@ -105,7 +105,7 @@ namespace gr {
         int im = 0;
         int index = 0;
         int row;
-        for (row = 0; row < rows; row++) {
+        for (row = 0; row < (int)rows; row++) {
           if (im == nbch) {
             break;
           }
@@ -134,7 +134,7 @@ namespace gr {
         }
         ldpc_encode_1st.table_length = index;
         index = 0;
-        for (;row < rows; row++) {
+        for (;row < (int)rows; row++) {
           for (int n = 0; n < 360; n++) {
             for (int col = 1; col <= table[row][0]; col++) {
               if ((im % 360) == 0) {

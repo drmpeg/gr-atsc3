@@ -313,14 +313,13 @@ namespace gr {
       int plen = frame_size - nbch;
       p = &out[nbch];
       int consumed = 0;
-      const unsigned int q1 = q1_val;
-      const unsigned int q2 = q2_val;
-      const unsigned int m1 = m1_val;
-      const unsigned int m2 = m2_val;
+      const int q1 = q1_val;
+      const int q2 = q2_val;
+      const int m1 = m1_val;
 
       for (int i = 0; i < noutput_items; i += frame_size) {
         // copy the information bits
-        memcpy(&out[i], &in[consumed], sizeof(unsigned char) * nbch);
+        memcpy(out, &in[consumed], sizeof(unsigned char) * nbch);
         consumed += nbch;
         if (ldpc_type == LDPC_TYPE_A) {
           // First zero all the parity bits
@@ -349,7 +348,7 @@ namespace gr {
         }
         else {
           // now do the parity checking
-          d = in;
+          d = &in[consumed - nbch];
           for (int i_p = 0; i_p < plen; i_p++) {
             unsigned char pbit = 0;
             for (int i_d = 1; i_d < ldpc_lut[i_p][0]; i_d++) {
@@ -361,7 +360,7 @@ namespace gr {
             p[j] ^= p[j - 1];
           }
         }
-        d += nbch;
+        out += frame_size;
         p += frame_size;
       }
 
