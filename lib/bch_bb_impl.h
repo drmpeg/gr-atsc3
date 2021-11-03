@@ -34,7 +34,6 @@ namespace gr {
       bch_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
       ~bch_bb_impl();
 
-      // Where all the action really happens
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
