@@ -693,9 +693,11 @@ namespace gr {
           mod = 2;
           if (framesize == FECFRAME_NORMAL) {
             nr2 = 0;
+            npart2 = 0;
           }
           else if (framesize == FECFRAME_SHORT) {
             nr2 = 180;
+            npart2 = 360;
           }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
@@ -704,9 +706,11 @@ namespace gr {
           mod = 4;
           if (framesize == FECFRAME_NORMAL) {
             nr2 = 0;
+            npart2 = 0;
           }
           else if (framesize == FECFRAME_SHORT) {
             nr2 = 90;
+            npart2 = 360;
           }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
@@ -715,9 +719,11 @@ namespace gr {
           mod = 6;
           if (framesize == FECFRAME_NORMAL) {
             nr2 = 0;
+            npart2 = 0;
           }
           else if (framesize == FECFRAME_SHORT) {
             nr2 = 180;
+            npart2 = 1080;
           }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
@@ -726,9 +732,11 @@ namespace gr {
           mod = 8;
           if (framesize == FECFRAME_NORMAL) {
             nr2 = 180;
+            npart2 = 1440;
           }
           else if (framesize == FECFRAME_SHORT) {
             nr2 = 225;
+            npart2 = 1800;
           }
           set_output_multiple(frame_size / mod);
           packed_items = frame_size / mod;
@@ -771,46 +779,47 @@ namespace gr {
       int consumed = 0;
       int produced = 0;
       int rows, rows2, index, block, indexb;
+      int indexn, inner, outer;
       unsigned int pack;
 
       switch (signal_constellation) {
         case MOD_QPSK:
           for (int i = 0; i < noutput_items; i += packed_items) {
-            rows = (frame_size / 2) - nr2;
+            rows = packed_items - nr2;
             const unsigned char *c1, *c2;
             c1 = &tempv[0];
             c2 = &tempv[rows];
+            if (ldpc_type == LDPC_TYPE_A) {
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = in[indexb++];;
+                }
+              }
+              in += frame_size;
+            }
+            else {
+              for (int k = 0; k < nbch; k++) {
+                tempu[k] = *in++;
+              }
+              for (int t = 0; t < q_val; t++) {
+                for (int s = 0; s < 360; s++) {
+                  tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                }
+              }
+              in = in + (q_val * 360);
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = tempu[indexb++];
+                }
+              }
+            }
             if (block_type == BLOCK_TYPE_A) {
-              if (ldpc_type == LDPC_TYPE_A) {
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = in[indexb++];;
-                  }
-                }
-                in += frame_size;
-              }
-              else {
-                for (int k = 0; k < nbch; k++) {
-                  tempu[k] = *in++;
-                }
-                for (int t = 0; t < q_val; t++) {
-                  for (int s = 0; s < 360; s++) {
-                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
-                  }
-                }
-                in = in + (q_val * 360);
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = tempu[indexb++];
-                  }
-                }
-              }
               index = 0;
               for (int j = 0; j < rows; j++) {
                 tempu[index++] = c1[j];
@@ -825,57 +834,75 @@ namespace gr {
                   tempu[index++] = c2[j];
                 }
               }
-              index = 0;
-              for (int j = 0; j < rows + nr2; j++) {
-                out[produced] = tempu[index++] << 1;
-                out[produced++] |= tempu[index++];
-                consumed += mod;
-              }
             }
             else {
-              /* block type B */
+              index = 0;
+              inner = 360 * mod;
+              outer = frame_size / inner;
+              for (int n = 0; n < outer; n++) {
+                indexn = n * inner;
+                for (int j = 0; j < 360; j++) {
+                  for (int k = 0; k < mod; k++) {
+                    tempu[index++] = tempv[indexn + (360 * k)];
+                  }
+                  indexn++;
+                }
+              }
+              if (npart2) {
+                index = frame_size - npart2;
+                for (int j = 0; j < npart2; j++) {
+                  tempu[index] = tempv[index];
+                  index++;
+                }
+              }
+            }
+            index = 0;
+            for (int j = 0; j < rows + nr2; j++) {
+              out[produced] = tempu[index++] << 1;
+              out[produced++] |= tempu[index++];
+              consumed += mod;
             }
           }
           break;
         case MOD_16QAM:
           for (int i = 0; i < noutput_items; i += packed_items) {
-            rows = (frame_size / mod) - nr2;
+            rows = packed_items - nr2;
             const unsigned char *c1, *c2, *c3, *c4;
             c1 = &tempv[0];
             c2 = &tempv[rows];
             c3 = &tempv[rows * 2];
             c4 = &tempv[rows * 3];
+            if (ldpc_type == LDPC_TYPE_A) {
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = in[indexb++];;
+                }
+              }
+              in += frame_size;
+            }
+            else {
+              for (int k = 0; k < nbch; k++) {
+                tempu[k] = *in++;
+              }
+              for (int t = 0; t < q_val; t++) {
+                for (int s = 0; s < 360; s++) {
+                  tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                }
+              }
+              in = in + (q_val * 360);
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = tempu[indexb++];
+                }
+              }
+            }
             if (block_type == BLOCK_TYPE_A) {
-              if (ldpc_type == LDPC_TYPE_A) {
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = in[indexb++];;
-                  }
-                }
-                in += frame_size;
-              }
-              else {
-                for (int k = 0; k < nbch; k++) {
-                  tempu[k] = *in++;
-                }
-                for (int t = 0; t < q_val; t++) {
-                  for (int s = 0; s < 360; s++) {
-                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
-                  }
-                }
-                in = in + (q_val * 360);
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = tempu[indexb++];
-                  }
-                }
-              }
               index = 0;
               for (int j = 0; j < rows; j++) {
                 tempu[index++] = c1[j];
@@ -896,24 +923,42 @@ namespace gr {
                   tempu[index++] = c4[j];
                 }
               }
-              index = 0;
-              for (int j = 0; j < rows + nr2; j++) {
-                pack = 0;
-                for (int e = 3; e >= 0 ; e--) {
-                  pack |= tempu[index++] << e;
-                }
-                out[produced++] = pack & 0xf;
-                consumed += mod;
-              }
             }
             else {
-              /* block type B */
+              index = 0;
+              inner = 360 * mod;
+              outer = frame_size / inner;
+              for (int n = 0; n < outer; n++) {
+                indexn = n * inner;
+                for (int j = 0; j < 360; j++) {
+                  for (int k = 0; k < mod; k++) {
+                    tempu[index++] = tempv[indexn + (360 * k)];
+                  }
+                  indexn++;
+                }
+              }
+              if (npart2) {
+                index = frame_size - npart2;
+                for (int j = 0; j < npart2; j++) {
+                  tempu[index] = tempv[index];
+                  index++;
+                }
+              }
+            }
+            index = 0;
+            for (int j = 0; j < rows + nr2; j++) {
+              pack = 0;
+              for (int e = 3; e >= 0 ; e--) {
+                pack |= tempu[index++] << e;
+              }
+              out[produced++] = pack & 0xf;
+              consumed += mod;
             }
           }
           break;
         case MOD_64QAM:
           for (int i = 0; i < noutput_items; i += packed_items) {
-            rows = (frame_size / mod) - nr2;
+            rows = packed_items - nr2;
             const unsigned char *c1, *c2, *c3, *c4, *c5, *c6;
             c1 = &tempv[0];
             c2 = &tempv[rows];
@@ -921,37 +966,37 @@ namespace gr {
             c4 = &tempv[rows * 3];
             c5 = &tempv[rows * 4];
             c6 = &tempv[rows * 5];
+            if (ldpc_type == LDPC_TYPE_A) {
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = in[indexb++];;
+                }
+              }
+              in += frame_size;
+            }
+            else {
+              for (int k = 0; k < nbch; k++) {
+                tempu[k] = *in++;
+              }
+              for (int t = 0; t < q_val; t++) {
+                for (int s = 0; s < 360; s++) {
+                  tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                }
+              }
+              in = in + (q_val * 360);
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = tempu[indexb++];
+                }
+              }
+            }
             if (block_type == BLOCK_TYPE_A) {
-              if (ldpc_type == LDPC_TYPE_A) {
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = in[indexb++];;
-                  }
-                }
-                in += frame_size;
-              }
-              else {
-                for (int k = 0; k < nbch; k++) {
-                  tempu[k] = *in++;
-                }
-                for (int t = 0; t < q_val; t++) {
-                  for (int s = 0; s < 360; s++) {
-                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
-                  }
-                }
-                in = in + (q_val * 360);
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = tempu[indexb++];
-                  }
-                }
-              }
               index = 0;
               for (int j = 0; j < rows; j++) {
                 tempu[index++] = c1[j];
@@ -978,24 +1023,42 @@ namespace gr {
                   tempu[index++] = c6[j];
                 }
               }
-              index = 0;
-              for (int j = 0; j < rows + nr2; j++) {
-                pack = 0;
-                for (int e = 5; e >= 0 ; e--) {
-                  pack |= tempu[index++] << e;
-                }
-                out[produced++] = pack & 0x3f;
-                consumed += mod;
-              }
             }
             else {
-              /* block type B */
+              index = 0;
+              inner = 360 * mod;
+              outer = frame_size / inner;
+              for (int n = 0; n < outer; n++) {
+                indexn = n * inner;
+                for (int j = 0; j < 360; j++) {
+                  for (int k = 0; k < mod; k++) {
+                    tempu[index++] = tempv[indexn + (360 * k)];
+                  }
+                  indexn++;
+                }
+              }
+              if (npart2) {
+                index = frame_size - npart2;
+                for (int j = 0; j < npart2; j++) {
+                  tempu[index] = tempv[index];
+                  index++;
+                }
+              }
+            }
+            index = 0;
+            for (int j = 0; j < rows + nr2; j++) {
+              pack = 0;
+              for (int e = 5; e >= 0 ; e--) {
+                pack |= tempu[index++] << e;
+              }
+              out[produced++] = pack & 0x3f;
+              consumed += mod;
             }
           }
           break;
         case MOD_256QAM:
           for (int i = 0; i < noutput_items; i += packed_items) {
-            rows = (frame_size / mod) - nr2;
+            rows = packed_items - nr2;
             const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
             c1 = &tempv[0];
             c2 = &tempv[rows];
@@ -1005,37 +1068,37 @@ namespace gr {
             c6 = &tempv[rows * 5];
             c7 = &tempv[rows * 6];
             c8 = &tempv[rows * 7];
+            if (ldpc_type == LDPC_TYPE_A) {
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = in[indexb++];;
+                }
+              }
+              in += frame_size;
+            }
+            else {
+              for (int k = 0; k < nbch; k++) {
+                tempu[k] = *in++;
+              }
+              for (int t = 0; t < q_val; t++) {
+                for (int s = 0; s < 360; s++) {
+                  tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
+                }
+              }
+              in = in + (q_val * 360);
+              index = 0;
+              for (int j = 0; j < group_size; j++) {
+                block = group_table[j];
+                indexb = block * 360;
+                for (int k = 0; k < 360; k++) {
+                  tempv[index++] = tempu[indexb++];
+                }
+              }
+            }
             if (block_type == BLOCK_TYPE_A) {
-              if (ldpc_type == LDPC_TYPE_A) {
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = in[indexb++];;
-                  }
-                }
-                in += frame_size;
-              }
-              else {
-                for (int k = 0; k < nbch; k++) {
-                  tempu[k] = *in++;
-                }
-                for (int t = 0; t < q_val; t++) {
-                  for (int s = 0; s < 360; s++) {
-                    tempu[nbch + (360 * t) + s] = in[(q_val * s) + t];
-                  }
-                }
-                in = in + (q_val * 360);
-                index = 0;
-                for (int j = 0; j < group_size; j++) {
-                  block = group_table[j];
-                  indexb = block * 360;
-                  for (int k = 0; k < 360; k++) {
-                    tempv[index++] = tempu[indexb++];
-                  }
-                }
-              }
               index = 0;
               for (int j = 0; j < rows; j++) {
                 tempu[index++] = c1[j];
@@ -1068,18 +1131,36 @@ namespace gr {
                   tempu[index++] = c8[j];
                 }
               }
-              index = 0;
-              for (int j = 0; j < rows + nr2; j++) {
-                pack = 0;
-                for (int e = 7; e >= 0 ; e--) {
-                  pack |= tempu[index++] << e;
-                }
-                out[produced++] = pack & 0xff;
-                consumed += mod;
-              }
             }
             else {
-              /* block type B */
+              index = 0;
+              inner = 360 * mod;
+              outer = frame_size / inner;
+              for (int n = 0; n < outer; n++) {
+                indexn = n * inner;
+                for (int j = 0; j < 360; j++) {
+                  for (int k = 0; k < mod; k++) {
+                    tempu[index++] = tempv[indexn + (360 * k)];
+                  }
+                  indexn++;
+                }
+              }
+              if (npart2) {
+                index = frame_size - npart2;
+                for (int j = 0; j < npart2; j++) {
+                  tempu[index] = tempv[index];
+                  index++;
+                }
+              }
+            }
+            index = 0;
+            for (int j = 0; j < rows + nr2; j++) {
+              pack = 0;
+              for (int e = 7; e >= 0 ; e--) {
+                pack |= tempu[index++] << e;
+              }
+              out[produced++] = pack & 0xff;
+              consumed += mod;
             }
           }
           break;
