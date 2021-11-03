@@ -11,6 +11,7 @@
 ########################################################################
 install(FILES
     api.h
+    atsc3_config.h
     bbscrambler_bb.h
     bch_bb.h
     ldpc_bb.h
