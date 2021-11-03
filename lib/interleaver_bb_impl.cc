@@ -778,8 +778,9 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
       int consumed = 0;
       int produced = 0;
-      int rows, rows2, index, block, indexb;
-      int indexn, inner, outer;
+      int rows, rows2, index, block, indexb, indexn;
+      int inner = 360 * mod;
+      int outer = frame_size / inner;
       unsigned int pack;
 
       switch (signal_constellation) {
@@ -837,8 +838,6 @@ namespace gr {
             }
             else {
               index = 0;
-              inner = 360 * mod;
-              outer = frame_size / inner;
               for (int n = 0; n < outer; n++) {
                 indexn = n * inner;
                 for (int j = 0; j < 360; j++) {
@@ -923,8 +922,6 @@ namespace gr {
             }
             else {
               index = 0;
-              inner = 360 * mod;
-              outer = frame_size / inner;
               for (int n = 0; n < outer; n++) {
                 indexn = n * inner;
                 for (int j = 0; j < 360; j++) {
@@ -1020,8 +1017,6 @@ namespace gr {
             }
             else {
               index = 0;
-              inner = 360 * mod;
-              outer = frame_size / inner;
               for (int n = 0; n < outer; n++) {
                 indexn = n * inner;
                 for (int j = 0; j < 360; j++) {
@@ -1125,8 +1120,6 @@ namespace gr {
             }
             else {
               index = 0;
-              inner = 360 * mod;
-              outer = frame_size / inner;
               for (int n = 0; n < outer; n++) {
                 indexn = n * inner;
                 for (int j = 0; j < 360; j++) {
