@@ -850,10 +850,7 @@ namespace gr {
               }
               if (npart2) {
                 index = frame_size - npart2;
-                for (int j = 0; j < npart2; j++) {
-                  tempu[index] = tempv[index];
-                  index++;
-                }
+                memcpy(&tempu[index], &tempv[index], sizeof(unsigned char) * npart2);
               }
             }
             index = 0;
@@ -939,10 +936,7 @@ namespace gr {
               }
               if (npart2) {
                 index = frame_size - npart2;
-                for (int j = 0; j < npart2; j++) {
-                  tempu[index] = tempv[index];
-                  index++;
-                }
+                memcpy(&tempu[index], &tempv[index], sizeof(unsigned char) * npart2);
               }
             }
             index = 0;
@@ -1039,10 +1033,7 @@ namespace gr {
               }
               if (npart2) {
                 index = frame_size - npart2;
-                for (int j = 0; j < npart2; j++) {
-                  tempu[index] = tempv[index];
-                  index++;
-                }
+                memcpy(&tempu[index], &tempv[index], sizeof(unsigned char) * npart2);
               }
             }
             index = 0;
@@ -1147,10 +1138,7 @@ namespace gr {
               }
               if (npart2) {
                 index = frame_size - npart2;
-                for (int j = 0; j < npart2; j++) {
-                  tempu[index] = tempv[index];
-                  index++;
-                }
+                memcpy(&tempu[index], &tempv[index], sizeof(unsigned char) * npart2);
               }
             }
             index = 0;
