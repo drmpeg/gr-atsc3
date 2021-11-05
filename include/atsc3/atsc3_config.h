@@ -42,7 +42,8 @@ namespace gr {
     };
 
     enum atsc3_guardinterval_t {
-      GI_1_192 = 0,
+      GI_RESERVED = 0,
+      GI_1_192,
       GI_2_384,
       GI_3_512,
       GI_4_768,
@@ -56,6 +57,85 @@ namespace gr {
       GI_12_4864,
     };
 
+    enum atsc3_mimo_scattered_pilot_encoding_t {
+      MSPE_WALSH_HADAMARD_PILOTS = 0,
+      MSPE_NULL_PILOTS,
+    };
+
+    enum atsc3_time_info_flag_t {
+      TIF_NOT_INCLUDED = 0,
+      TIF_MS_PRECISION,
+      TIF_US_PRECISION,
+      TIF_NS_PRECISION,
+    };
+
+    enum atsc3_papr_t {
+      PAPR_OFF = 0,
+      PAPR_TR,
+      PAPR_ACE,
+      PAPR_BOTH,
+    };
+
+    enum atsc3_time_length_mode_t {
+      TLM_TIME_ALIGNED = 0,
+      TLM_SYMBOL_ALIGNED,
+    };
+
+    enum atsc3_detail_fec_type_t {
+      DFT_MODE_1 = 0,
+      DFT_MODE_2,
+      DFT_MODE_3,
+      DFT_MODE_4,
+      DFT_MODE_5,
+      DFT_MODE_6,
+      DFT_MODE_7,
+    };
+
+    enum atsc3_additional_parity_mode_t {
+      APM_K0 = 0,
+      APM_K1,
+      APM_K2,
+    };
+
+    enum atsc3_miso_t {
+      MISO_OFF = 0,
+      MISO_64,
+      MISO_256,
+    };
+
+    enum atsc3_fftsize_t {
+      FFTSIZE_8K = 0,
+      FFTSIZE_16K,
+      FFTSIZE_32K,
+    };
+
+    enum atsc3_pilotpattern_t {
+      PILOT_SP3_2 = 0,
+      PILOT_SP3_4,
+      PILOT_SP4_2,
+      PILOT_SP4_4,
+      PILOT_SP6_2,
+      PILOT_SP6_4,
+      PILOT_SP8_2,
+      PILOT_SP8_4,
+      PILOT_SP12_2,
+      PILOT_SP12_4,
+      PILOT_SP16_2,
+      PILOT_SP16_4,
+      PILOT_SP24_2,
+      PILOT_SP24_4,
+      PILOT_SP32_2,
+      PILOT_SP32_4,
+    };
+
+    enum atsc3_reduced_carriers_t {
+      CRED_0 = 0,
+      CRED_1,
+      CRED_2,
+      CRED_3,
+      CRED_4,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -63,5 +143,15 @@ typedef gr::atsc3::atsc3_code_rate_t atsc3_code_rate_t;
 typedef gr::atsc3::atsc3_framesize_t atsc3_framesize_t;
 typedef gr::atsc3::atsc3_constellation_t atsc3_constellation_t;
 typedef gr::atsc3::atsc3_guardinterval_t atsc3_guardinterval_t;
+typedef gr::atsc3::atsc3_mimo_scattered_pilot_encoding_t atsc3_mimo_scattered_pilot_encoding_t;
+typedef gr::atsc3::atsc3_time_info_flag_t atsc3_time_info_flag_t;
+typedef gr::atsc3::atsc3_papr_t atsc3_papr_t;
+typedef gr::atsc3::atsc3_time_length_mode_t atsc3_time_length_mode_t;
+typedef gr::atsc3::atsc3_detail_fec_type_t atsc3_detail_fec_type_t;
+typedef gr::atsc3::atsc3_additional_parity_mode_t atsc3_additional_parity_mode_t;
+typedef gr::atsc3::atsc3_miso_t atsc3_miso_t;
+typedef gr::atsc3::atsc3_fftsize_t atsc3_fftsize_t;
+typedef gr::atsc3::atsc3_pilotpattern_t atsc3_pilotpattern_t;
+typedef gr::atsc3::atsc3_reduced_carriers_t atsc3_reduced_carriers_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

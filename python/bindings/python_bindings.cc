@@ -27,6 +27,7 @@ namespace py = pybind11;
     void bind_ldpc_bb(py::module& m);
     void bind_interleaver_bb(py::module& m);
     void bind_modulator_bc(py::module& m);
+    void bind_framemapper_cc(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -61,5 +62,6 @@ PYBIND11_MODULE(atsc3_python, m)
     bind_ldpc_bb(m);
     bind_interleaver_bb(m);
     bind_modulator_bc(m);
+    bind_framemapper_cc(m);
     // ) END BINDING_FUNCTION_CALLS
 }

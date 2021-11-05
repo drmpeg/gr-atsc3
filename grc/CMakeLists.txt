@@ -11,5 +11,6 @@ install(FILES
     atsc3_bch_bb.block.yml
     atsc3_ldpc_bb.block.yml
     atsc3_interleaver_bb.block.yml
-    atsc3_modulator_bc.block.yml DESTINATION share/gnuradio/grc/blocks
+    atsc3_modulator_bc.block.yml
+    atsc3_framemapper_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )
