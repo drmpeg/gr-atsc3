@@ -10,6 +10,7 @@
 
 #include <atsc3/framemapper_cc.h>
 #include "atsc3_defines.h"
+#include <bitset>
 
 typedef struct {
   int version;
@@ -118,7 +119,16 @@ namespace gr {
       void add_l1basic(gr_complex*);
       void add_l1detail(gr_complex*);
       int add_crc32_bits(unsigned char*, int);
+      void init_fm_randomizer(void);
+      void calculate_crc_table();
+      int poly_mult(const int*, int, const int*, int, int*);
+      void bch_poly_build_tables(void);
       unsigned char l1_interleave[FRAME_SIZE_SHORT];
+      unsigned char fm_randomize[FRAME_SIZE_SHORT];
+      std::bitset<MAX_BCH_PARITY_BITS> crc_table[256];
+      int num_parity_bits;
+      std::bitset<MAX_BCH_PARITY_BITS> polynome;
+
       gr_complex l1basic_cache[1840];
 
      public:

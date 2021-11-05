@@ -31,6 +31,9 @@ namespace gr {
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
 
+      init_fm_randomizer();
+      num_parity_bits = 168;
+      bch_poly_build_tables();
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
       l1basicinit->lls_flag = FALSE;
@@ -102,9 +105,114 @@ namespace gr {
     }
 
     void
+    framemapper_cc_impl::init_fm_randomizer(void)
+    {
+      int sr = 0x18f;
+      int b;
+
+      for (int i = 0; i < FRAME_SIZE_SHORT; i++) {
+        fm_randomize[i] = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        b = sr & 1;
+        sr >>= 1;
+        if (b) {
+          sr ^= POLYNOMIAL;
+        }
+      }
+    }
+
+    int
+    framemapper_cc_impl::poly_mult(const int* ina, int lena, const int* inb, int lenb, int* out)
+    {
+      memset(out, 0, sizeof(int) * (lena + lenb));
+
+      for (int i = 0; i < lena; i++) {
+        for (int j = 0; j < lenb; j++) {
+          if (ina[i] * inb[j] > 0) {
+            out[i + j]++; // count number of terms for this pwr of x
+          }
+        }
+      }
+      int max = 0;
+      for (int i = 0; i < lena + lenb; i++) {
+        out[i] = out[i] & 1; // If even ignore the term
+        if (out[i]) {
+          max = i;
+        }
+      }
+      // return the size of array to house the result.
+      return max + 1;
+    }
+
+    // precalculate the crc from:
+    // http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html - cf. CRC-32 Lookup
+
+    void
+    framemapper_cc_impl::calculate_crc_table(void)
+    {
+      for (int divident = 0; divident < 256; divident++) {
+        std::bitset<MAX_BCH_PARITY_BITS> curByte(divident);
+        curByte <<= num_parity_bits - 8;
+
+        for (unsigned char bit = 0; bit < 8; bit++) {
+          if ((curByte[num_parity_bits - 1]) != 0) {
+            curByte <<= 1;
+            curByte ^= polynome;
+          }
+          else {
+            curByte <<= 1;
+          }
+        }
+        crc_table[divident] = curByte;
+      }
+    }
+
+    void
+    framemapper_cc_impl::bch_poly_build_tables(void)
+    {
+      // Short polynomials
+      const int polys01[] = { 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+      const int polys02[] = { 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1 };
+      const int polys03[] = { 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1 };
+      const int polys04[] = { 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
+      const int polys05[] = { 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1 };
+      const int polys06[] = { 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1 };
+      const int polys07[] = { 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1 };
+      const int polys08[] = { 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1 };
+      const int polys09[] = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1 };
+      const int polys10[] = { 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1 };
+      const int polys11[] = { 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 };
+      const int polys12[] = { 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1 };
+
+      int len;
+      int polyout[2][200];
+
+      len = poly_mult(polys01, 15, polys02, 15, polyout[0]);
+      len = poly_mult(polys03, 15, polyout[0], len, polyout[1]);
+      len = poly_mult(polys04, 15, polyout[1], len, polyout[0]);
+      len = poly_mult(polys05, 15, polyout[0], len, polyout[1]);
+      len = poly_mult(polys06, 15, polyout[1], len, polyout[0]);
+      len = poly_mult(polys07, 15, polyout[0], len, polyout[1]);
+      len = poly_mult(polys08, 15, polyout[1], len, polyout[0]);
+      len = poly_mult(polys09, 15, polyout[0], len, polyout[1]);
+      len = poly_mult(polys10, 15, polyout[1], len, polyout[0]);
+      len = poly_mult(polys11, 15, polyout[0], len, polyout[1]);
+      len = poly_mult(polys12, 15, polyout[1], len, polyout[0]);
+
+      for (int i = 0; i < num_parity_bits; i++) {
+        polynome[i] = polyout[0][i];
+      }
+      calculate_crc_table();
+    }
+
+    void
     framemapper_cc_impl::add_l1basic(gr_complex *out)
     {
-      int temp, offset_bits = 0;
+      int temp, index, offset_bits = 0;
+      long long templong;
+      std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
+      unsigned char b, tempbch, msb;
       unsigned char *l1basic = l1_interleave;
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
 
@@ -207,15 +315,44 @@ namespace gr {
       }
       l1basic[offset_bits++] = l1basicinit->first_sub_sbs_first;
       l1basic[offset_bits++] = l1basicinit->first_sub_sbs_last;
-      temp = l1basicinit->reserved;
+      templong = l1basicinit->reserved;
       for (int n = 47; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = templong & (1 << n) ? 1 : 0;
       }
       offset_bits += add_crc32_bits(l1basic, offset_bits);
-      printf("\n");
-      for (int i = 0; i < 25 * 8; i += 8) {
+
+      for (int i = 0; i < offset_bits; i += 8) {
         temp = 0;
-        int index = 0;
+        index = 0;
+        for (int j = 7; j >= 0; j--) {
+          temp |= l1basic[i + index++] << j;
+        }
+        temp ^= fm_randomize[i / 8];
+        index = 0;
+        for (int n = 7; n >= 0; n--) {
+          l1basic[i + index++] = temp & (1 << n) ? 1 : 0;
+        }
+        b = temp;
+        msb = 0;
+        for (int n = 1; n <= 8; n++) {
+          tempbch = parity_bits[num_parity_bits - n];
+          msb |= tempbch << (8 - n);
+        }
+        /* XOR-in next input byte into MSB of crc and get this MSB, that's our new
+         * intermediate divident */
+        unsigned char pos = (msb ^ b);
+        /* Shift out the MSB used for division per lookuptable and XOR with the
+         * remainder */
+        parity_bits = (parity_bits << 8) ^ crc_table[pos];
+      }
+      for (int n = 0; n < num_parity_bits; n++) {
+        l1basic[offset_bits++] = (char)parity_bits[num_parity_bits - 1];
+        parity_bits <<= 1;
+      }
+
+      for (int i = 0; i < offset_bits; i += 8) {
+        temp = 0;
+        index = 0;
         for (int j = 7; j >= 0; j--) {
           temp |= l1basic[i + index] << j;
           index++;
