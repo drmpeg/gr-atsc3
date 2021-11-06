@@ -34,6 +34,11 @@ namespace gr {
       init_fm_randomizer();
       num_parity_bits = 168;
       bch_poly_build_tables();
+      q1_val = 3;
+      q2_val = 33;
+      m1_val = 1080;
+      m2_val = 11880;
+      ldpc_bf_type_a(ldpc_tab_3_15S);
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
       l1basicinit->lls_flag = FALSE;
@@ -210,11 +215,18 @@ namespace gr {
     framemapper_cc_impl::add_l1basic(gr_complex *out)
     {
       int temp, index, offset_bits = 0;
+      int npad, padbits, count;
       long long templong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
-      unsigned char *l1basic = l1_interleave;
+      unsigned char *l1basic = l1_basic;
+      unsigned char *l1temp = l1_temp;
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
+      const unsigned char* d;
+      int plen = FRAME_SIZE_SHORT - NBCH_3_15;
+      const int q1 = q1_val;
+      const int q2 = q2_val;
+      const int m1 = m1_val;
 
       temp = l1basicinit->version;
       for (int n = 2; n >= 0; n--) {
@@ -322,8 +334,7 @@ namespace gr {
       offset_bits += add_crc32_bits(l1basic, offset_bits);
 
       for (int i = 0; i < offset_bits; i += 8) {
-        temp = 0;
-        index = 0;
+        temp = index = 0;
         for (int j = 7; j >= 0; j--) {
           temp |= l1basic[i + index++] << j;
         }
@@ -345,19 +356,71 @@ namespace gr {
          * remainder */
         parity_bits = (parity_bits << 8) ^ crc_table[pos];
       }
-      for (int n = 0; n < num_parity_bits; n++) {
-        l1basic[offset_bits++] = (char)parity_bits[num_parity_bits - 1];
-        parity_bits <<= 1;
+
+      npad = (NBCH_3_15 - (offset_bits + num_parity_bits)) / 360;
+      memset(&l1temp[0], 0x55, sizeof(unsigned char) * FRAME_SIZE_SHORT);
+      for (int i = 0; i < npad; i++) {
+        memset(&l1temp[shortening_table[0][i] * 360], 0, sizeof(unsigned char) * 360);
+      }
+      padbits = (NBCH_3_15 - (offset_bits + num_parity_bits)) - (360 * npad);
+      memset(&l1temp[shortening_table[0][npad] * 360], 0, sizeof(unsigned char) * padbits);
+      index = 0;
+      for (int i = npad + 1; i < 9; i++) {
+        memcpy(&l1temp[shortening_table[0][i] * 360], &l1basic[index], sizeof(unsigned char) * offset_bits);
+        index += 360;
+      }
+      index = count = 0;
+      for (int n = 0; n < NBCH_3_15; n++) {
+        if (l1temp[index] == 0x55) {
+          l1temp[index++] = (char)parity_bits[num_parity_bits - 1];
+          parity_bits <<= 1;
+          count++;
+          if (count == num_parity_bits) {
+            break;
+          }
+        }
+        else {
+          index++;
+        }
       }
 
-      for (int i = 0; i < offset_bits; i += 8) {
-        temp = 0;
-        index = 0;
+      memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
+      // First zero all the parity bits
+      memset(buffer, 0, sizeof(unsigned char)*plen);
+      // now do the parity checking
+      d = &l1basic[0];
+      for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
+        buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
+      }
+      for(int j = 1; j < m1; j++) {
+        buffer[j] ^= buffer[j-1];
+      }
+      for (int t = 0; t < q1; t++) {
+        for (int s = 0; s < 360; s++) {
+          l1basic[NBCH_3_15 + (360 * t) + s] = buffer[(q1 * s) + t];
+        }
+      }
+      for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
+        buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
+      }
+      for (int t = 0; t < q2; t++) {
+        for (int s = 0; s < 360; s++) {
+          l1basic[NBCH_3_15 + m1 + (360 * t) + s] = buffer[(m1 + q2 * s) + t];
+        }
+      }
+
+      for (int i = 0; i < FRAME_SIZE_SHORT; i += 8) {
+        temp = index = 0;
         for (int j = 7; j >= 0; j--) {
           temp |= l1basic[i + index] << j;
           index++;
         }
-        printf("%02x", temp);
+        if ((i % 256) == 0) {
+          if (i != 0) {
+            printf("\n");
+          }
+        }
+        printf("%02X", temp);
       }
       printf("\n");
     }
@@ -383,6 +446,32 @@ namespace gr {
       // Tell runtime system how many output items we produced.
       return noutput_items;
     }
+
+    const int framemapper_cc_impl::shortening_table[8][18] = {
+      {4, 1, 5, 2, 8, 6, 0, 7, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {7, 8, 5, 4, 1, 2, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {6, 1, 7, 8, 0, 2, 4, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 12, 15, 13, 2, 5, 7, 9, 8, 6, 16, 10, 14, 1, 17, 11, 4, 3},
+      {0, 15, 5, 16, 17, 1, 6, 13, 11, 4, 7, 12, 8, 14, 2, 3, 9, 10},
+      {2, 4, 5, 17, 9, 7, 1, 6, 15, 8, 10, 14, 16, 0, 11, 13, 12, 3},
+      {0, 15, 5, 16, 17, 1, 6, 13, 11, 4, 7, 12, 8, 14, 2, 3, 9, 10},
+      {15, 7, 8, 11, 5, 10, 16, 4, 12, 3, 0, 6, 9, 1, 14, 17, 2, 13}
+    };
+
+    const uint16_t framemapper_cc_impl::ldpc_tab_3_15S[12][12] = {
+      {11, 8, 372, 841, 4522, 5253, 7430, 8542, 9822, 10550, 11896, 11988},
+      {11, 80, 255, 667, 1511, 3549, 5239, 5422, 5497, 7157, 7854, 11267},
+      {11, 257, 406, 792, 2916, 3072, 3214, 3638, 4090, 8175, 8892, 9003},
+      {11, 80, 150, 346, 1883, 6838, 7818, 9482, 10366, 10514, 11468, 12341},
+      {11, 32, 100, 978, 3493, 6751, 7787, 8496, 10170, 10318, 10451, 12561},
+      {11, 504, 803, 856, 2048, 6775, 7631, 8110, 8221, 8371, 9443, 10990},
+      {11, 152, 283, 696, 1164, 4514, 4649, 7260, 7370, 11925, 11986, 12092},
+      {11, 127, 1034, 1044, 1842, 3184, 3397, 5931, 7577, 11898, 12339, 12689},
+      {11, 107, 513, 979, 3934, 4374, 4658, 7286, 7809, 8830, 10804, 10893},
+      {10, 2045, 2499, 7197, 8887, 9420, 9922, 10132, 10540, 10816, 11876, 0},
+      {10, 2932, 6241, 7136, 7835, 8541, 9403, 9817, 11679, 12377, 12810, 0},
+      {10, 2211, 2288, 3937, 4310, 5952, 6597, 9692, 10445, 11064, 11272, 0}
+    };
 
   } /* namespace atsc3 */
 } /* namespace gr */
