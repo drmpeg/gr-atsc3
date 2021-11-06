@@ -274,6 +274,7 @@ namespace gr {
 
       const static int shortening_table[8][18];
       const static uint16_t ldpc_tab_3_15S[12][12];
+      const static int group_table_basic[36];
 
      public:
       framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_guardinterval_t guardinterval);

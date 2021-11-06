@@ -215,7 +215,9 @@ namespace gr {
     framemapper_cc_impl::add_l1basic(gr_complex *out)
     {
       int temp, index, offset_bits = 0;
-      int npad, padbits, count;
+      int npad, padbits, count, nrepeat;
+      int block, indexb, nouter;
+      int npunctemp, npunc, nfectemp, nfec;
       long long templong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
@@ -357,12 +359,13 @@ namespace gr {
         parity_bits = (parity_bits << 8) ^ crc_table[pos];
       }
 
-      npad = (NBCH_3_15 - (offset_bits + num_parity_bits)) / 360;
+      nouter = offset_bits + num_parity_bits;
+      npad = (NBCH_3_15 - nouter) / 360;
       memset(&l1temp[0], 0x55, sizeof(unsigned char) * FRAME_SIZE_SHORT);
       for (int i = 0; i < npad; i++) {
         memset(&l1temp[shortening_table[0][i] * 360], 0, sizeof(unsigned char) * 360);
       }
-      padbits = (NBCH_3_15 - (offset_bits + num_parity_bits)) - (360 * npad);
+      padbits = (NBCH_3_15 - nouter) - (360 * npad);
       memset(&l1temp[shortening_table[0][npad] * 360], 0, sizeof(unsigned char) * padbits);
       index = 0;
       for (int i = npad + 1; i < 9; i++) {
@@ -409,13 +412,48 @@ namespace gr {
         }
       }
 
-      for (int i = 0; i < FRAME_SIZE_SHORT; i += 8) {
-        temp = index = 0;
-        for (int j = 7; j >= 0; j--) {
-          temp |= l1basic[i + index] << j;
+      memcpy(&l1temp[0], &l1basic[0], sizeof(unsigned char) * NBCH_3_15);
+      index = NBCH_3_15;
+      for (int j = 0; j < 36; j++) {
+        block = group_table_basic[j];
+        indexb = block * 360;
+        for (int k = 0; k < 360; k++) {
+          l1temp[index++] = l1basic[indexb++];;
+        }
+      }
+
+      nrepeat = 2 * (0 * nouter) + 3672;
+      npunctemp = (0 * (NBCH_3_15 - nouter)) + 9360;
+      nfectemp = nouter + 12960 - npunctemp;
+      nfec = (nfectemp / 2) * 2;
+      npunc = npunctemp - (nfec - nfectemp);
+      memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
+      memcpy(&l1basic[NBCH_3_15], &l1temp[NBCH_3_15], sizeof(unsigned char) * nrepeat);
+      memcpy(&l1basic[NBCH_3_15 + nrepeat], &l1temp[NBCH_3_15], sizeof(unsigned char) * FRAME_SIZE_SHORT - NBCH_3_15 - npunc);
+
+      for (int i = 0; i < npad; i++) {
+        memset(&l1basic[shortening_table[0][i] * 360], 0x55, sizeof(unsigned char) * 360);
+      }
+      memset(&l1basic[shortening_table[0][npad] * 360], 0x55, sizeof(unsigned char) * padbits);
+      index = count = 0;
+      for (int i = 0; i < NBCH_3_15; i++) {
+        if (l1basic[index] != 0x55) {
+          l1temp[count++] = l1basic[index++];
+        }
+        else {
           index++;
         }
-        if ((i % 256) == 0) {
+      }
+      memcpy(&l1temp[count], &l1basic[NBCH_3_15], sizeof(unsigned char) * FRAME_SIZE_SHORT - NBCH_3_15 + nrepeat - npunc);
+
+#if 0
+      for (int i = 0; i < FRAME_SIZE_SHORT - NBCH_3_15 + nrepeat - npunc + count; i += 8) {
+        temp = index = 0;
+        for (int j = 7; j >= 0; j--) {
+          temp |= l1temp[i + index] << j;
+          index++;
+        }
+        if ((i % 128) == 0) {
           if (i != 0) {
             printf("\n");
           }
@@ -423,6 +461,17 @@ namespace gr {
         printf("%02X", temp);
       }
       printf("\n");
+#else
+      index = 0;
+      for (int i = 0; i < FRAME_SIZE_SHORT - NBCH_3_15 + nrepeat - npunc + count; i++) {
+        if ((i % 64) == 0) {
+          if (i != 0) {
+            printf("\n");
+          }
+        }
+        printf("%d", l1temp[index++]);
+      }
+#endif
     }
 
     void
@@ -471,6 +520,12 @@ namespace gr {
       {10, 2045, 2499, 7197, 8887, 9420, 9922, 10132, 10540, 10816, 11876, 0},
       {10, 2932, 6241, 7136, 7835, 8541, 9403, 9817, 11679, 12377, 12810, 0},
       {10, 2211, 2288, 3937, 4310, 5952, 6597, 9692, 10445, 11064, 11272, 0}
+    };
+
+    const int framemapper_cc_impl::group_table_basic[36] = {
+      20, 23, 25, 32, 38, 41, 18, 9, 10, 11, 31, 24,
+      14, 15, 26, 40, 33, 19, 28, 34, 16, 39, 27, 30,
+      21, 44, 43, 35, 42, 36, 12, 13, 29, 22, 37, 17
     };
 
   } /* namespace atsc3 */
