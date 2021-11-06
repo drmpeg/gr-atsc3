@@ -30,6 +30,7 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
+      double normalization;
 
       init_fm_randomizer();
       num_parity_bits = 168;
@@ -39,6 +40,11 @@ namespace gr {
       m1_val = 1080;
       m2_val = 11880;
       ldpc_bf_type_a(ldpc_tab_3_15S);
+      normalization = std::sqrt(2.0);
+      m_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
+      m_qpsk[1] = gr_complex(-1.0 / normalization,  1.0 / normalization);
+      m_qpsk[2] = gr_complex( 1.0 / normalization, -1.0 / normalization);
+      m_qpsk[3] = gr_complex(-1.0 / normalization, -1.0 / normalization);
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
       l1basicinit->lls_flag = FALSE;
@@ -70,7 +76,7 @@ namespace gr {
       l1basicinit->first_sub_sbs_last = TRUE;
       l1basicinit->reserved = 0xffffffffffff;
       l1basicinit->crc = 0;
-      add_l1basic(&l1basic_cache[0]);
+      set_output_multiple(7640);
     }
 
     /*
@@ -83,7 +89,7 @@ namespace gr {
     void
     framemapper_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
+      ninput_items_required[0] = 32400;
     }
 
 #define CRC_POLY 0x00210801
@@ -216,7 +222,7 @@ namespace gr {
     {
       int temp, index, offset_bits = 0;
       int npad, padbits, count, nrepeat;
-      int block, indexb, nouter;
+      int block, indexb, nouter, symbols;
       int npunctemp, npunc, nfectemp, nfec;
       long long templong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
@@ -335,6 +341,7 @@ namespace gr {
       }
       offset_bits += add_crc32_bits(l1basic, offset_bits);
 
+      /* scrambling and BCH encoding */
       for (int i = 0; i < offset_bits; i += 8) {
         temp = index = 0;
         for (int j = 7; j >= 0; j--) {
@@ -359,6 +366,7 @@ namespace gr {
         parity_bits = (parity_bits << 8) ^ crc_table[pos];
       }
 
+      /* zero padding */
       nouter = offset_bits + num_parity_bits;
       npad = (NBCH_3_15 - nouter) / 360;
       memset(&l1temp[0], 0x55, sizeof(unsigned char) * FRAME_SIZE_SHORT);
@@ -387,6 +395,7 @@ namespace gr {
         }
       }
 
+      /* LDPC encoding */
       memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
       // First zero all the parity bits
       memset(buffer, 0, sizeof(unsigned char)*plen);
@@ -412,6 +421,7 @@ namespace gr {
         }
       }
 
+      /* group-wise interleaver */
       memcpy(&l1temp[0], &l1basic[0], sizeof(unsigned char) * NBCH_3_15);
       index = NBCH_3_15;
       for (int j = 0; j < 36; j++) {
@@ -422,15 +432,18 @@ namespace gr {
         }
       }
 
+      /* repetition and parity puncturing */
       nrepeat = 2 * (0 * nouter) + 3672;
       npunctemp = (0 * (NBCH_3_15 - nouter)) + 9360;
       nfectemp = nouter + 12960 - npunctemp;
       nfec = (nfectemp / 2) * 2;
       npunc = npunctemp - (nfec - nfectemp);
+      symbols = nfec + nrepeat;
       memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
       memcpy(&l1basic[NBCH_3_15], &l1temp[NBCH_3_15], sizeof(unsigned char) * nrepeat);
-      memcpy(&l1basic[NBCH_3_15 + nrepeat], &l1temp[NBCH_3_15], sizeof(unsigned char) * FRAME_SIZE_SHORT - NBCH_3_15 - npunc);
+      memcpy(&l1basic[NBCH_3_15 + nrepeat], &l1temp[NBCH_3_15], sizeof(unsigned char) * (FRAME_SIZE_SHORT - NBCH_3_15 - npunc));
 
+      /* zero removal */
       for (int i = 0; i < npad; i++) {
         memset(&l1basic[shortening_table[0][i] * 360], 0x55, sizeof(unsigned char) * 360);
       }
@@ -444,10 +457,30 @@ namespace gr {
           index++;
         }
       }
-      memcpy(&l1temp[count], &l1basic[NBCH_3_15], sizeof(unsigned char) * FRAME_SIZE_SHORT - NBCH_3_15 + nrepeat - npunc);
+      memcpy(&l1temp[count], &l1basic[NBCH_3_15], sizeof(unsigned char) * (symbols - count));
 
+      /* block interleaver, bit demuxing and constellation mapping */
+      const unsigned char *c1, *c2;
+      c1 = &l1temp[0];
+      c2 = &l1temp[symbols / 2];
+      index = 0;
+      for (int j = 0; j < symbols / 2; j++) {
+        l1basic[index++] = c1[j];
+        l1basic[index++] = c2[j];
+      }
+      for (int i = 0; i < symbols; i += 2) {
+        temp = l1basic[i] << 1;
+        temp |= l1basic[i + 1];
+        *out++ = m_qpsk[temp];
+      }
+    }
+
+    void
+    framemapper_cc_impl::add_l1detail(gr_complex *out)
+    {
 #if 0
-      for (int i = 0; i < FRAME_SIZE_SHORT - NBCH_3_15 + nrepeat - npunc + count; i += 8) {
+#if 1
+      for (int i = 0; i < symbols; i += 8) {
         temp = index = 0;
         for (int j = 7; j >= 0; j--) {
           temp |= l1temp[i + index] << j;
@@ -472,11 +505,7 @@ namespace gr {
         printf("%d", l1temp[index++]);
       }
 #endif
-    }
-
-    void
-    framemapper_cc_impl::add_l1detail(gr_complex *out)
-    {
+#endif
     }
 
     int
@@ -487,6 +516,10 @@ namespace gr {
     {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
+
+      for (int i = 0; i < noutput_items; i += 7640) {
+        add_l1basic(out);
+      }
 
       // Tell runtime system how many input items we consumed on
       // each input stream.

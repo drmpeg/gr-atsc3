@@ -147,6 +147,7 @@ namespace gr {
       void ldpc_lookup_generate(void);
       ldpc_encode_table ldpc_encode_1st;
       ldpc_encode_table ldpc_encode_2nd;
+      gr_complex m_qpsk[4];
 
       gr_complex l1basic_cache[1840];
 
