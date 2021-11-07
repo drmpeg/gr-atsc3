@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(d99af07899f8b2ca6feabee353e81227)                     */
+/* BINDTOOL_HEADER_FILE_HASH(214f946c6ac6efe0137fe08cc68a182f)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -183,6 +183,17 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_l1_fec_mode_t>();
+    py::enum_<::gr::atsc3::atsc3_fec_type_t>(m,"atsc3_fec_type_t")
+        .value("FEC_TYPE_BCH_16K", ::gr::atsc3::FEC_TYPE_BCH_16K) // 0
+        .value("FEC_TYPE_BCH_64K", ::gr::atsc3::FEC_TYPE_BCH_64K) // 1
+        .value("FEC_TYPE_CRC_16K", ::gr::atsc3::FEC_TYPE_CRC_16K) // 2
+        .value("FEC_TYPE_CRC_64K", ::gr::atsc3::FEC_TYPE_CRC_64K) // 3
+        .value("FEC_TYPE_ONLY_16K", ::gr::atsc3::FEC_TYPE_ONLY_16K) // 4
+        .value("FEC_TYPE_ONLY_64K", ::gr::atsc3::FEC_TYPE_ONLY_64K) // 5
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_fec_type_t>();
 
 
 

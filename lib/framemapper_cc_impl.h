@@ -102,7 +102,7 @@ typedef struct {
   int plp_HTI_cell_interleaver;
   int plp_ldm_injection_level;
   int bsid;
-  int reserved;
+  long long reserved;
   int crc;
 } L1_Detail;
 
@@ -136,6 +136,7 @@ namespace gr {
       void bch_poly_build_tables(void);
       unsigned char l1_temp[FRAME_SIZE_SHORT];
       unsigned char l1_basic[FRAME_SIZE_SHORT];
+      unsigned char l1_detail[FRAME_SIZE_SHORT];
       unsigned char fm_randomize[FRAME_SIZE_SHORT];
       std::bitset<MAX_BCH_PARITY_BITS> crc_table[256];
       int num_parity_bits;
@@ -281,6 +282,7 @@ namespace gr {
       const static int shortening_table[8][18];
       const static uint16_t ldpc_tab_3_15S[12][12];
       const static int group_table_basic[36];
+      const static int group_table_detail[36];
       const static gr_complex mod_table_16QAM[4];
       const static gr_complex mod_table_64QAM[16];
       const static gr_complex mod_table_256QAM[2][64];

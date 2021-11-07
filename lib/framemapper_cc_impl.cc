@@ -30,6 +30,7 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
+      L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
       double normalization;
       int rateindex, i, j;
 
@@ -44,6 +45,7 @@ namespace gr {
       m1_val = 1080;
       m2_val = 11880;
       ldpc_bf_type_a(ldpc_tab_3_15S);
+
       normalization = std::sqrt(2.0);
       m_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
       m_qpsk[1] = gr_complex(-1.0 / normalization,  1.0 / normalization);
@@ -137,6 +139,7 @@ namespace gr {
           m_l1d_256qam[i] = -mod_table_256QAM[rateindex][j];
         }
       }
+
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
       l1basicinit->lls_flag = FALSE;
@@ -158,7 +161,7 @@ namespace gr {
       l1basicinit->L1_Detail_total_cells = 204;
       l1basicinit->first_sub_mimo = FALSE;
       l1basicinit->first_sub_miso = MISO_OFF;
-      l1basicinit->first_sub_fft_size = FFTSIZE_8K;
+      l1basicinit->first_sub_fft_size = fftsize;
       l1basicinit->first_sub_reduced_carriers = CRED_0;
       l1basicinit->first_sub_guard_interval = GI_5_1024;
       l1basicinit->first_sub_num_ofdm_symbols = 71;
@@ -168,7 +171,31 @@ namespace gr {
       l1basicinit->first_sub_sbs_last = TRUE;
       l1basicinit->reserved = 0xffffffffffff;
       l1basicinit->crc = 0;
-      set_output_multiple(934 * 2);
+
+      l1detailinit->version = 0;
+      l1detailinit->num_rf = 0;
+      l1detailinit->frequency_interleaver = FALSE;
+      l1detailinit->sbs_null_cells = 3026;
+      l1detailinit->num_plp = 0;
+      l1detailinit->plp_id = 0;
+      l1detailinit->plp_lls_flag = FALSE;
+      l1detailinit->plp_layer = 0;
+      l1detailinit->plp_start = 0;
+      l1detailinit->plp_size = 450029;
+      l1detailinit->plp_scrambler_type = 0;
+      if (framesize == FECFRAME_SHORT) {
+        l1detailinit->plp_fec_type = FEC_TYPE_BCH_16K;
+      }
+      else {
+        l1detailinit->plp_fec_type = FEC_TYPE_BCH_64K;
+      }
+      l1detailinit->plp_mod = constellation;
+      l1detailinit->plp_cod = rate;
+      l1detailinit->plp_TI_mode = 0;
+      l1detailinit->plp_fec_block_start = 0;
+      l1detailinit->plp_type = 0;
+      l1detailinit->reserved = 0xfffffffffffff;
+      set_output_multiple(3820);
     }
 
     /*
@@ -181,7 +208,7 @@ namespace gr {
     void
     framemapper_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = 8100;
+      ninput_items_required[0] = 64800;
     }
 
 #define CRC_POLY 0x00210801
@@ -541,28 +568,28 @@ namespace gr {
           mod = 2;
           break;
         case L1_FEC_MODE_4:
-          mod = 4;
           B = 12292;
+          mod = 4;
           break;
         case L1_FEC_MODE_5:
           B = 12350;
           mod = 6;
           break;
         case L1_FEC_MODE_6:
-          mod = 8;
           B = 12432;
+          mod = 8;
           break;
         case L1_FEC_MODE_7:
-          mod = 8;
           B = 12766;
+          mod = 8;
           break;
         default:
-          mod = 2;
           B = 9360;
+          mod = 2;
           break;
       }
       if (l1b_mode == L1_FEC_MODE_1) {
-        nrepeat = 2 * (0 * nouter) + 3672;
+        nrepeat = 2 * floor((0 * nouter)) + 3672;
       }
       else {
         nrepeat = 0;
@@ -760,7 +787,270 @@ namespace gr {
     void
     framemapper_cc_impl::add_l1detail(gr_complex *out)
     {
-#if 0
+      int temp, index, offset_bits = 0;
+      int npad, padbits, count, nrepeat, table;
+      int block, indexb, nouter, symbols;
+      int npunctemp, npunc, nfectemp, nfec;
+      int Anum, Aden, B, mod, rows, pack;
+      long long templong;
+      std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
+      unsigned char b, tempbch, msb;
+      unsigned char *l1detail = l1_detail;
+      unsigned char *l1temp = l1_temp;
+      L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
+      const unsigned char* d;
+      int plen = FRAME_SIZE_SHORT - NBCH_3_15;
+      const int q1 = q1_val;
+      const int q2 = q2_val;
+      const int m1 = m1_val;
+      const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
+
+      temp = l1detailinit->version;
+      for (int n = 3; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->num_rf;
+      for (int n = 2; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      l1detail[offset_bits++] = l1detailinit->frequency_interleaver;
+      temp = l1detailinit->sbs_null_cells;
+      for (int n = 12; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->num_plp;
+      for (int n = 5; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_id;
+      for (int n = 5; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      l1detail[offset_bits++] = l1detailinit->plp_lls_flag;
+      temp = l1detailinit->plp_layer;
+      for (int n = 1; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_start;
+      for (int n = 23; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_size;
+      for (int n = 23; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_scrambler_type;
+      for (int n = 1; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_fec_type;
+      for (int n = 3; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_mod;
+      for (int n = 3; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_cod;
+      for (int n = 3; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_TI_mode;
+      for (int n = 1; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      temp = l1detailinit->plp_fec_block_start;
+      for (int n = 14; n >= 0; n--) {
+        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+      }
+      l1detail[offset_bits++] = l1detailinit->plp_type;
+      templong = l1detailinit->reserved;
+      for (int n = 51; n >= 0; n--) {
+        l1detail[offset_bits++] = templong & (1 << n) ? 1 : 0;
+      }
+      offset_bits += add_crc32_bits(l1detail, offset_bits);
+
+      /* scrambling and BCH encoding */
+      for (int i = 0; i < offset_bits; i += 8) {
+        temp = index = 0;
+        for (int j = 7; j >= 0; j--) {
+          temp |= l1detail[i + index++] << j;
+        }
+        temp ^= fm_randomize[i / 8];
+        index = 0;
+        for (int n = 7; n >= 0; n--) {
+          l1detail[i + index++] = temp & (1 << n) ? 1 : 0;
+        }
+        b = temp;
+        msb = 0;
+        for (int n = 1; n <= 8; n++) {
+          tempbch = parity_bits[num_parity_bits - n];
+          msb |= tempbch << (8 - n);
+        }
+        /* XOR-in next input byte into MSB of crc and get this MSB, that's our new
+         * intermediate divident */
+        unsigned char pos = (msb ^ b);
+        /* Shift out the MSB used for division per lookuptable and XOR with the
+         * remainder */
+        parity_bits = (parity_bits << 8) ^ crc_table[pos];
+      }
+
+      /* zero padding */
+      switch (l1d_mode) {
+        case L1_FEC_MODE_1:
+          table = 1;
+          Anum = 7;
+          Aden = 2;
+          B = 0;
+          mod = 2;
+          break;
+        case L1_FEC_MODE_2:
+          table = 2;
+          Anum = 2;
+          Aden = 1;
+          B = 6036;
+          mod = 2;
+          break;
+        case L1_FEC_MODE_3:
+          table = 3;
+          Anum = 11;
+          Aden = 16;
+          B = 4653;
+          mod = 2;
+          break;
+        case L1_FEC_MODE_4:
+          table = 4;
+          Anum = 29;
+          Aden = 32;
+          B = 3200;
+          mod = 4;
+          break;
+        case L1_FEC_MODE_5:
+          table = 5;
+          Anum = 3;
+          Aden = 4;
+          B = 4284;
+          mod = 6;
+          break;
+        case L1_FEC_MODE_6:
+          table = 6;
+          Anum = 11;
+          Aden = 16;
+          B = 4900;
+          mod = 8;
+          break;
+        case L1_FEC_MODE_7:
+          table = 7;
+          Anum = 49;
+          Aden = 256;
+          B = 8246;
+          mod = 8;
+          break;
+        default:
+          table = 1;
+          Anum = 7;
+          Aden = 2;
+          B = 0;
+          mod = 2;
+          break;
+      }
+      nouter = offset_bits + num_parity_bits;
+      npad = (NBCH_3_15 - nouter) / 360;
+      memset(&l1temp[0], 0x55, sizeof(unsigned char) * FRAME_SIZE_SHORT);
+      for (int i = 0; i < npad; i++) {
+        memset(&l1temp[shortening_table[table][i] * 360], 0, sizeof(unsigned char) * 360);
+      }
+      padbits = (NBCH_3_15 - nouter) - (360 * npad);
+      memset(&l1temp[shortening_table[table][npad] * 360], 0, sizeof(unsigned char) * padbits);
+      index = 0;
+      for (int i = npad + 1; i < 9; i++) {
+        memcpy(&l1temp[shortening_table[table][i] * 360], &l1detail[index], sizeof(unsigned char) * offset_bits);
+        index += 360;
+      }
+      index = count = 0;
+      for (int n = 0; n < NBCH_3_15; n++) {
+        if (l1temp[index] == 0x55) {
+          l1temp[index++] = (char)parity_bits[num_parity_bits - 1];
+          parity_bits <<= 1;
+          count++;
+          if (count == num_parity_bits) {
+            break;
+          }
+        }
+        else {
+          index++;
+        }
+      }
+
+      /* LDPC encoding */
+      memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
+      // First zero all the parity bits
+      memset(buffer, 0, sizeof(unsigned char)*plen);
+      // now do the parity checking
+      d = &l1detail[0];
+      for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
+        buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
+      }
+      for(int j = 1; j < m1; j++) {
+        buffer[j] ^= buffer[j-1];
+      }
+      for (int t = 0; t < q1; t++) {
+        for (int s = 0; s < 360; s++) {
+          l1detail[NBCH_3_15 + (360 * t) + s] = buffer[(q1 * s) + t];
+        }
+      }
+      for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
+        buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
+      }
+      for (int t = 0; t < q2; t++) {
+        for (int s = 0; s < 360; s++) {
+          l1detail[NBCH_3_15 + m1 + (360 * t) + s] = buffer[(m1 + q2 * s) + t];
+        }
+      }
+
+      /* group-wise interleaver */
+      memcpy(&l1temp[0], &l1detail[0], sizeof(unsigned char) * NBCH_3_15);
+      index = NBCH_3_15;
+      for (int j = 0; j < 36; j++) {
+        block = group_table_detail[j];
+        indexb = block * 360;
+        for (int k = 0; k < 360; k++) {
+          l1temp[index++] = l1detail[indexb++];;
+        }
+      }
+
+      /* repetition and parity puncturing */
+      if (l1d_mode == L1_FEC_MODE_1) {
+        nrepeat = 2 * floor(((61 * nouter) / 16)) - 508;
+      }
+      else {
+        nrepeat = 0;
+      }
+      npunctemp = floor((Anum * (NBCH_3_15 - nouter)) / Aden) + B;
+      nfectemp = nouter + 12960 - npunctemp;
+      nfec = ceil(nfectemp / mod) * mod;
+      npunc = npunctemp - (nfec - nfectemp);
+      symbols = nfec + nrepeat;
+      memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
+      memcpy(&l1detail[NBCH_3_15], &l1temp[NBCH_3_15], sizeof(unsigned char) * nrepeat);
+      memcpy(&l1detail[NBCH_3_15 + nrepeat], &l1temp[NBCH_3_15], sizeof(unsigned char) * (FRAME_SIZE_SHORT - NBCH_3_15 - npunc));
+
+      /* zero removal */
+      for (int i = 0; i < npad; i++) {
+        memset(&l1detail[shortening_table[table][i] * 360], 0x55, sizeof(unsigned char) * 360);
+      }
+      memset(&l1detail[shortening_table[table][npad] * 360], 0x55, sizeof(unsigned char) * padbits);
+      index = count = 0;
+      for (int i = 0; i < NBCH_3_15; i++) {
+        if (l1detail[index] != 0x55) {
+          l1temp[count++] = l1detail[index++];
+        }
+        else {
+          index++;
+        }
+      }
+      memcpy(&l1temp[count], &l1detail[NBCH_3_15], sizeof(unsigned char) * (symbols - count));
+
 #if 1
       for (int i = 0; i < symbols; i += 8) {
         temp = index = 0;
@@ -776,18 +1066,171 @@ namespace gr {
         printf("%02X", temp);
       }
       printf("\n");
-#else
-      index = 0;
-      for (int i = 0; i < FRAME_SIZE_SHORT - NBCH_3_15 + nrepeat - npunc + count; i++) {
-        if ((i % 64) == 0) {
-          if (i != 0) {
-            printf("\n");
+#endif
+
+      /* block interleaver, bit demuxing and constellation mapping */
+      rows = symbols / mod;
+      switch (l1d_mode) {
+        case L1_FEC_MODE_1:
+        case L1_FEC_MODE_2:
+        case L1_FEC_MODE_3:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1detail[index++] = c1[j];
+            l1detail[index++] = c2[j];
           }
-        }
-        printf("%d", l1temp[index++]);
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            temp = l1detail[index++] << 1;
+            temp |= l1detail[index++];
+            *out++ = m_qpsk[temp];
+          }
+          break;
+        case L1_FEC_MODE_4:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1detail[index++] = c1[j];
+            l1detail[index++] = c2[j];
+            l1detail[index++] = c3[j];
+            l1detail[index++] = c4[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 3; e >= 0 ; e--) {
+              pack |= l1detail[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0xf;
+            temp >>= 4;
+            pack |= temp;
+            count = (count + 1) & 0x3;
+            *out++ = m_16qam[pack & 0xf];
+          }
+          break;
+        case L1_FEC_MODE_5:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          c5 = &l1temp[rows * 4];
+          c6 = &l1temp[rows * 5];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1detail[index++] = c1[j];
+            l1detail[index++] = c2[j];
+            l1detail[index++] = c3[j];
+            l1detail[index++] = c4[j];
+            l1detail[index++] = c5[j];
+            l1detail[index++] = c6[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 5; e >= 0 ; e--) {
+              pack |= l1detail[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0x3f;
+            temp >>= 6;
+            pack |= temp;
+            count = (count + 1);
+            if (count == 6) {  /* faster than modulo */
+              count = 0;
+            }
+            *out++ = m_64qam[pack & 0x3f];
+          }
+          break;
+        case L1_FEC_MODE_6:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          c5 = &l1temp[rows * 4];
+          c6 = &l1temp[rows * 5];
+          c7 = &l1temp[rows * 6];
+          c8 = &l1temp[rows * 7];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1detail[index++] = c1[j];
+            l1detail[index++] = c2[j];
+            l1detail[index++] = c3[j];
+            l1detail[index++] = c4[j];
+            l1detail[index++] = c5[j];
+            l1detail[index++] = c6[j];
+            l1detail[index++] = c7[j];
+            l1detail[index++] = c8[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 7; e >= 0 ; e--) {
+              pack |= l1detail[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0xff;
+            temp >>= 8;
+            pack |= temp;
+            count = (count + 1) & 0x7;
+            *out++ = m_l1b_256qam[pack & 0xff];
+          }
+          break;
+        case L1_FEC_MODE_7:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          c5 = &l1temp[rows * 4];
+          c6 = &l1temp[rows * 5];
+          c7 = &l1temp[rows * 6];
+          c8 = &l1temp[rows * 7];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1detail[index++] = c1[j];
+            l1detail[index++] = c2[j];
+            l1detail[index++] = c3[j];
+            l1detail[index++] = c4[j];
+            l1detail[index++] = c5[j];
+            l1detail[index++] = c6[j];
+            l1detail[index++] = c7[j];
+            l1detail[index++] = c8[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 7; e >= 0 ; e--) {
+              pack |= l1detail[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0xff;
+            temp >>= 8;
+            pack |= temp;
+            count = (count + 1) & 0x7;
+            *out++ = m_l1b_256qam[pack & 0xff];
+          }
+          break;
+        default:
+          c1 = &l1temp[0];
+          c2 = &l1temp[symbols / mod];
+          index = 0;
+          for (int j = 0; j < symbols / mod; j++) {
+            l1detail[index++] = c1[j];
+            l1detail[index++] = c2[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            temp = l1detail[index++] << 1;
+            temp |= l1detail[index++];
+            *out++ = m_qpsk[temp];
+          }
+          break;
       }
-#endif
-#endif
     }
 
     int
@@ -800,7 +1243,7 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
 
       for (int i = 0; i < noutput_items; i += 7640) {
-        add_l1basic(out);
+        add_l1detail(out);
       }
 
       // Tell runtime system how many input items we consumed on
@@ -841,6 +1284,12 @@ namespace gr {
       20, 23, 25, 32, 38, 41, 18, 9, 10, 11, 31, 24,
       14, 15, 26, 40, 33, 19, 28, 34, 16, 39, 27, 30,
       21, 44, 43, 35, 42, 36, 12, 13, 29, 22, 37, 17
+    };
+
+    const int framemapper_cc_impl::group_table_detail[36] = {
+      16, 22, 27, 30, 37, 44, 20, 23, 25, 32, 38, 41,
+      9, 10, 17, 18, 21, 33, 35, 14, 28, 12, 15, 19,
+      11, 24, 29, 34, 36, 13, 40, 43, 31, 26, 39, 42
     };
 
     const gr_complex framemapper_cc_impl::mod_table_16QAM[4] = {

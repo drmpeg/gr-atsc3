@@ -136,6 +136,15 @@ namespace gr {
       L1_FEC_MODE_7,
     };
 
+    enum atsc3_fec_type_t {
+      FEC_TYPE_BCH_16K = 0,
+      FEC_TYPE_BCH_64K,
+      FEC_TYPE_CRC_16K,
+      FEC_TYPE_CRC_64K,
+      FEC_TYPE_ONLY_16K,
+      FEC_TYPE_ONLY_64K,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -153,5 +162,6 @@ typedef gr::atsc3::atsc3_fftsize_t atsc3_fftsize_t;
 typedef gr::atsc3::atsc3_pilotpattern_t atsc3_pilotpattern_t;
 typedef gr::atsc3::atsc3_reduced_carriers_t atsc3_reduced_carriers_t;
 typedef gr::atsc3::atsc3_l1_fec_mode_t atsc3_l1_fec_mode_t;
+typedef gr::atsc3::atsc3_fec_type_t atsc3_fec_type_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */
