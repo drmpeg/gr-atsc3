@@ -14,24 +14,28 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_guardinterval_t guardinterval)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, guardinterval);
+        framesize, rate, constellation, fftsize, guardinterval, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_guardinterval_t guardinterval)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       double normalization;
+      int rateindex, i, j;
 
+      fft_size = fftsize;
+      l1b_mode = l1bmode;
+      l1d_mode = l1dmode;
       init_fm_randomizer();
       num_parity_bits = 168;
       bch_poly_build_tables();
@@ -45,6 +49,94 @@ namespace gr {
       m_qpsk[1] = gr_complex(-1.0 / normalization,  1.0 / normalization);
       m_qpsk[2] = gr_complex( 1.0 / normalization, -1.0 / normalization);
       m_qpsk[3] = gr_complex(-1.0 / normalization, -1.0 / normalization);
+      m_16qam[0] = mod_table_16QAM[0];
+      m_16qam[1] = mod_table_16QAM[1];
+      m_16qam[2] = mod_table_16QAM[2];
+      m_16qam[3] = mod_table_16QAM[3];
+      m_16qam[4] = -std::conj(mod_table_16QAM[0]);
+      m_16qam[5] = -std::conj(mod_table_16QAM[1]);
+      m_16qam[6] = -std::conj(mod_table_16QAM[2]);
+      m_16qam[7] = -std::conj(mod_table_16QAM[3]);
+      m_16qam[8] = std::conj(mod_table_16QAM[0]);
+      m_16qam[9] = std::conj(mod_table_16QAM[1]);
+      m_16qam[10] = std::conj(mod_table_16QAM[2]);
+      m_16qam[11] = std::conj(mod_table_16QAM[3]);
+      m_16qam[12] = -mod_table_16QAM[0];
+      m_16qam[13] = -mod_table_16QAM[1];
+      m_16qam[14] = -mod_table_16QAM[2];
+      m_16qam[15] = -mod_table_16QAM[3];
+      for (i = 0, j = 0; i < 16; i++, j++) {
+        m_64qam[i] = mod_table_64QAM[j];
+      }
+      for (i = 16, j = 0; i < 32; i++, j++) {
+        m_64qam[i] = -std::conj(mod_table_64QAM[j]);
+      }
+      for (i = 32, j = 0; i < 48; i++, j++) {
+        m_64qam[i] = std::conj(mod_table_64QAM[j]);
+      }
+      for (i = 48, j = 0; i < 64; i++, j++) {
+        m_64qam[i] = -mod_table_64QAM[j];
+      }
+      if (l1bmode == L1_FEC_MODE_6) {
+        rateindex = 0;
+        for (i = 0, j = 0; i < 64; i++, j++) {
+          m_l1b_256qam[i] = mod_table_256QAM[rateindex][j];
+        }
+        for (i = 64, j = 0; i < 128; i++, j++) {
+          m_l1b_256qam[i] = -std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 128, j = 0; i < 192; i++, j++) {
+          m_l1b_256qam[i] = std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 192, j = 0; i < 256; i++, j++) {
+          m_l1b_256qam[i] = -mod_table_256QAM[rateindex][j];
+        }
+      }
+      else {
+        rateindex = 1;
+        for (i = 0, j = 0; i < 64; i++, j++) {
+          m_l1b_256qam[i] = mod_table_256QAM[rateindex][j];
+        }
+        for (i = 64, j = 0; i < 128; i++, j++) {
+          m_l1b_256qam[i] = -std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 128, j = 0; i < 192; i++, j++) {
+          m_l1b_256qam[i] = std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 192, j = 0; i < 256; i++, j++) {
+          m_l1b_256qam[i] = -mod_table_256QAM[rateindex][j];
+        }
+      }
+      if (l1dmode == L1_FEC_MODE_6) {
+        rateindex = 0;
+        for (i = 0, j = 0; i < 64; i++, j++) {
+          m_l1d_256qam[i] = mod_table_256QAM[rateindex][j];
+        }
+        for (i = 64, j = 0; i < 128; i++, j++) {
+          m_l1d_256qam[i] = -std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 128, j = 0; i < 192; i++, j++) {
+          m_l1d_256qam[i] = std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 192, j = 0; i < 256; i++, j++) {
+          m_l1d_256qam[i] = -mod_table_256QAM[rateindex][j];
+        }
+      }
+      else {
+        rateindex = 1;
+        for (i = 0, j = 0; i < 64; i++, j++) {
+          m_l1d_256qam[i] = mod_table_256QAM[rateindex][j];
+        }
+        for (i = 64, j = 0; i < 128; i++, j++) {
+          m_l1d_256qam[i] = -std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 128, j = 0; i < 192; i++, j++) {
+          m_l1d_256qam[i] = std::conj(mod_table_256QAM[rateindex][j]);
+        }
+        for (i = 192, j = 0; i < 256; i++, j++) {
+          m_l1d_256qam[i] = -mod_table_256QAM[rateindex][j];
+        }
+      }
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
       l1basicinit->lls_flag = FALSE;
@@ -57,13 +149,13 @@ namespace gr {
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0;
       l1basicinit->num_subframes = 0;
-      l1basicinit->preamble_num_symbols = 1;
+      l1basicinit->preamble_num_symbols = 0;
       l1basicinit->preamble_reduced_carriers = 0;
       l1basicinit->L1_Detail_content_tag = 0;
       l1basicinit->L1_Detail_size_bytes = 25;
-      l1basicinit->L1_Detail_fec_type = DFT_MODE_1;
+      l1basicinit->L1_Detail_fec_type = DFT_MODE_2;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
-      l1basicinit->L1_Detail_total_cells = 2787;
+      l1basicinit->L1_Detail_total_cells = 774;
       l1basicinit->first_sub_mimo = FALSE;
       l1basicinit->first_sub_miso = MISO_OFF;
       l1basicinit->first_sub_fft_size = FFTSIZE_8K;
@@ -72,11 +164,11 @@ namespace gr {
       l1basicinit->first_sub_num_ofdm_symbols = 71;
       l1basicinit->first_sub_scattered_pilot_pattern = PILOT_SP3_4;
       l1basicinit->first_sub_scattered_pilot_boost = 4;
-      l1basicinit->first_sub_sbs_first = FALSE;
+      l1basicinit->first_sub_sbs_first = TRUE;
       l1basicinit->first_sub_sbs_last = TRUE;
       l1basicinit->reserved = 0xffffffffffff;
       l1basicinit->crc = 0;
-      set_output_multiple(7640);
+      set_output_multiple(934 * 2);
     }
 
     /*
@@ -89,7 +181,7 @@ namespace gr {
     void
     framemapper_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = 32400;
+      ninput_items_required[0] = 8100;
     }
 
 #define CRC_POLY 0x00210801
@@ -224,6 +316,7 @@ namespace gr {
       int npad, padbits, count, nrepeat;
       int block, indexb, nouter, symbols;
       int npunctemp, npunc, nfectemp, nfec;
+      int B, mod, rows, pack;
       long long templong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
@@ -235,6 +328,7 @@ namespace gr {
       const int q1 = q1_val;
       const int q2 = q2_val;
       const int m1 = m1_val;
+      const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
 
       temp = l1basicinit->version;
       for (int n = 2; n >= 0; n--) {
@@ -433,10 +527,49 @@ namespace gr {
       }
 
       /* repetition and parity puncturing */
-      nrepeat = 2 * (0 * nouter) + 3672;
-      npunctemp = (0 * (NBCH_3_15 - nouter)) + 9360;
+      switch (l1b_mode) {
+        case L1_FEC_MODE_1:
+          B = 9360;
+          mod = 2;
+          break;
+        case L1_FEC_MODE_2:
+          B = 11460;
+          mod = 2;
+          break;
+        case L1_FEC_MODE_3:
+          B = 12360;
+          mod = 2;
+          break;
+        case L1_FEC_MODE_4:
+          mod = 4;
+          B = 12292;
+          break;
+        case L1_FEC_MODE_5:
+          B = 12350;
+          mod = 6;
+          break;
+        case L1_FEC_MODE_6:
+          mod = 8;
+          B = 12432;
+          break;
+        case L1_FEC_MODE_7:
+          mod = 8;
+          B = 12766;
+          break;
+        default:
+          mod = 2;
+          B = 9360;
+          break;
+      }
+      if (l1b_mode == L1_FEC_MODE_1) {
+        nrepeat = 2 * (0 * nouter) + 3672;
+      }
+      else {
+        nrepeat = 0;
+      }
+      npunctemp = floor(0 * (NBCH_3_15 - nouter)) + B;
       nfectemp = nouter + 12960 - npunctemp;
-      nfec = (nfectemp / 2) * 2;
+      nfec = ceil(nfectemp / mod) * mod;
       npunc = npunctemp - (nfec - nfectemp);
       symbols = nfec + nrepeat;
       memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
@@ -460,18 +593,144 @@ namespace gr {
       memcpy(&l1temp[count], &l1basic[NBCH_3_15], sizeof(unsigned char) * (symbols - count));
 
       /* block interleaver, bit demuxing and constellation mapping */
-      const unsigned char *c1, *c2;
-      c1 = &l1temp[0];
-      c2 = &l1temp[symbols / 2];
-      index = 0;
-      for (int j = 0; j < symbols / 2; j++) {
-        l1basic[index++] = c1[j];
-        l1basic[index++] = c2[j];
-      }
-      for (int i = 0; i < symbols; i += 2) {
-        temp = l1basic[i] << 1;
-        temp |= l1basic[i + 1];
-        *out++ = m_qpsk[temp];
+      rows = symbols / mod;
+      switch (l1b_mode) {
+        case L1_FEC_MODE_1:
+        case L1_FEC_MODE_2:
+        case L1_FEC_MODE_3:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1basic[index++] = c1[j];
+            l1basic[index++] = c2[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            temp = l1basic[index++] << 1;
+            temp |= l1basic[index++];
+            *out++ = m_qpsk[temp];
+          }
+          break;
+        case L1_FEC_MODE_4:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1basic[index++] = c1[j];
+            l1basic[index++] = c2[j];
+            l1basic[index++] = c3[j];
+            l1basic[index++] = c4[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 3; e >= 0 ; e--) {
+              pack |= l1basic[index++] << e;
+            }
+            *out++ = m_16qam[pack & 0xf];
+          }
+          break;
+        case L1_FEC_MODE_5:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          c5 = &l1temp[rows * 4];
+          c6 = &l1temp[rows * 5];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1basic[index++] = c1[j];
+            l1basic[index++] = c2[j];
+            l1basic[index++] = c3[j];
+            l1basic[index++] = c4[j];
+            l1basic[index++] = c5[j];
+            l1basic[index++] = c6[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 5; e >= 0 ; e--) {
+              pack |= l1basic[index++] << e;
+            }
+            *out++ = m_64qam[pack & 0x3f];
+          }
+          break;
+        case L1_FEC_MODE_6:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          c5 = &l1temp[rows * 4];
+          c6 = &l1temp[rows * 5];
+          c7 = &l1temp[rows * 6];
+          c8 = &l1temp[rows * 7];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1basic[index++] = c1[j];
+            l1basic[index++] = c2[j];
+            l1basic[index++] = c3[j];
+            l1basic[index++] = c4[j];
+            l1basic[index++] = c5[j];
+            l1basic[index++] = c6[j];
+            l1basic[index++] = c7[j];
+            l1basic[index++] = c8[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 7; e >= 0 ; e--) {
+              pack |= l1basic[index++] << e;
+            }
+            *out++ = m_l1b_256qam[pack & 0xff];
+          }
+          break;
+        case L1_FEC_MODE_7:
+          c1 = &l1temp[0];
+          c2 = &l1temp[rows];
+          c3 = &l1temp[rows * 2];
+          c4 = &l1temp[rows * 3];
+          c5 = &l1temp[rows * 4];
+          c6 = &l1temp[rows * 5];
+          c7 = &l1temp[rows * 6];
+          c8 = &l1temp[rows * 7];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1basic[index++] = c1[j];
+            l1basic[index++] = c2[j];
+            l1basic[index++] = c3[j];
+            l1basic[index++] = c4[j];
+            l1basic[index++] = c5[j];
+            l1basic[index++] = c6[j];
+            l1basic[index++] = c7[j];
+            l1basic[index++] = c8[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 7; e >= 0 ; e--) {
+              pack |= l1basic[index++] << e;
+            }
+            *out++ = m_l1b_256qam[pack & 0xff];
+          }
+          break;
+        default:
+          c1 = &l1temp[0];
+          c2 = &l1temp[symbols / mod];
+          index = 0;
+          for (int j = 0; j < symbols / mod; j++) {
+            l1basic[index++] = c1[j];
+            l1basic[index++] = c2[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            temp = l1basic[index++] << 1;
+            temp |= l1basic[index++];
+            *out++ = m_qpsk[temp];
+          }
+          break;
       }
     }
 
@@ -559,6 +818,52 @@ namespace gr {
       20, 23, 25, 32, 38, 41, 18, 9, 10, 11, 31, 24,
       14, 15, 26, 40, 33, 19, 28, 34, 16, 39, 27, 30,
       21, 44, 43, 35, 42, 36, 12, 13, 29, 22, 37, 17
+    };
+
+    const gr_complex framemapper_cc_impl::mod_table_16QAM[4] = {
+      gr_complex(0.2535, 0.4923), gr_complex(0.4923, 0.2535), gr_complex(0.4927, 1.2044), gr_complex(1.2044, 0.4927)
+    };
+
+    const gr_complex framemapper_cc_impl::mod_table_64QAM[16] = {
+      gr_complex(0.1305, 0.3311), gr_complex(0.1633, 0.3162), gr_complex(0.1622, 0.7113), gr_complex(0.3905, 0.6163),
+      gr_complex(0.3311, 0.1305), gr_complex(0.3162, 0.1633), gr_complex(0.7113, 0.1622), gr_complex(0.6163, 0.3905),
+      gr_complex(0.2909, 1.4626), gr_complex(0.8285, 1.2399), gr_complex(0.2062, 1.0367), gr_complex(0.5872, 0.8789),
+      gr_complex(1.4626, 0.2909), gr_complex(1.2399, 0.8285), gr_complex(1.0367, 0.2062), gr_complex(0.8789, 0.5872)
+    };
+
+    const gr_complex framemapper_cc_impl::mod_table_256QAM[2][64] = {
+      {gr_complex(0.0899, 0.1337), gr_complex(0.0910, 0.1377), gr_complex(0.0873, 0.3862), gr_complex(0.0883, 0.3873),
+       gr_complex(0.1115, 0.1442), gr_complex(0.1135, 0.1472), gr_complex(0.2067, 0.3591), gr_complex(0.1975, 0.3621),
+       gr_complex(0.1048, 0.7533), gr_complex(0.1770, 0.7412), gr_complex(0.1022, 0.5904), gr_complex(0.1191, 0.5890),
+       gr_complex(0.4264, 0.6230), gr_complex(0.3650, 0.6689), gr_complex(0.3254, 0.5153), gr_complex(0.2959, 0.5302),
+       gr_complex(0.3256, 0.0768), gr_complex(0.3266, 0.0870), gr_complex(0.4721, 0.0994), gr_complex(0.4721, 0.1206),
+       gr_complex(0.2927, 0.1267), gr_complex(0.2947, 0.1296), gr_complex(0.3823, 0.2592), gr_complex(0.3944, 0.2521),
+       gr_complex(0.7755, 0.1118), gr_complex(0.7513, 0.2154), gr_complex(0.6591, 0.1033), gr_complex(0.6446, 0.1737),
+       gr_complex(0.5906, 0.4930), gr_complex(0.6538, 0.4155), gr_complex(0.4981, 0.3921), gr_complex(0.5373, 0.3586),
+       gr_complex(0.1630, 1.6621), gr_complex(0.4720, 1.5898), gr_complex(0.1268, 1.3488), gr_complex(0.3752, 1.2961),
+       gr_complex(1.0398, 1.2991), gr_complex(0.7733, 1.4772), gr_complex(0.8380, 1.0552), gr_complex(0.6242, 1.2081),
+       gr_complex(0.1103, 0.9397), gr_complex(0.2415, 0.9155), gr_complex(0.1118, 1.1163), gr_complex(0.3079, 1.0866),
+       gr_complex(0.5647, 0.7638), gr_complex(0.4385, 0.8433), gr_complex(0.6846, 0.8841), gr_complex(0.5165, 1.0034),
+       gr_complex(1.6489, 0.1630), gr_complex(1.5848, 0.4983), gr_complex(1.3437, 0.1389), gr_complex(1.2850, 0.4025),
+       gr_complex(1.2728, 1.0661), gr_complex(1.4509, 0.7925), gr_complex(1.0249, 0.8794), gr_complex(1.1758, 0.6545),
+       gr_complex(0.9629, 0.1113), gr_complex(0.9226, 0.2849), gr_complex(1.1062, 0.1118), gr_complex(1.0674, 0.3393),
+       gr_complex(0.7234, 0.6223), gr_complex(0.8211, 0.4860), gr_complex(0.8457, 0.7260), gr_complex(0.9640, 0.5518)},
+      {gr_complex(1.2412, 1.0688), gr_complex(1.2668, 0.8034), gr_complex(0.9860, 1.1758), gr_complex(1.0365, 0.9065),
+       gr_complex(1.2111, 0.5135), gr_complex(1.4187, 0.6066), gr_complex(1.0103, 0.4879), gr_complex(1.0380, 0.6906),
+       gr_complex(0.6963, 1.3442), gr_complex(0.7089, 1.1122), gr_complex(0.1256, 1.4745), gr_complex(0.8331, 0.9455),
+       gr_complex(0.6615, 0.6012), gr_complex(0.6894, 0.7594), gr_complex(0.8373, 0.5633), gr_complex(0.8552, 0.7410),
+       gr_complex(1.2666, 0.1027), gr_complex(1.4915, 0.1198), gr_complex(1.0766, 0.0945), gr_complex(0.9007, 0.0848),
+       gr_complex(1.2454, 0.3064), gr_complex(1.4646, 0.3600), gr_complex(1.0570, 0.2995), gr_complex(0.9140, 0.2530),
+       gr_complex(0.5461, 0.0679), gr_complex(0.5681, 0.1947), gr_complex(0.6874, 0.0537), gr_complex(0.7375, 0.1492),
+       gr_complex(0.6290, 0.4553), gr_complex(0.6007, 0.3177), gr_complex(0.7885, 0.4231), gr_complex(0.7627, 0.2849),
+       gr_complex(0.0816, 1.1632), gr_complex(0.0830, 0.9813), gr_complex(0.2528, 1.2315), gr_complex(0.2502, 1.0100),
+       gr_complex(0.0732, 0.6827), gr_complex(0.0811, 0.8293), gr_complex(0.2159, 0.6673), gr_complex(0.2359, 0.8283),
+       gr_complex(0.4302, 1.4458), gr_complex(0.5852, 0.9680), gr_complex(0.4528, 1.2074), gr_complex(0.4167, 1.0099),
+       gr_complex(0.5035, 0.6307), gr_complex(0.5359, 0.7954), gr_complex(0.3580, 0.6532), gr_complex(0.3841, 0.8207),
+       gr_complex(0.0576, 0.0745), gr_complex(0.0581, 0.2241), gr_complex(0.1720, 0.0742), gr_complex(0.1753, 0.2222),
+       gr_complex(0.0652, 0.5269), gr_complex(0.0611, 0.3767), gr_complex(0.1972, 0.5178), gr_complex(0.1836, 0.3695),
+       gr_complex(0.4145, 0.0709), gr_complex(0.4266, 0.2100), gr_complex(0.2912, 0.0730), gr_complex(0.2982, 0.2177),
+       gr_complex(0.4766, 0.4821), gr_complex(0.4497, 0.3448), gr_complex(0.3334, 0.5025), gr_complex(0.3125, 0.3601)}
     };
 
   } /* namespace atsc3 */

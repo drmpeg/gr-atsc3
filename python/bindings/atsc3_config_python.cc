@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(57332c00e3c4f2d2747d20bd8bbe78cd)                     */
+/* BINDTOOL_HEADER_FILE_HASH(dd88cf2c25aabe2b8c9bf54cd8edc238)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -183,6 +183,18 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_reduced_carriers_t>();
+    py::enum_<::gr::atsc3::atsc3_l1_fec_mode_t>(m,"atsc3_l1_fec_mode_t")
+        .value("L1_FEC_MODE_1", ::gr::atsc3::L1_FEC_MODE_1) // 0
+        .value("L1_FEC_MODE_2", ::gr::atsc3::L1_FEC_MODE_2) // 1
+        .value("L1_FEC_MODE_3", ::gr::atsc3::L1_FEC_MODE_3) // 2
+        .value("L1_FEC_MODE_4", ::gr::atsc3::L1_FEC_MODE_4) // 3
+        .value("L1_FEC_MODE_5", ::gr::atsc3::L1_FEC_MODE_5) // 4
+        .value("L1_FEC_MODE_6", ::gr::atsc3::L1_FEC_MODE_6) // 5
+        .value("L1_FEC_MODE_7", ::gr::atsc3::L1_FEC_MODE_7) // 6
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_l1_fec_mode_t>();
 
 
 

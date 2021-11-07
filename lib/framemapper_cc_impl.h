@@ -123,6 +123,9 @@ namespace gr {
     class framemapper_cc_impl : public framemapper_cc
     {
      private:
+      int fft_size;
+      int l1b_mode;
+      int l1d_mode;
       L1Signalling L1_Signalling[1];
       void add_l1basic(gr_complex*);
       void add_l1detail(gr_complex*);
@@ -148,8 +151,10 @@ namespace gr {
       ldpc_encode_table ldpc_encode_1st;
       ldpc_encode_table ldpc_encode_2nd;
       gr_complex m_qpsk[4];
-
-      gr_complex l1basic_cache[1840];
+      gr_complex m_16qam[16];
+      gr_complex m_64qam[64];
+      gr_complex m_l1b_256qam[256];
+      gr_complex m_l1d_256qam[256];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
@@ -276,9 +281,12 @@ namespace gr {
       const static int shortening_table[8][18];
       const static uint16_t ldpc_tab_3_15S[12][12];
       const static int group_table_basic[36];
+      const static gr_complex mod_table_16QAM[4];
+      const static gr_complex mod_table_64QAM[16];
+      const static gr_complex mod_table_256QAM[2][64];
 
      public:
-      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_guardinterval_t guardinterval);
+      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~framemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

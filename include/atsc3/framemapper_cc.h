@@ -33,7 +33,7 @@ namespace gr {
        * class. atsc3::framemapper_cc::make is the public interface for
        * creating new instances.
        */
-      static sptr make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_guardinterval_t guardinterval);
+      static sptr make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
     };
 
   } // namespace atsc3
