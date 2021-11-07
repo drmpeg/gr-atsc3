@@ -81,16 +81,6 @@ namespace gr {
       TLM_SYMBOL_ALIGNED,
     };
 
-    enum atsc3_detail_fec_type_t {
-      DFT_MODE_1 = 0,
-      DFT_MODE_2,
-      DFT_MODE_3,
-      DFT_MODE_4,
-      DFT_MODE_5,
-      DFT_MODE_6,
-      DFT_MODE_7,
-    };
-
     enum atsc3_additional_parity_mode_t {
       APM_K0 = 0,
       APM_K1,
@@ -157,7 +147,6 @@ typedef gr::atsc3::atsc3_mimo_scattered_pilot_encoding_t atsc3_mimo_scattered_pi
 typedef gr::atsc3::atsc3_time_info_flag_t atsc3_time_info_flag_t;
 typedef gr::atsc3::atsc3_papr_t atsc3_papr_t;
 typedef gr::atsc3::atsc3_time_length_mode_t atsc3_time_length_mode_t;
-typedef gr::atsc3::atsc3_detail_fec_type_t atsc3_detail_fec_type_t;
 typedef gr::atsc3::atsc3_additional_parity_mode_t atsc3_additional_parity_mode_t;
 typedef gr::atsc3::atsc3_miso_t atsc3_miso_t;
 typedef gr::atsc3::atsc3_fftsize_t atsc3_fftsize_t;

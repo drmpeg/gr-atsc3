@@ -153,9 +153,9 @@ namespace gr {
       l1basicinit->preamble_reduced_carriers = 0;
       l1basicinit->L1_Detail_content_tag = 0;
       l1basicinit->L1_Detail_size_bytes = 25;
-      l1basicinit->L1_Detail_fec_type = DFT_MODE_2;
+      l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
-      l1basicinit->L1_Detail_total_cells = 774;
+      l1basicinit->L1_Detail_total_cells = 204;
       l1basicinit->first_sub_mimo = FALSE;
       l1basicinit->first_sub_miso = MISO_OFF;
       l1basicinit->first_sub_fft_size = FFTSIZE_8K;
@@ -624,12 +624,17 @@ namespace gr {
             l1basic[index++] = c3[j];
             l1basic[index++] = c4[j];
           }
-          index = 0;
+          index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
             for (int e = 3; e >= 0 ; e--) {
               pack |= l1basic[index++] << e;
             }
+            temp = pack << count;
+            pack = temp & 0xf;
+            temp >>= 4;
+            pack |= temp;
+            count = (count + 1) & 0x3;
             *out++ = m_16qam[pack & 0xf];
           }
           break;
@@ -649,11 +654,19 @@ namespace gr {
             l1basic[index++] = c5[j];
             l1basic[index++] = c6[j];
           }
-          index = 0;
+          index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
             for (int e = 5; e >= 0 ; e--) {
               pack |= l1basic[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0x3f;
+            temp >>= 6;
+            pack |= temp;
+            count = (count + 1);
+            if (count == 6) {  /* faster than modulo */
+              count = 0;
             }
             *out++ = m_64qam[pack & 0x3f];
           }
@@ -678,12 +691,17 @@ namespace gr {
             l1basic[index++] = c7[j];
             l1basic[index++] = c8[j];
           }
-          index = 0;
+          index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
             for (int e = 7; e >= 0 ; e--) {
               pack |= l1basic[index++] << e;
             }
+            temp = pack << count;
+            pack = temp & 0xff;
+            temp >>= 8;
+            pack |= temp;
+            count = (count + 1) & 0x7;
             *out++ = m_l1b_256qam[pack & 0xff];
           }
           break;
@@ -707,12 +725,17 @@ namespace gr {
             l1basic[index++] = c7[j];
             l1basic[index++] = c8[j];
           }
-          index = 0;
+          index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
             for (int e = 7; e >= 0 ; e--) {
               pack |= l1basic[index++] << e;
             }
+            temp = pack << count;
+            pack = temp & 0xff;
+            temp >>= 8;
+            pack |= temp;
+            count = (count + 1) & 0x7;
             *out++ = m_l1b_256qam[pack & 0xff];
           }
           break;

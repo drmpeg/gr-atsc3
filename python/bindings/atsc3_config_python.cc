@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(dd88cf2c25aabe2b8c9bf54cd8edc238)                     */
+/* BINDTOOL_HEADER_FILE_HASH(d99af07899f8b2ca6feabee353e81227)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -116,18 +116,6 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_time_length_mode_t>();
-    py::enum_<::gr::atsc3::atsc3_detail_fec_type_t>(m,"atsc3_detail_fec_type_t")
-        .value("DFT_MODE_1", ::gr::atsc3::DFT_MODE_1) // 0
-        .value("DFT_MODE_2", ::gr::atsc3::DFT_MODE_2) // 1
-        .value("DFT_MODE_3", ::gr::atsc3::DFT_MODE_3) // 2
-        .value("DFT_MODE_4", ::gr::atsc3::DFT_MODE_4) // 3
-        .value("DFT_MODE_5", ::gr::atsc3::DFT_MODE_5) // 4
-        .value("DFT_MODE_6", ::gr::atsc3::DFT_MODE_6) // 5
-        .value("DFT_MODE_7", ::gr::atsc3::DFT_MODE_7) // 6
-        .export_values()
-    ;
-
-    py::implicitly_convertible<int, ::gr::atsc3::atsc3_detail_fec_type_t>();
     py::enum_<::gr::atsc3::atsc3_additional_parity_mode_t>(m,"atsc3_additional_parity_mode_t")
         .value("APM_K0", ::gr::atsc3::APM_K0) // 0
         .value("APM_K1", ::gr::atsc3::APM_K1) // 1
