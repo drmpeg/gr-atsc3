@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(214f946c6ac6efe0137fe08cc68a182f)                     */
+/* BINDTOOL_HEADER_FILE_HASH(e116a452142c1c83972634153e7f4a95)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -109,13 +109,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_papr_t>();
-    py::enum_<::gr::atsc3::atsc3_time_length_mode_t>(m,"atsc3_time_length_mode_t")
-        .value("TLM_TIME_ALIGNED", ::gr::atsc3::TLM_TIME_ALIGNED) // 0
-        .value("TLM_SYMBOL_ALIGNED", ::gr::atsc3::TLM_SYMBOL_ALIGNED) // 1
+    py::enum_<::gr::atsc3::atsc3_frame_length_mode_t>(m,"atsc3_frame_length_mode_t")
+        .value("FLM_TIME_ALIGNED", ::gr::atsc3::FLM_TIME_ALIGNED) // 0
+        .value("FLM_SYMBOL_ALIGNED", ::gr::atsc3::FLM_SYMBOL_ALIGNED) // 1
         .export_values()
     ;
 
-    py::implicitly_convertible<int, ::gr::atsc3::atsc3_time_length_mode_t>();
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_frame_length_mode_t>();
     py::enum_<::gr::atsc3::atsc3_additional_parity_mode_t>(m,"atsc3_additional_parity_mode_t")
         .value("APM_K0", ::gr::atsc3::APM_K0) // 0
         .value("APM_K1", ::gr::atsc3::APM_K1) // 1

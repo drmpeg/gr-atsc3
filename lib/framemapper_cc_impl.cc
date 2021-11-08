@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, guardinterval, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, guardinterval, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -32,7 +32,7 @@ namespace gr {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
       double normalization;
-      int rateindex, i, j;
+      int rateindex, i, j, l1cells;
 
       fft_size = fftsize;
       l1b_mode = l1bmode;
@@ -146,31 +146,28 @@ namespace gr {
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
       l1basicinit->papr_reduction = PAPR_OFF;
-      l1basicinit->frame_length_mode = TLM_SYMBOL_ALIGNED;
+      l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
       l1basicinit->frame_length = 0;
       l1basicinit->excess_samples_per_symbol = 0;
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0;
       l1basicinit->num_subframes = 0;
-      l1basicinit->preamble_num_symbols = 0;
       l1basicinit->preamble_reduced_carriers = 0;
       l1basicinit->L1_Detail_content_tag = 0;
       l1basicinit->L1_Detail_size_bytes = 25;
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
-      l1basicinit->L1_Detail_total_cells = 204;
       l1basicinit->first_sub_mimo = FALSE;
       l1basicinit->first_sub_miso = MISO_OFF;
       l1basicinit->first_sub_fft_size = fftsize;
       l1basicinit->first_sub_reduced_carriers = CRED_0;
       l1basicinit->first_sub_guard_interval = GI_5_1024;
-      l1basicinit->first_sub_num_ofdm_symbols = 71;
+      l1basicinit->first_sub_num_ofdm_symbols = numpayloadsyms - 1;
       l1basicinit->first_sub_scattered_pilot_pattern = PILOT_SP3_4;
       l1basicinit->first_sub_scattered_pilot_boost = 4;
-      l1basicinit->first_sub_sbs_first = TRUE;
+      l1basicinit->first_sub_sbs_first = FALSE;
       l1basicinit->first_sub_sbs_last = TRUE;
       l1basicinit->reserved = 0xffffffffffff;
-      l1basicinit->crc = 0;
 
       l1detailinit->version = 0;
       l1detailinit->num_rf = 0;
@@ -195,6 +192,15 @@ namespace gr {
       l1detailinit->plp_fec_block_start = 0;
       l1detailinit->plp_type = 0;
       l1detailinit->reserved = 0xfffffffffffff;
+      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0]);
+      l1cells += add_l1basic(&l1_dummy[0]);
+      printf("l1cells = %d\n", l1cells);
+      if (l1cells <= 4307) {
+        l1basicinit->preamble_num_symbols = 0;
+      }
+      else {
+        l1basicinit->preamble_num_symbols = 1;
+      }
       set_output_multiple(3820);
     }
 
@@ -336,12 +342,12 @@ namespace gr {
       calculate_crc_table();
     }
 
-    void
+    int
     framemapper_cc_impl::add_l1basic(gr_complex *out)
     {
       int temp, index, offset_bits = 0;
       int npad, padbits, count, nrepeat;
-      int block, indexb, nouter, symbols;
+      int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
       int B, mod, rows, pack;
       long long templong;
@@ -598,7 +604,7 @@ namespace gr {
       nfectemp = nouter + 12960 - npunctemp;
       nfec = ceil(nfectemp / mod) * mod;
       npunc = npunctemp - (nfec - nfectemp);
-      symbols = nfec + nrepeat;
+      numbits = nfec + nrepeat;
       memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
       memcpy(&l1basic[NBCH_3_15], &l1temp[NBCH_3_15], sizeof(unsigned char) * nrepeat);
       memcpy(&l1basic[NBCH_3_15 + nrepeat], &l1temp[NBCH_3_15], sizeof(unsigned char) * (FRAME_SIZE_SHORT - NBCH_3_15 - npunc));
@@ -617,10 +623,27 @@ namespace gr {
           index++;
         }
       }
-      memcpy(&l1temp[count], &l1basic[NBCH_3_15], sizeof(unsigned char) * (symbols - count));
+      memcpy(&l1temp[count], &l1basic[NBCH_3_15], sizeof(unsigned char) * (numbits - count));
+
+#if 1
+      for (int i = 0; i < numbits; i += 8) {
+        temp = index = 0;
+        for (int j = 7; j >= 0; j--) {
+          temp |= l1temp[i + index] << j;
+          index++;
+        }
+        if ((i % 128) == 0) {
+          if (i != 0) {
+            printf("\n");
+          }
+        }
+        printf("%02X", temp);
+      }
+      printf("\n");
+#endif
 
       /* block interleaver, bit demuxing and constellation mapping */
-      rows = symbols / mod;
+      rows = numbits / mod;
       switch (l1b_mode) {
         case L1_FEC_MODE_1:
         case L1_FEC_MODE_2:
@@ -768,9 +791,9 @@ namespace gr {
           break;
         default:
           c1 = &l1temp[0];
-          c2 = &l1temp[symbols / mod];
+          c2 = &l1temp[rows];
           index = 0;
-          for (int j = 0; j < symbols / mod; j++) {
+          for (int j = 0; j < rows; j++) {
             l1basic[index++] = c1[j];
             l1basic[index++] = c2[j];
           }
@@ -782,14 +805,15 @@ namespace gr {
           }
           break;
       }
+      return (numbits / mod);
     }
 
-    void
+    int
     framemapper_cc_impl::add_l1detail(gr_complex *out)
     {
       int temp, index, offset_bits = 0;
       int npad, padbits, count, nrepeat, table;
-      int block, indexb, nouter, symbols;
+      int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
       int Anum, Aden, B, mod, rows, pack;
       long long templong;
@@ -1030,7 +1054,7 @@ namespace gr {
       nfectemp = nouter + 12960 - npunctemp;
       nfec = ceil(nfectemp / mod) * mod;
       npunc = npunctemp - (nfec - nfectemp);
-      symbols = nfec + nrepeat;
+      numbits = nfec + nrepeat;
       memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
       memcpy(&l1detail[NBCH_3_15], &l1temp[NBCH_3_15], sizeof(unsigned char) * nrepeat);
       memcpy(&l1detail[NBCH_3_15 + nrepeat], &l1temp[NBCH_3_15], sizeof(unsigned char) * (FRAME_SIZE_SHORT - NBCH_3_15 - npunc));
@@ -1049,10 +1073,10 @@ namespace gr {
           index++;
         }
       }
-      memcpy(&l1temp[count], &l1detail[NBCH_3_15], sizeof(unsigned char) * (symbols - count));
+      memcpy(&l1temp[count], &l1detail[NBCH_3_15], sizeof(unsigned char) * (numbits - count));
 
 #if 1
-      for (int i = 0; i < symbols; i += 8) {
+      for (int i = 0; i < numbits; i += 8) {
         temp = index = 0;
         for (int j = 7; j >= 0; j--) {
           temp |= l1temp[i + index] << j;
@@ -1069,7 +1093,7 @@ namespace gr {
 #endif
 
       /* block interleaver, bit demuxing and constellation mapping */
-      rows = symbols / mod;
+      rows = numbits / mod;
       switch (l1d_mode) {
         case L1_FEC_MODE_1:
         case L1_FEC_MODE_2:
@@ -1217,9 +1241,9 @@ namespace gr {
           break;
         default:
           c1 = &l1temp[0];
-          c2 = &l1temp[symbols / mod];
+          c2 = &l1temp[rows];
           index = 0;
-          for (int j = 0; j < symbols / mod; j++) {
+          for (int j = 0; j < rows; j++) {
             l1detail[index++] = c1[j];
             l1detail[index++] = c2[j];
           }
@@ -1231,6 +1255,7 @@ namespace gr {
           }
           break;
       }
+      return (numbits / mod);
     }
 
     int
@@ -1243,7 +1268,7 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
 
       for (int i = 0; i < noutput_items; i += 7640) {
-        add_l1detail(out);
+        add_l1basic(out);
       }
 
       // Tell runtime system how many input items we consumed on

@@ -76,9 +76,9 @@ namespace gr {
       PAPR_BOTH,
     };
 
-    enum atsc3_time_length_mode_t {
-      TLM_TIME_ALIGNED = 0,
-      TLM_SYMBOL_ALIGNED,
+    enum atsc3_frame_length_mode_t {
+      FLM_TIME_ALIGNED = 0,
+      FLM_SYMBOL_ALIGNED,
     };
 
     enum atsc3_additional_parity_mode_t {
@@ -155,7 +155,7 @@ typedef gr::atsc3::atsc3_guardinterval_t atsc3_guardinterval_t;
 typedef gr::atsc3::atsc3_mimo_scattered_pilot_encoding_t atsc3_mimo_scattered_pilot_encoding_t;
 typedef gr::atsc3::atsc3_time_info_flag_t atsc3_time_info_flag_t;
 typedef gr::atsc3::atsc3_papr_t atsc3_papr_t;
-typedef gr::atsc3::atsc3_time_length_mode_t atsc3_time_length_mode_t;
+typedef gr::atsc3::atsc3_frame_length_mode_t atsc3_frame_length_mode_t;
 typedef gr::atsc3::atsc3_additional_parity_mode_t atsc3_additional_parity_mode_t;
 typedef gr::atsc3::atsc3_miso_t atsc3_miso_t;
 typedef gr::atsc3::atsc3_fftsize_t atsc3_fftsize_t;

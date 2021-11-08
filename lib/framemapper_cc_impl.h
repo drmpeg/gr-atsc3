@@ -127,8 +127,8 @@ namespace gr {
       int l1b_mode;
       int l1d_mode;
       L1Signalling L1_Signalling[1];
-      void add_l1basic(gr_complex*);
-      void add_l1detail(gr_complex*);
+      int add_l1basic(gr_complex*);
+      int add_l1detail(gr_complex*);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
       void calculate_crc_table();
@@ -156,6 +156,8 @@ namespace gr {
       gr_complex m_64qam[64];
       gr_complex m_l1b_256qam[256];
       gr_complex m_l1d_256qam[256];
+
+      gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
@@ -288,7 +290,7 @@ namespace gr {
       const static gr_complex mod_table_256QAM[2][64];
 
      public:
-      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~framemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
