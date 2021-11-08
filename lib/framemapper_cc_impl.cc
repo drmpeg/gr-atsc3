@@ -180,7 +180,7 @@ namespace gr {
       l1detailinit->plp_lls_flag = FALSE;
       l1detailinit->plp_layer = 0;
       l1detailinit->plp_start = 0;
-      l1detailinit->plp_size = 446728;
+      l1detailinit->plp_size = 446958;
       l1detailinit->plp_scrambler_type = 0;
       if (framesize == FECFRAME_SHORT) {
         l1detailinit->plp_fec_type = FEC_TYPE_BCH_16K;
@@ -203,7 +203,7 @@ namespace gr {
       else {
         l1basicinit->preamble_num_symbols = 1;
       }
-      set_output_multiple(3820);
+      set_output_multiple(8100);
     }
 
     /*
@@ -216,7 +216,7 @@ namespace gr {
     void
     framemapper_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = 64800;
+      ninput_items_required[0] = 8100;
     }
 
 #define CRC_POLY 0x00210801
@@ -504,10 +504,17 @@ namespace gr {
       }
       padbits = (NBCH_3_15 - nouter) - (360 * npad);
       memset(&l1temp[shortening_table[0][npad] * 360], 0, sizeof(unsigned char) * padbits);
-      index = 0;
-      for (int i = npad + 1; i < 9; i++) {
-        memcpy(&l1temp[shortening_table[0][i] * 360], &l1basic[index], sizeof(unsigned char) * offset_bits);
-        index += 360;
+      index = count = 0;
+      for (int n = 0; n < NBCH_3_15; n++) {
+        if (l1temp[index] == 0x55) {
+          l1temp[index++] = l1basic[count++];
+          if (count == offset_bits) {
+            break;
+          }
+        }
+        else {
+          index++;
+        }
       }
       index = count = 0;
       for (int n = 0; n < NBCH_3_15; n++) {
@@ -1013,10 +1020,18 @@ namespace gr {
       }
       padbits = (nbch - nouter) - (360 * npad);
       memset(&l1temp[shortening_table[table][npad] * 360], 0, sizeof(unsigned char) * padbits);
-      index = 0;
-      for (int i = npad + 1; i < 18; i++) { /* fix me */
-        memcpy(&l1temp[shortening_table[table][i] * 360], &l1detail[index], sizeof(unsigned char) * offset_bits);
-        index += 360;
+
+      index = count = 0;
+      for (int n = 0; n < nbch; n++) {
+        if (l1temp[index] == 0x55) {
+          l1temp[index++] = l1detail[count++];
+          if (count == offset_bits) {
+            break;
+          }
+        }
+        else {
+          index++;
+        }
       }
       index = count = 0;
       for (int n = 0; n < nbch; n++) {
@@ -1109,7 +1124,7 @@ namespace gr {
         nrepeat = 0;
       }
       npunctemp = ((Anum * (nbch - nouter)) / Aden) + B;
-      nfectemp = nouter + 9720 - npunctemp; /* fix me */
+      nfectemp = nouter + (FRAME_SIZE_SHORT - nbch) - npunctemp;
       nfec = ((nfectemp + mod - 1) / mod) * mod;
       npunc = npunctemp - (nfec - nfectemp);
       numbits = nfec + nrepeat;
@@ -1324,10 +1339,6 @@ namespace gr {
     {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
-
-      for (int i = 0; i < noutput_items; i += 7640) {
-        add_l1basic(out);
-      }
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
