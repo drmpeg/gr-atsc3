@@ -939,7 +939,7 @@ namespace gr {
             index = 0;
             for (int j = 0; j < rows + nr2; j++) {
               pack = 0;
-              for (int e = 3; e >= 0 ; e--) {
+              for (int e = 3; e >= 0; e--) {
                 pack |= tempu[index++] << e;
               }
               out[produced++] = pack & 0xf;
@@ -1034,7 +1034,7 @@ namespace gr {
             index = 0;
             for (int j = 0; j < rows + nr2; j++) {
               pack = 0;
-              for (int e = 5; e >= 0 ; e--) {
+              for (int e = 5; e >= 0; e--) {
                 pack |= tempu[index++] << e;
               }
               out[produced++] = pack & 0x3f;
@@ -1137,7 +1137,7 @@ namespace gr {
             index = 0;
             for (int j = 0; j < rows + nr2; j++) {
               pack = 0;
-              for (int e = 7; e >= 0 ; e--) {
+              for (int e = 7; e >= 0; e--) {
                 pack |= tempu[index++] << e;
               }
               out[produced++] = pack & 0xff;

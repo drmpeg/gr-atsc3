@@ -45,6 +45,8 @@ namespace gr {
       m1_val = 1080;
       m2_val = 11880;
       ldpc_bf_type_a(ldpc_tab_3_15S);
+      q_val = 27;
+      ldpc_bf_type_b(ldpc_tab_6_15S);
 
       normalization = std::sqrt(2.0);
       m_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
@@ -165,7 +167,7 @@ namespace gr {
       l1basicinit->first_sub_num_ofdm_symbols = numpayloadsyms - 1;
       l1basicinit->first_sub_scattered_pilot_pattern = PILOT_SP3_4;
       l1basicinit->first_sub_scattered_pilot_boost = 4;
-      l1basicinit->first_sub_sbs_first = FALSE;
+      l1basicinit->first_sub_sbs_first = TRUE;
       l1basicinit->first_sub_sbs_last = TRUE;
       l1basicinit->reserved = 0xffffffffffff;
 
@@ -178,7 +180,7 @@ namespace gr {
       l1detailinit->plp_lls_flag = FALSE;
       l1detailinit->plp_layer = 0;
       l1detailinit->plp_start = 0;
-      l1detailinit->plp_size = 450029;
+      l1detailinit->plp_size = 446728;
       l1detailinit->plp_scrambler_type = 0;
       if (framesize == FECFRAME_SHORT) {
         l1detailinit->plp_fec_type = FEC_TYPE_BCH_16K;
@@ -552,7 +554,7 @@ namespace gr {
       memcpy(&l1temp[0], &l1basic[0], sizeof(unsigned char) * NBCH_3_15);
       index = NBCH_3_15;
       for (int j = 0; j < 36; j++) {
-        block = group_table_basic[j];
+        block = group_table[0][j];
         indexb = block * 360;
         for (int k = 0; k < 360; k++) {
           l1temp[index++] = l1basic[indexb++];;
@@ -595,14 +597,14 @@ namespace gr {
           break;
       }
       if (l1b_mode == L1_FEC_MODE_1) {
-        nrepeat = 2 * floor((0 * nouter)) + 3672;
+        nrepeat = 2 * (0 * nouter) + 3672;
       }
       else {
         nrepeat = 0;
       }
-      npunctemp = floor(0 * (NBCH_3_15 - nouter)) + B;
+      npunctemp = (0 * (NBCH_3_15 - nouter)) + B;
       nfectemp = nouter + 12960 - npunctemp;
-      nfec = ceil(nfectemp / mod) * mod;
+      nfec = ((nfectemp + mod - 1) / mod) * mod;
       npunc = npunctemp - (nfec - nfectemp);
       numbits = nfec + nrepeat;
       memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
@@ -677,7 +679,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 3; e >= 0 ; e--) {
+            for (int e = 3; e >= 0; e--) {
               pack |= l1basic[index++] << e;
             }
             temp = pack << count;
@@ -707,7 +709,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 5; e >= 0 ; e--) {
+            for (int e = 5; e >= 0; e--) {
               pack |= l1basic[index++] << e;
             }
             temp = pack << count;
@@ -744,7 +746,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 7; e >= 0 ; e--) {
+            for (int e = 7; e >= 0; e--) {
               pack |= l1basic[index++] << e;
             }
             temp = pack << count;
@@ -778,7 +780,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 7; e >= 0 ; e--) {
+            for (int e = 7; e >= 0; e--) {
               pack |= l1basic[index++] << e;
             }
             temp = pack << count;
@@ -823,7 +825,8 @@ namespace gr {
       unsigned char *l1temp = l1_temp;
       L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
       const unsigned char* d;
-      int plen = FRAME_SIZE_SHORT - NBCH_3_15;
+      unsigned char* p;
+      int plen, nbch, groups;
       const int q1 = q1_val;
       const int q2 = q2_val;
       const int m1 = m1_val;
@@ -922,6 +925,9 @@ namespace gr {
       /* zero padding */
       switch (l1d_mode) {
         case L1_FEC_MODE_1:
+          plen = FRAME_SIZE_SHORT - NBCH_3_15;
+          nbch = NBCH_3_15;
+          groups = 36;
           table = 1;
           Anum = 7;
           Aden = 2;
@@ -929,6 +935,9 @@ namespace gr {
           mod = 2;
           break;
         case L1_FEC_MODE_2:
+          plen = FRAME_SIZE_SHORT - NBCH_3_15;
+          nbch = NBCH_3_15;
+          groups = 36;
           table = 2;
           Anum = 2;
           Aden = 1;
@@ -936,6 +945,9 @@ namespace gr {
           mod = 2;
           break;
         case L1_FEC_MODE_3:
+          plen = FRAME_SIZE_SHORT - NBCH_6_15;
+          nbch = NBCH_6_15;
+          groups = 27;
           table = 3;
           Anum = 11;
           Aden = 16;
@@ -943,6 +955,9 @@ namespace gr {
           mod = 2;
           break;
         case L1_FEC_MODE_4:
+          plen = FRAME_SIZE_SHORT - NBCH_6_15;
+          nbch = NBCH_6_15;
+          groups = 27;
           table = 4;
           Anum = 29;
           Aden = 32;
@@ -950,6 +965,9 @@ namespace gr {
           mod = 4;
           break;
         case L1_FEC_MODE_5:
+          plen = FRAME_SIZE_SHORT - NBCH_6_15;
+          nbch = NBCH_6_15;
+          groups = 27;
           table = 5;
           Anum = 3;
           Aden = 4;
@@ -957,6 +975,9 @@ namespace gr {
           mod = 6;
           break;
         case L1_FEC_MODE_6:
+          plen = FRAME_SIZE_SHORT - NBCH_6_15;
+          nbch = NBCH_6_15;
+          groups = 27;
           table = 6;
           Anum = 11;
           Aden = 16;
@@ -964,6 +985,9 @@ namespace gr {
           mod = 8;
           break;
         case L1_FEC_MODE_7:
+          plen = FRAME_SIZE_SHORT - NBCH_6_15;
+          nbch = NBCH_6_15;
+          groups = 27;
           table = 7;
           Anum = 49;
           Aden = 256;
@@ -971,6 +995,9 @@ namespace gr {
           mod = 8;
           break;
         default:
+          plen = FRAME_SIZE_SHORT - NBCH_3_15;
+          nbch = NBCH_3_15;
+          groups = 36;
           table = 1;
           Anum = 7;
           Aden = 2;
@@ -979,20 +1006,20 @@ namespace gr {
           break;
       }
       nouter = offset_bits + num_parity_bits;
-      npad = (NBCH_3_15 - nouter) / 360;
+      npad = ((nbch - nouter) / 360);
       memset(&l1temp[0], 0x55, sizeof(unsigned char) * FRAME_SIZE_SHORT);
       for (int i = 0; i < npad; i++) {
         memset(&l1temp[shortening_table[table][i] * 360], 0, sizeof(unsigned char) * 360);
       }
-      padbits = (NBCH_3_15 - nouter) - (360 * npad);
+      padbits = (nbch - nouter) - (360 * npad);
       memset(&l1temp[shortening_table[table][npad] * 360], 0, sizeof(unsigned char) * padbits);
       index = 0;
-      for (int i = npad + 1; i < 9; i++) {
+      for (int i = npad + 1; i < 18; i++) { /* fix me */
         memcpy(&l1temp[shortening_table[table][i] * 360], &l1detail[index], sizeof(unsigned char) * offset_bits);
         index += 360;
       }
       index = count = 0;
-      for (int n = 0; n < NBCH_3_15; n++) {
+      for (int n = 0; n < nbch; n++) {
         if (l1temp[index] == 0x55) {
           l1temp[index++] = (char)parity_bits[num_parity_bits - 1];
           parity_bits <<= 1;
@@ -1007,36 +1034,67 @@ namespace gr {
       }
 
       /* LDPC encoding */
-      memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
-      // First zero all the parity bits
-      memset(buffer, 0, sizeof(unsigned char)*plen);
-      // now do the parity checking
-      d = &l1detail[0];
-      for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
-        buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
-      }
-      for(int j = 1; j < m1; j++) {
-        buffer[j] ^= buffer[j-1];
-      }
-      for (int t = 0; t < q1; t++) {
-        for (int s = 0; s < 360; s++) {
-          l1detail[NBCH_3_15 + (360 * t) + s] = buffer[(q1 * s) + t];
-        }
-      }
-      for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
-        buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
-      }
-      for (int t = 0; t < q2; t++) {
-        for (int s = 0; s < 360; s++) {
-          l1detail[NBCH_3_15 + m1 + (360 * t) + s] = buffer[(m1 + q2 * s) + t];
-        }
+      switch (l1d_mode) {
+        case L1_FEC_MODE_1:
+        case L1_FEC_MODE_2:
+          memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * nbch);
+          // First zero all the parity bits
+          memset(buffer, 0, sizeof(unsigned char)*plen);
+          // now do the parity checking
+          d = &l1detail[0];
+          for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
+            buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
+          }
+          for(int j = 1; j < m1; j++) {
+            buffer[j] ^= buffer[j-1];
+          }
+          for (int t = 0; t < q1; t++) {
+            for (int s = 0; s < 360; s++) {
+              l1detail[nbch + (360 * t) + s] = buffer[(q1 * s) + t];
+            }
+          }
+          for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
+            buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
+          }
+          for (int t = 0; t < q2; t++) {
+            for (int s = 0; s < 360; s++) {
+              l1detail[nbch + m1 + (360 * t) + s] = buffer[(m1 + q2 * s) + t];
+            }
+          }
+          break;
+        case L1_FEC_MODE_3:
+        case L1_FEC_MODE_4:
+        case L1_FEC_MODE_5:
+        case L1_FEC_MODE_6:
+        case L1_FEC_MODE_7:
+          memcpy(&buffer[0], &l1temp[0], sizeof(unsigned char) * nbch);
+          // now do the parity checking
+          d = &l1temp[0];
+          p = &buffer[nbch];
+          for (int i_p = 0; i_p < plen; i_p++) {
+            unsigned char pbit = 0;
+            for (int i_d = 1; i_d < ldpc_lut[i_p][0]; i_d++) {
+              pbit ^= d[ldpc_lut[i_p][i_d]];
+            }
+            p[i_p] = pbit;
+          }
+          for (int j = 1; j < plen; j++) {
+            p[j] ^= p[j - 1];
+          }
+          memcpy(&l1detail[0], &buffer[0], sizeof(unsigned char) * nbch);
+          for (int t = 0; t < q_val; t++) {
+            for (int s = 0; s < 360; s++) {
+              l1detail[nbch + (360 * t) + s] = buffer[(q_val * s) + t + nbch];
+            }
+          }
+          break;
       }
 
       /* group-wise interleaver */
-      memcpy(&l1temp[0], &l1detail[0], sizeof(unsigned char) * NBCH_3_15);
-      index = NBCH_3_15;
-      for (int j = 0; j < 36; j++) {
-        block = group_table_detail[j];
+      memcpy(&l1temp[0], &l1detail[0], sizeof(unsigned char) * nbch);
+      index = nbch;
+      for (int j = 0; j < groups; j++) {
+        block = group_table[table][j];
         indexb = block * 360;
         for (int k = 0; k < 360; k++) {
           l1temp[index++] = l1detail[indexb++];;
@@ -1045,19 +1103,19 @@ namespace gr {
 
       /* repetition and parity puncturing */
       if (l1d_mode == L1_FEC_MODE_1) {
-        nrepeat = 2 * floor(((61 * nouter) / 16)) - 508;
+        nrepeat = 2 * ((61 * nouter) / 16) - 508;
       }
       else {
         nrepeat = 0;
       }
-      npunctemp = floor((Anum * (NBCH_3_15 - nouter)) / Aden) + B;
-      nfectemp = nouter + 12960 - npunctemp;
-      nfec = ceil(nfectemp / mod) * mod;
+      npunctemp = ((Anum * (nbch - nouter)) / Aden) + B;
+      nfectemp = nouter + 9720 - npunctemp; /* fix me */
+      nfec = ((nfectemp + mod - 1) / mod) * mod;
       npunc = npunctemp - (nfec - nfectemp);
       numbits = nfec + nrepeat;
-      memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
-      memcpy(&l1detail[NBCH_3_15], &l1temp[NBCH_3_15], sizeof(unsigned char) * nrepeat);
-      memcpy(&l1detail[NBCH_3_15 + nrepeat], &l1temp[NBCH_3_15], sizeof(unsigned char) * (FRAME_SIZE_SHORT - NBCH_3_15 - npunc));
+      memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * nbch);
+      memcpy(&l1detail[nbch], &l1temp[nbch], sizeof(unsigned char) * nrepeat);
+      memcpy(&l1detail[nbch + nrepeat], &l1temp[nbch], sizeof(unsigned char) * (FRAME_SIZE_SHORT - nbch - npunc));
 
       /* zero removal */
       for (int i = 0; i < npad; i++) {
@@ -1065,7 +1123,7 @@ namespace gr {
       }
       memset(&l1detail[shortening_table[table][npad] * 360], 0x55, sizeof(unsigned char) * padbits);
       index = count = 0;
-      for (int i = 0; i < NBCH_3_15; i++) {
+      for (int i = 0; i < nbch; i++) {
         if (l1detail[index] != 0x55) {
           l1temp[count++] = l1detail[index++];
         }
@@ -1073,7 +1131,7 @@ namespace gr {
           index++;
         }
       }
-      memcpy(&l1temp[count], &l1detail[NBCH_3_15], sizeof(unsigned char) * (numbits - count));
+      memcpy(&l1temp[count], &l1detail[nbch], sizeof(unsigned char) * (numbits - count));
 
 #if 1
       for (int i = 0; i < numbits; i += 8) {
@@ -1127,7 +1185,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 3; e >= 0 ; e--) {
+            for (int e = 3; e >= 0; e--) {
               pack |= l1detail[index++] << e;
             }
             temp = pack << count;
@@ -1157,7 +1215,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 5; e >= 0 ; e--) {
+            for (int e = 5; e >= 0; e--) {
               pack |= l1detail[index++] << e;
             }
             temp = pack << count;
@@ -1194,7 +1252,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 7; e >= 0 ; e--) {
+            for (int e = 7; e >= 0; e--) {
               pack |= l1detail[index++] << e;
             }
             temp = pack << count;
@@ -1228,7 +1286,7 @@ namespace gr {
           index = count = 0;
           for (int j = 0; j < rows; j++) {
             pack = 0;
-            for (int e = 7; e >= 0 ; e--) {
+            for (int e = 7; e >= 0; e--) {
               pack |= l1detail[index++] << e;
             }
             temp = pack << count;
@@ -1305,16 +1363,47 @@ namespace gr {
       {10, 2211, 2288, 3937, 4310, 5952, 6597, 9692, 10445, 11064, 11272, 0}
     };
 
-    const int framemapper_cc_impl::group_table_basic[36] = {
-      20, 23, 25, 32, 38, 41, 18, 9, 10, 11, 31, 24,
-      14, 15, 26, 40, 33, 19, 28, 34, 16, 39, 27, 30,
-      21, 44, 43, 35, 42, 36, 12, 13, 29, 22, 37, 17
+    const uint16_t framemapper_cc_impl::ldpc_tab_6_15S[18][31] = {
+      {30, 27, 430, 519, 828, 1897, 1943, 2513, 2600, 2640, 3310, 3415, 4266, 5044, 5100, 5328, 5483, 5928, 6204, 6392, 6416, 6602, 7019, 7415, 7623, 8112, 8485, 8724, 8994, 9445, 9667},
+      {30, 27, 174, 188, 631, 1172, 1427, 1779, 2217, 2270, 2601, 2813, 3196, 3582, 3895, 3908, 3948, 4463, 4955, 5120, 5809, 5988, 6478, 6604, 7096, 7673, 7735, 7795, 8925, 9613, 9670},
+      {30, 27, 370, 617, 852, 910, 1030, 1326, 1521, 1606, 2118, 2248, 2909, 3214, 3413, 3623, 3742, 3752, 4317, 4694, 5300, 5687, 6039, 6100, 6232, 6491, 6621, 6860, 7304, 8542, 8634},
+      {4, 990, 1753, 7635, 8540, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 933, 1415, 5666, 8745, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 27, 6567, 8707, 9216, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 2341, 8692, 9580, 9615, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 260, 1092, 5839, 6080, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 352, 3750, 4847, 7726, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 4610, 6580, 9506, 9597, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 2512, 2974, 4814, 9348, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 1461, 4021, 5060, 7009, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {4, 1796, 2883, 5553, 8306, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {3, 1249, 5422, 7057, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {3, 3965, 6968, 9422, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {3, 1498, 2931, 5092, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {3, 27, 1090, 6215, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {3, 26, 4232, 6354, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
 
-    const int framemapper_cc_impl::group_table_detail[36] = {
-      16, 22, 27, 30, 37, 44, 20, 23, 25, 32, 38, 41,
-      9, 10, 17, 18, 21, 33, 35, 14, 28, 12, 15, 19,
-      11, 24, 29, 34, 36, 13, 40, 43, 31, 26, 39, 42
+    const int framemapper_cc_impl::group_table[8][36] = {
+      {20, 23, 25, 32, 38, 41, 18, 9, 10, 11, 31, 24,
+       14, 15, 26, 40, 33, 19, 28, 34, 16, 39, 27, 30,
+       21, 44, 43, 35, 42, 36, 12, 13, 29, 22, 37, 17},
+      {16, 22, 27, 30, 37, 44, 20, 23, 25, 32, 38, 41,
+       9, 10, 17, 18, 21, 33, 35, 14, 28, 12, 15, 19,
+       11, 24, 29, 34, 36, 13, 40, 43, 31, 26, 39, 42},
+      {9, 31, 23, 10, 11, 25, 43, 29, 36, 16, 27, 34,
+       26, 18, 37, 15, 13, 17, 35, 21, 20, 24, 44, 12,
+       22, 40, 19, 32, 38, 41, 30, 33, 14, 28, 39, 42},
+      {19, 37, 30, 42, 23, 44, 27, 40, 21, 34, 25, 32, 29, 24,
+       26, 35, 39, 20, 18, 43, 31, 36, 38, 22, 33, 28, 41},
+      {20, 35, 42, 39, 26, 23, 30, 18, 28, 37, 32, 27, 44, 43,
+       41, 40, 38, 36, 34, 33, 31, 29, 25, 24, 22, 21, 19},
+      {19, 37, 33, 26, 40, 43, 22, 29, 24, 35, 44, 31, 27, 20,
+       21, 39, 25, 42, 34, 18, 32, 38, 23, 30, 28, 36, 41},
+      {20, 35, 42, 39, 26, 23, 30, 18, 28, 37, 32, 27, 44, 43,
+       41, 40, 38, 36, 34, 33, 31, 29, 25, 24, 22, 21, 19},
+      {44, 23, 29, 33, 24, 28, 21, 27, 42, 18, 22, 31, 32, 37,
+       43, 30, 25, 35, 20, 34, 39, 36, 19, 41, 40, 26, 38}
     };
 
     const gr_complex framemapper_cc_impl::mod_table_16QAM[4] = {

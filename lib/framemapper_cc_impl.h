@@ -13,6 +13,7 @@
 #include <bitset>
 
 #define NBCH_3_15 3240
+#define NBCH_6_15 6480
 
 typedef struct {
   int version;
@@ -166,7 +167,7 @@ namespace gr {
       void ldpc_bf_type_b(entry_t (&table)[rows][cols])
       {
         size_t max_lut_arraysize = 0;
-        const unsigned int pbits = FRAME_SIZE_SHORT - NBCH_3_15;
+        const unsigned int pbits = FRAME_SIZE_SHORT - NBCH_6_15;
         const unsigned int q = q_val;
         for (auto& row : table) { /* count the entries in the table */
           max_lut_arraysize += row[0];
@@ -283,8 +284,8 @@ namespace gr {
 
       const static int shortening_table[8][18];
       const static uint16_t ldpc_tab_3_15S[12][12];
-      const static int group_table_basic[36];
-      const static int group_table_detail[36];
+      const static uint16_t ldpc_tab_6_15S[18][31];
+      const static int group_table[8][36];
       const static gr_complex mod_table_16QAM[4];
       const static gr_complex mod_table_64QAM[16];
       const static gr_complex mod_table_256QAM[2][64];
