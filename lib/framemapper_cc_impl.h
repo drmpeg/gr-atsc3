@@ -157,6 +157,10 @@ namespace gr {
       gr_complex m_64qam[64];
       gr_complex m_l1b_256qam[256];
       gr_complex m_l1d_256qam[256];
+      int first_preamble_cells;
+      int preamble_cells;
+      int data_cells;
+      int sbs_cells;
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
@@ -289,9 +293,16 @@ namespace gr {
       const static gr_complex mod_table_16QAM[4];
       const static gr_complex mod_table_64QAM[16];
       const static gr_complex mod_table_256QAM[2][64];
+      const static int preamble_cells_table[32][5];
+      const static int data_cells_table_8K[16][5];
+      const static int data_cells_table_16K[16][5];
+      const static int data_cells_table_32K[16][5];
+      const static int sbs_cells_table_8K[16][5];
+      const static int sbs_cells_table_16K[16][5];
+      const static int sbs_cells_table_32K[16][5];
 
      public:
-      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, atsc3_guardinterval_t guardinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~framemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
