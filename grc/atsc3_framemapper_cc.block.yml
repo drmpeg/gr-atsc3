@@ -4,7 +4,7 @@ category: '[ATSC3.0]'
 
 templates:
   imports: import atsc3
-  make: atsc3.framemapper_cc(${framesize.val}, ${rate.val}, ${constellation.val}, ${fftsize.val}, ${numpayloadsyms}, ${guardinterval.val}, ${pilotpattern.val}, ${l1bmode.val}, ${l1dmode.val})
+  make: atsc3.framemapper_cc(${framesize.val}, ${rate.val}, ${constellation.val}, ${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${plpsize}, ${guardinterval.val}, ${pilotpattern.val}, ${l1bmode.val}, ${l1dmode.val})
 
 parameters:
 -   id: framesize
@@ -39,6 +39,14 @@ parameters:
     label: Number of Payload Symbols
     dtype: int
     default: '72'
+-   id: numpreamblesyms
+    label: Number of Preamble Symbols
+    dtype: int
+    default: '2'
+-   id: plpsize
+    label: PLP Size
+    dtype: int
+    default: '450029'
 -   id: guardinterval
     label: Guard Interval samples
     dtype: enum

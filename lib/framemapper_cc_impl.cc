@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, guardinterval, pilotpattern, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, plpsize, guardinterval, pilotpattern, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -33,11 +33,15 @@ namespace gr {
       L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
       double normalization;
       int rateindex, i, j, l1cells;
+      int fftsamples, gisamples;
       int cred = 0;
 
+      samples = 0;
+      cells = 0;
       fft_size = fftsize;
       l1b_mode = l1bmode;
       l1d_mode = l1dmode;
+      plp_size = plpsize;
       init_fm_randomizer();
       num_parity_bits = 168;
       bch_poly_build_tables();
@@ -150,11 +154,10 @@ namespace gr {
       l1basicinit->return_channel_flag = FALSE;
       l1basicinit->papr_reduction = PAPR_OFF;
       l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
-      l1basicinit->frame_length = 0;
-      l1basicinit->excess_samples_per_symbol = 0;
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0;
       l1basicinit->num_subframes = 0;
+      l1basicinit->preamble_num_symbols = numpreamblesyms - 1;
       l1basicinit->preamble_reduced_carriers = 0;
       l1basicinit->L1_Detail_content_tag = 0;
       l1basicinit->L1_Detail_size_bytes = 25;
@@ -181,13 +184,15 @@ namespace gr {
       l1detailinit->plp_lls_flag = FALSE;
       l1detailinit->plp_layer = 0;
       l1detailinit->plp_start = 0;
-      l1detailinit->plp_size = 450029;
+      l1detailinit->plp_size = plpsize;
       l1detailinit->plp_scrambler_type = 0;
       if (framesize == FECFRAME_SHORT) {
+        fec_cells = FRAME_SIZE_SHORT;
         l1detailinit->plp_fec_type = FEC_TYPE_BCH_16K;
       }
       else {
         l1detailinit->plp_fec_type = FEC_TYPE_BCH_64K;
+        fec_cells = FRAME_SIZE_NORMAL;
       }
       l1detailinit->plp_mod = constellation;
       l1detailinit->plp_cod = rate;
@@ -195,114 +200,140 @@ namespace gr {
       l1detailinit->plp_fec_block_start = 0;
       l1detailinit->plp_type = 0;
       l1detailinit->reserved = 0xfffffffffffff;
-      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0]);
-      l1cells += add_l1basic(&l1_dummy[0]);
+      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0);
+      l1cells += add_l1basic(&l1_dummy[0], 0);
       printf("l1cells = %d\n", l1cells);
-      if (l1cells <= 4307) {
-        l1basicinit->preamble_num_symbols = 0;
-      }
-      else {
-        l1basicinit->preamble_num_symbols = 1;
-      }
       switch (fftsize) {
         case FFTSIZE_8K:
+          fftsamples = 8192;
           first_preamble_cells = 4307;
           switch (guardinterval) {
             case GI_1_192:
+              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               break;
             case GI_2_384:
+              gisamples = 384;
               preamble_cells = preamble_cells_table[1][cred];
               break;
             case GI_3_512:
+              gisamples = 512;
               preamble_cells = preamble_cells_table[2][cred];
               break;
             case GI_4_768:
+              gisamples = 768;
               preamble_cells = preamble_cells_table[3][cred];
               break;
             case GI_5_1024:
+              gisamples = 1024;
               preamble_cells = preamble_cells_table[4][cred];
               break;
             case GI_6_1536:
+              gisamples = 1536;
               preamble_cells = preamble_cells_table[5][cred];
               break;
             case GI_7_2048:
+              gisamples = 2048;
               preamble_cells = preamble_cells_table[6][cred];
               break;
             default:
+              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               break;
           }
           break;
         case FFTSIZE_16K:
+          fftsamples = 16384;
           first_preamble_cells = 8614;
           switch (guardinterval) {
             case GI_1_192:
+              gisamples = 192;
               preamble_cells = preamble_cells_table[7][cred];
               break;
             case GI_2_384:
+              gisamples = 384;
               preamble_cells = preamble_cells_table[8][cred];
               break;
             case GI_3_512:
+              gisamples = 512;
               preamble_cells = preamble_cells_table[9][cred];
               break;
             case GI_4_768:
+              gisamples = 768;
               preamble_cells = preamble_cells_table[10][cred];
               break;
             case GI_5_1024:
+              gisamples = 1024;
               preamble_cells = preamble_cells_table[11][cred];
               break;
             case GI_6_1536:
+              gisamples = 1536;
               preamble_cells = preamble_cells_table[12][cred];
               break;
             case GI_7_2048:
+              gisamples = 2048;
               preamble_cells = preamble_cells_table[13][cred];
               break;
             case GI_8_2432:
+              gisamples = 2432;
               preamble_cells = preamble_cells_table[14][cred];
               break;
             case GI_9_3072:
+              gisamples = 3072;
               preamble_cells = preamble_cells_table[15][cred];
               break;
             case GI_10_3648:
+              gisamples = 3648;
               preamble_cells = preamble_cells_table[16][cred];
               break;
             case GI_11_4096:
+              gisamples = 4096;
               preamble_cells = preamble_cells_table[17][cred];
               break;
             default:
+              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               break;
           }
           break;
         case FFTSIZE_32K:
+          fftsamples = 32768;
           first_preamble_cells = 17288;
           switch (guardinterval) {
             case GI_1_192:
+              gisamples = 192;
               preamble_cells = preamble_cells_table[18][cred];
               break;
             case GI_2_384:
+              gisamples = 384;
               preamble_cells = preamble_cells_table[19][cred];
               break;
             case GI_3_512:
+              gisamples = 512;
               preamble_cells = preamble_cells_table[20][cred];
               break;
             case GI_4_768:
+              gisamples = 768;
               preamble_cells = preamble_cells_table[21][cred];
               break;
             case GI_5_1024:
+              gisamples = 1024;
               preamble_cells = preamble_cells_table[22][cred];
               break;
             case GI_6_1536:
+              gisamples = 1536;
               preamble_cells = preamble_cells_table[23][cred];
               break;
             case GI_7_2048:
+              gisamples = 2048;
               preamble_cells = preamble_cells_table[24][cred];
               break;
             case GI_8_2432:
+              gisamples = 2432;
               preamble_cells = preamble_cells_table[25][cred];
               break;
             case GI_9_3072:
+              gisamples = 3072;
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
                 preamble_cells = preamble_cells_table[26][cred];
               }
@@ -311,6 +342,7 @@ namespace gr {
               }
               break;
             case GI_10_3648:
+              gisamples = 3648;
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
                 preamble_cells = preamble_cells_table[28][cred];
               }
@@ -319,19 +351,59 @@ namespace gr {
               }
               break;
             case GI_11_4096:
+              gisamples = 4096;
               preamble_cells = preamble_cells_table[30][cred];
               break;
             case GI_12_4864:
+              gisamples = 4864;
               preamble_cells = preamble_cells_table[31][cred];
               break;
             default:
+              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               break;
           }
           break;
         default:
+          fftsamples = 8192;
+          first_preamble_cells = 4307;
+          switch (guardinterval) {
+            case GI_1_192:
+              gisamples = 192;
+              preamble_cells = preamble_cells_table[0][cred];
+              break;
+            case GI_2_384:
+              gisamples = 384;
+              preamble_cells = preamble_cells_table[1][cred];
+              break;
+            case GI_3_512:
+              gisamples = 512;
+              preamble_cells = preamble_cells_table[2][cred];
+              break;
+            case GI_4_768:
+              gisamples = 768;
+              preamble_cells = preamble_cells_table[3][cred];
+              break;
+            case GI_5_1024:
+              gisamples = 1024;
+              preamble_cells = preamble_cells_table[4][cred];
+              break;
+            case GI_6_1536:
+              gisamples = 1536;
+              preamble_cells = preamble_cells_table[5][cred];
+              break;
+            case GI_7_2048:
+              gisamples = 2048;
+              preamble_cells = preamble_cells_table[6][cred];
+              break;
+            default:
+              gisamples = 192;
+              preamble_cells = preamble_cells_table[0][cred];
+              break;
+          }
           break;
       }
+      frame_samples = ((fftsamples + gisamples) * (numpayloadsyms + numpreamblesyms)) + BOOTSTRAP_SAMPLES;
       switch (fftsize) {
         case FFTSIZE_8K:
           switch (pilotpattern) {
@@ -567,7 +639,7 @@ namespace gr {
     void
     framemapper_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = 450029;
+      ninput_items_required[0] = plp_size;
     }
 
 #define CRC_POLY 0x00210801
@@ -696,7 +768,7 @@ namespace gr {
     }
 
     int
-    framemapper_cc_impl::add_l1basic(gr_complex *out)
+    framemapper_cc_impl::add_l1basic(gr_complex *out, int time_offset)
     {
       int temp, index, offset_bits = 0;
       int npad, padbits, count, nrepeat;
@@ -743,7 +815,7 @@ namespace gr {
         }
       }
       else {
-        temp = l1basicinit->time_offset;
+        temp = time_offset;
         for (int n = 15; n >= 0; n--) {
           l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
         }
@@ -1169,7 +1241,7 @@ namespace gr {
     }
 
     int
-    framemapper_cc_impl::add_l1detail(gr_complex *out)
+    framemapper_cc_impl::add_l1detail(gr_complex *out, int block_start)
     {
       int temp, index, offset_bits = 0;
       int npad, padbits, count, nrepeat, table;
@@ -1244,7 +1316,7 @@ namespace gr {
       for (int n = 1; n >= 0; n--) {
         l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_fec_block_start;
+      temp = block_start;
       for (int n = 14; n >= 0; n--) {
         l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
       }
@@ -1690,18 +1762,25 @@ namespace gr {
     {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
-      int cells = 0;
+      int index = 0;
+      int temp;
 
       for (int i = 0; i < noutput_items; i += noutput_items) {
-        printf("noutput_items = %d\n", noutput_items);
-        cells += add_l1basic(&out[0]);
-        cells += add_l1detail(&out[cells]);
-        memcpy(&out[cells], &in[0], sizeof(gr_complex) * 450029);
+        temp = samples % 6912;
+        index += add_l1basic(&out[0], temp);
+        temp = cells % fec_cells;
+        if (temp) {
+          temp = fec_cells - (cells % fec_cells);
+        }
+        index += add_l1detail(&out[index], temp);
+        memcpy(&out[index], &in[0], sizeof(gr_complex) * plp_size);
+        samples += frame_samples;
+        cells += plp_size;
       }
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each (noutput_items);
+      consume_each (plp_size);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

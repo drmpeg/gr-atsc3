@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(framemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(43c9072f6770895734494e444165e70c)                     */
+/* BINDTOOL_HEADER_FILE_HASH(9372886a3de2fc9e1f05a6da716afd5a)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -42,6 +42,8 @@ void bind_framemapper_cc(py::module& m)
            py::arg("constellation"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
+           py::arg("numpreamblesyms"),
+           py::arg("plpsize"),
            py::arg("guardinterval"),
            py::arg("pilotpattern"),
            py::arg("l1bmode"),
