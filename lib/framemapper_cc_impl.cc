@@ -32,16 +32,20 @@ namespace gr {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
       double normalization;
-      int rateindex, i, j, l1cells;
-      int fftsamples, gisamples;
-      int cred = 0;
+      int rateindex, i, j, l1cells, totalcells;
+      int fftsamples, gisamples, cred = 0;
+      int first_preamble_cells;
+      int preamble_cells;
+      int data_cells;
+      int sbs_cells;
 
       samples = 0;
       cells = 0;
-      fft_size = fftsize;
       l1b_mode = l1bmode;
       l1d_mode = l1dmode;
       plp_size = plpsize;
+      symbols = numpreamblesyms + numpayloadsyms;
+      preamblesyms = numpreamblesyms;
       init_fm_randomizer();
       num_parity_bits = 168;
       bch_poly_build_tables();
@@ -178,7 +182,6 @@ namespace gr {
       l1detailinit->version = 0;
       l1detailinit->num_rf = 0;
       l1detailinit->frequency_interleaver = FALSE;
-      l1detailinit->sbs_null_cells = 3026;
       l1detailinit->num_plp = 0;
       l1detailinit->plp_id = 0;
       l1detailinit->plp_lls_flag = FALSE;
@@ -201,6 +204,7 @@ namespace gr {
       l1detailinit->plp_type = 0;
       l1detailinit->reserved = 0xfffffffffffff;
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0);
+      printf("l1cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
       printf("l1cells = %d\n", l1cells);
       switch (fftsize) {
@@ -622,11 +626,97 @@ namespace gr {
           }
           break;
         default:
+          switch (pilotpattern) {
+            case PILOT_SP3_2:
+              data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              break;
+            case PILOT_SP3_4:
+              data_cells = data_cells_table_8K[PILOT_SP3_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP3_4][cred];
+              break;
+            case PILOT_SP4_2:
+              data_cells = data_cells_table_8K[PILOT_SP4_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP4_2][cred];
+              break;
+            case PILOT_SP4_4:
+              data_cells = data_cells_table_8K[PILOT_SP4_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP4_4][cred];
+              break;
+            case PILOT_SP6_2:
+              data_cells = data_cells_table_8K[PILOT_SP6_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP6_2][cred];
+              break;
+            case PILOT_SP6_4:
+              data_cells = data_cells_table_8K[PILOT_SP6_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP6_4][cred];
+              break;
+            case PILOT_SP8_2:
+              data_cells = data_cells_table_8K[PILOT_SP8_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP8_2][cred];
+              break;
+            case PILOT_SP8_4:
+              data_cells = data_cells_table_8K[PILOT_SP8_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP8_4][cred];
+              break;
+            case PILOT_SP12_2:
+              data_cells = data_cells_table_8K[PILOT_SP12_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP12_2][cred];
+              break;
+            case PILOT_SP12_4:
+              data_cells = data_cells_table_8K[PILOT_SP12_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP12_4][cred];
+              break;
+            case PILOT_SP16_2:
+              data_cells = data_cells_table_8K[PILOT_SP16_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP16_2][cred];
+              break;
+            case PILOT_SP16_4:
+              data_cells = data_cells_table_8K[PILOT_SP16_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP16_4][cred];
+              break;
+            case PILOT_SP24_2:
+              data_cells = data_cells_table_8K[PILOT_SP24_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP24_2][cred];
+              break;
+            case PILOT_SP24_4:
+              data_cells = data_cells_table_8K[PILOT_SP24_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP24_4][cred];
+              break;
+            case PILOT_SP32_2:
+              data_cells = data_cells_table_8K[PILOT_SP32_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP32_2][cred];
+              break;
+            case PILOT_SP32_4:
+              data_cells = data_cells_table_8K[PILOT_SP32_4][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP32_4][cred];
+              break;
+            default:
+              data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
+              sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              break;
+          }
           break;
       }
-      printf("preamble cells = %d, data cells = %d, sbs cells = %d\n", preamble_cells, data_cells, sbs_cells);
-      printf("total cells = %d\n", first_preamble_cells + preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells);
-      set_output_multiple(first_preamble_cells + preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells);
+      frame_symbols[0] = first_preamble_cells;
+      for (int n = 1; n < numpreamblesyms; n++) {
+        frame_symbols[n] = preamble_cells;
+      }
+      if (l1basicinit->first_sub_sbs_first == TRUE) {
+        frame_symbols[numpreamblesyms] = sbs_cells;
+        for (int n = 0; n < numpayloadsyms; n++) {
+          frame_symbols[n + numpreamblesyms + 1] = data_cells;
+        }
+      }
+      else {
+        for (int n = 0; n < numpayloadsyms; n++) {
+          frame_symbols[n + numpreamblesyms] = data_cells;
+        }
+      }
+      frame_symbols[numpreamblesyms + numpayloadsyms - 1] = sbs_cells;
+      totalcells = first_preamble_cells + preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
+      l1detailinit->sbs_null_cells = sbsnullcells = totalcells - (plpsize + l1cells);
+      set_output_multiple(totalcells);
     }
 
     /*
@@ -1754,6 +1844,8 @@ namespace gr {
       return (numbits / mod);
     }
 
+    const gr_complex zero = gr_complex(0.0, 0.0);
+
     int
     framemapper_cc_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
@@ -1762,18 +1854,57 @@ namespace gr {
     {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
-      int index = 0;
-      int temp;
+      int indexin = 0;
+      int indexout = 0;
+      int temp, l1cells, rows;
+      const gr_complex *c1, *c2;
 
       for (int i = 0; i < noutput_items; i += noutput_items) {
-        temp = samples % 6912;
-        index += add_l1basic(&out[0], temp);
+        temp = samples % SAMPLES_PER_MILLISECOND_6MHZ;
+        indexout += add_l1basic(&out[0], temp);
         temp = cells % fec_cells;
         if (temp) {
           temp = fec_cells - (cells % fec_cells);
         }
-        index += add_l1detail(&out[index], temp);
-        memcpy(&out[index], &in[0], sizeof(gr_complex) * plp_size);
+#if 0
+        rows = add_l1detail(&l1_dummy[0], temp);
+        rows /= preamblesyms;
+        c1 = &l1_dummy[1];
+        c2 = &l1_dummy[rows + 1];
+        out[indexout++] = l1_dummy[0];
+        for (int j = 0; j < rows; j++) {
+          out[indexout++] = c1[j];
+          out[indexout++] = c2[j];
+        }
+        printf("index = %d\n", indexout);
+#else
+        indexout += add_l1detail(&out[indexout], temp);
+        printf("index = %d\n", indexout);
+#endif
+
+        l1cells = indexout;
+        temp = 0;
+        for (int n = 0; n < preamblesyms; n++) {
+          temp += frame_symbols[n];
+        }
+        temp -= l1cells;
+        memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * temp);
+        indexin += temp;
+        indexout += temp;
+        for (int j = preamblesyms; j < symbols - 1; j++) {
+          memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * frame_symbols[j]);
+          indexin += frame_symbols[j];
+          indexout += frame_symbols[j];
+        }
+        for (int n = 0; n < sbsnullcells / 2; n++) {
+          out[indexout++] = zero;
+        }
+        memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[symbols - 1] - sbsnullcells));
+        indexout += (frame_symbols[symbols - 1] - sbsnullcells);
+        for (int n = 0; n < sbsnullcells / 2; n++) {
+          out[indexout++] = zero;
+        }
+
         samples += frame_samples;
         cells += plp_size;
       }

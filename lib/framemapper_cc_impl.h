@@ -124,10 +124,12 @@ namespace gr {
     class framemapper_cc_impl : public framemapper_cc
     {
      private:
-      int fft_size;
       int l1b_mode;
       int l1d_mode;
       int plp_size;
+      int symbols;
+      int sbsnullcells;
+      int preamblesyms;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
       int add_l1detail(gr_complex*, int);
@@ -158,10 +160,7 @@ namespace gr {
       gr_complex m_64qam[64];
       gr_complex m_l1b_256qam[256];
       gr_complex m_l1d_256qam[256];
-      int first_preamble_cells;
-      int preamble_cells;
-      int data_cells;
-      int sbs_cells;
+      int frame_symbols[4123];
       long long samples;
       int frame_samples;
       long long cells;
