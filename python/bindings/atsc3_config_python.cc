@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(e116a452142c1c83972634153e7f4a95)                     */
+/* BINDTOOL_HEADER_FILE_HASH(15eb14b1f80ca373a4da7b9f2c369b23)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -194,6 +194,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_fec_type_t>();
+    py::enum_<::gr::atsc3::atsc3_first_sbs_t>(m,"atsc3_first_sbs_t")
+        .value("SBS_OFF", ::gr::atsc3::SBS_OFF) // 0
+        .value("SBS_ON", ::gr::atsc3::SBS_ON) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_first_sbs_t>();
 
 
 

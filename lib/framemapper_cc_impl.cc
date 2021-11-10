@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, plpsize, guardinterval, pilotpattern, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, plpsize, guardinterval, pilotpattern, firstsbs, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -34,6 +34,7 @@ namespace gr {
       double normalization;
       int rateindex, i, j, l1cells, totalcells;
       int fftsamples, gisamples, cred = 0;
+      int total_preamble_cells;
       int first_preamble_cells;
       int preamble_cells;
       int data_cells;
@@ -43,9 +44,10 @@ namespace gr {
       cells = 0;
       l1b_mode = l1bmode;
       l1d_mode = l1dmode;
+      first_sbs = firstsbs;
       plp_size = plpsize;
       symbols = numpreamblesyms + numpayloadsyms;
-      preamblesyms = numpreamblesyms;
+      preamble_syms = numpreamblesyms;
       init_fm_randomizer();
       num_parity_bits = 168;
       bch_poly_build_tables();
@@ -175,7 +177,7 @@ namespace gr {
       l1basicinit->first_sub_num_ofdm_symbols = numpayloadsyms - 1;
       l1basicinit->first_sub_scattered_pilot_pattern = PILOT_SP3_4;
       l1basicinit->first_sub_scattered_pilot_boost = 4;
-      l1basicinit->first_sub_sbs_first = FALSE;
+      l1basicinit->first_sub_sbs_first = firstsbs;
       l1basicinit->first_sub_sbs_last = TRUE;
       l1basicinit->reserved = 0xffffffffffff;
 
@@ -190,12 +192,45 @@ namespace gr {
       l1detailinit->plp_size = plpsize;
       l1detailinit->plp_scrambler_type = 0;
       if (framesize == FECFRAME_SHORT) {
-        fec_cells = FRAME_SIZE_SHORT;
+        switch (constellation) {
+          case MOD_QPSK:
+            fec_cells = 8100;
+            break;
+          case MOD_16QAM:
+            fec_cells = 4050;
+            break;
+          case MOD_64QAM:
+            fec_cells = 2700;
+            break;
+          case MOD_256QAM:
+            fec_cells = 2025;
+            break;
+          default:
+            fec_cells = 0;
+            break;
+        }
         l1detailinit->plp_fec_type = FEC_TYPE_BCH_16K;
       }
       else {
+        switch (constellation) {
+          case MOD_QPSK:
+            fec_cells = 32400;
+            break;
+          case MOD_16QAM:
+            fec_cells = 16200;
+            break;
+          case MOD_64QAM:
+            fec_cells = 10800;
+            break;
+          case MOD_256QAM:
+            fec_cells = 8100;
+            break;
+          default:
+            fec_cells = 0;
+            break;
+        }
         l1detailinit->plp_fec_type = FEC_TYPE_BCH_64K;
-        fec_cells = FRAME_SIZE_NORMAL;
+
       }
       l1detailinit->plp_mod = constellation;
       l1detailinit->plp_cod = rate;
@@ -699,8 +734,10 @@ namespace gr {
           break;
       }
       frame_symbols[0] = first_preamble_cells;
+      total_preamble_cells = 0;
       for (int n = 1; n < numpreamblesyms; n++) {
         frame_symbols[n] = preamble_cells;
+        total_preamble_cells += preamble_cells;
       }
       if (l1basicinit->first_sub_sbs_first == TRUE) {
         frame_symbols[numpreamblesyms] = sbs_cells;
@@ -714,8 +751,17 @@ namespace gr {
         }
       }
       frame_symbols[numpreamblesyms + numpayloadsyms - 1] = sbs_cells;
-      totalcells = first_preamble_cells + preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
+      if (firstsbs) {
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * data_cells) + (sbs_cells * 2);
+      }
+      else {
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
+      }
+#if 0
       l1detailinit->sbs_null_cells = sbsnullcells = totalcells - (plpsize + l1cells);
+#else
+      l1detailinit->sbs_null_cells = sbsnullcells = 3026;
+#endif
       set_output_multiple(totalcells);
     }
 
@@ -1856,7 +1902,10 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin = 0;
       int indexout = 0;
+      int preamblesyms = preamble_syms;
       int temp, l1cells, rows;
+      int left_nulls = sbsnullcells / 2;
+      int right_nulls = left_nulls;
       const gr_complex *c1, *c2;
 
       for (int i = 0; i < noutput_items; i += noutput_items) {
@@ -1876,10 +1925,10 @@ namespace gr {
           out[indexout++] = c1[j];
           out[indexout++] = c2[j];
         }
-        printf("index = %d\n", indexout);
+        printf("indexout = %d\n", indexout);
 #else
         indexout += add_l1detail(&out[indexout], temp);
-        printf("index = %d\n", indexout);
+        printf("indexout = %d\n", indexout);
 #endif
 
         l1cells = indexout;
@@ -1891,17 +1940,29 @@ namespace gr {
         memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * temp);
         indexin += temp;
         indexout += temp;
+        if (first_sbs) {
+          for (int n = 0; n < right_nulls; n++) {
+            out[indexout++] = zero;
+          }
+          memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[preamblesyms] - sbsnullcells));
+          indexout += frame_symbols[preamblesyms] - sbsnullcells;
+          for (int n = 0; n < left_nulls; n++) {
+            out[indexout++] = zero;
+          }
+          indexin += frame_symbols[preamblesyms] - sbsnullcells;
+          preamblesyms++;
+        }
         for (int j = preamblesyms; j < symbols - 1; j++) {
           memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * frame_symbols[j]);
           indexin += frame_symbols[j];
           indexout += frame_symbols[j];
         }
-        for (int n = 0; n < sbsnullcells / 2; n++) {
+        for (int n = 0; n < right_nulls; n++) {
           out[indexout++] = zero;
         }
         memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[symbols - 1] - sbsnullcells));
-        indexout += (frame_symbols[symbols - 1] - sbsnullcells);
-        for (int n = 0; n < sbsnullcells / 2; n++) {
+        indexout += frame_symbols[symbols - 1] - sbsnullcells;
+        for (int n = 0; n < left_nulls; n++) {
           out[indexout++] = zero;
         }
 

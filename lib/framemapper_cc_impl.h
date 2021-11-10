@@ -127,9 +127,10 @@ namespace gr {
       int l1b_mode;
       int l1d_mode;
       int plp_size;
+      int first_sbs;
       int symbols;
       int sbsnullcells;
-      int preamblesyms;
+      int preamble_syms;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
       int add_l1detail(gr_complex*, int);
@@ -306,7 +307,7 @@ namespace gr {
       const static int sbs_cells_table_32K[16][5];
 
      public:
-      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~framemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

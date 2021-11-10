@@ -145,6 +145,11 @@ namespace gr {
       FEC_TYPE_ONLY_64K,
     };
 
+    enum atsc3_first_sbs_t {
+      SBS_OFF = 0,
+      SBS_ON,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -163,5 +168,6 @@ typedef gr::atsc3::atsc3_pilotpattern_t atsc3_pilotpattern_t;
 typedef gr::atsc3::atsc3_reduced_carriers_t atsc3_reduced_carriers_t;
 typedef gr::atsc3::atsc3_l1_fec_mode_t atsc3_l1_fec_mode_t;
 typedef gr::atsc3::atsc3_fec_type_t atsc3_fec_type_t;
+typedef gr::atsc3::atsc3_first_sbs_t atsc3_first_sbs_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */
