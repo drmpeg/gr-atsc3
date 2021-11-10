@@ -537,70 +537,87 @@ namespace gr {
             case PILOT_SP3_2:
               data_cells = data_cells_table_16K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP3_2][cred][pilotboost];
               break;
             case PILOT_SP3_4:
               data_cells = data_cells_table_16K[PILOT_SP3_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP3_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP3_4][cred][pilotboost];
               break;
             case PILOT_SP4_2:
               data_cells = data_cells_table_16K[PILOT_SP4_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP4_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP4_2][cred][pilotboost];
               break;
             case PILOT_SP4_4:
               data_cells = data_cells_table_16K[PILOT_SP4_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP4_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP4_4][cred][pilotboost];
               break;
             case PILOT_SP6_2:
               data_cells = data_cells_table_16K[PILOT_SP6_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP6_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP6_2][cred][pilotboost];
               break;
             case PILOT_SP6_4:
               data_cells = data_cells_table_16K[PILOT_SP6_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP6_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP6_4][cred][pilotboost];
               break;
             case PILOT_SP8_2:
               data_cells = data_cells_table_16K[PILOT_SP8_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP8_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP8_2][cred][pilotboost];
               break;
             case PILOT_SP8_4:
               data_cells = data_cells_table_16K[PILOT_SP8_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP8_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP8_4][cred][pilotboost];
               break;
             case PILOT_SP12_2:
               data_cells = data_cells_table_16K[PILOT_SP12_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP12_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP12_2][cred][pilotboost];
               break;
             case PILOT_SP12_4:
               data_cells = data_cells_table_16K[PILOT_SP12_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP12_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP12_4][cred][pilotboost];
               break;
             case PILOT_SP16_2:
               data_cells = data_cells_table_16K[PILOT_SP16_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP16_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP16_2][cred][pilotboost];
               break;
             case PILOT_SP16_4:
               data_cells = data_cells_table_16K[PILOT_SP16_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP16_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP16_4][cred][pilotboost];
               break;
             case PILOT_SP24_2:
               data_cells = data_cells_table_16K[PILOT_SP24_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP24_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP24_2][cred][pilotboost];
               break;
             case PILOT_SP24_4:
               data_cells = data_cells_table_16K[PILOT_SP24_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP24_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP24_4][cred][pilotboost];
               break;
             case PILOT_SP32_2:
               data_cells = data_cells_table_16K[PILOT_SP32_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP32_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP32_2][cred][pilotboost];
               break;
             case PILOT_SP32_4:
               data_cells = data_cells_table_16K[PILOT_SP32_4][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP32_4][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP32_4][cred][pilotboost];
               break;
             default:
               data_cells = data_cells_table_16K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_16K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP3_2][cred][pilotboost];
               break;
           }
           break;
@@ -609,70 +626,87 @@ namespace gr {
             case PILOT_SP3_2:
               data_cells = data_cells_table_32K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP3_2][cred][pilotboost];
               break;
             case PILOT_SP3_4:
               data_cells = data_cells_table_32K[PILOT_SP3_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP3_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP3_4][cred][pilotboost];
               break;
             case PILOT_SP4_2:
               data_cells = data_cells_table_32K[PILOT_SP4_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP4_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP4_2][cred][pilotboost];
               break;
             case PILOT_SP4_4:
               data_cells = data_cells_table_32K[PILOT_SP4_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP4_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP4_4][cred][pilotboost];
               break;
             case PILOT_SP6_2:
               data_cells = data_cells_table_32K[PILOT_SP6_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP6_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP6_2][cred][pilotboost];
               break;
             case PILOT_SP6_4:
               data_cells = data_cells_table_32K[PILOT_SP6_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP6_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP6_4][cred][pilotboost];
               break;
             case PILOT_SP8_2:
               data_cells = data_cells_table_32K[PILOT_SP8_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP8_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP8_2][cred][pilotboost];
               break;
             case PILOT_SP8_4:
               data_cells = data_cells_table_32K[PILOT_SP8_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP8_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP8_4][cred][pilotboost];
               break;
             case PILOT_SP12_2:
               data_cells = data_cells_table_32K[PILOT_SP12_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP12_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP12_2][cred][pilotboost];
               break;
             case PILOT_SP12_4:
               data_cells = data_cells_table_32K[PILOT_SP12_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP12_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP12_4][cred][pilotboost];
               break;
             case PILOT_SP16_2:
               data_cells = data_cells_table_32K[PILOT_SP16_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP16_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP16_2][cred][pilotboost];
               break;
             case PILOT_SP16_4:
               data_cells = data_cells_table_32K[PILOT_SP16_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP16_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP16_4][cred][pilotboost];
               break;
             case PILOT_SP24_2:
               data_cells = data_cells_table_32K[PILOT_SP24_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP24_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP24_2][cred][pilotboost];
               break;
             case PILOT_SP24_4:
               data_cells = data_cells_table_32K[PILOT_SP24_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP24_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP24_4][cred][pilotboost];
               break;
             case PILOT_SP32_2:
               data_cells = data_cells_table_32K[PILOT_SP32_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP32_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP32_2][cred][pilotboost];
               break;
             case PILOT_SP32_4:
               data_cells = data_cells_table_32K[PILOT_SP32_4][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP32_4][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP32_4][cred][pilotboost];
               break;
             default:
               data_cells = data_cells_table_32K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_32K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP3_2][cred][pilotboost];
               break;
           }
           break;
@@ -681,70 +715,87 @@ namespace gr {
             case PILOT_SP3_2:
               data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
               break;
             case PILOT_SP3_4:
               data_cells = data_cells_table_8K[PILOT_SP3_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP3_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_4][cred][pilotboost];
               break;
             case PILOT_SP4_2:
               data_cells = data_cells_table_8K[PILOT_SP4_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP4_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_2][cred][pilotboost];
               break;
             case PILOT_SP4_4:
               data_cells = data_cells_table_8K[PILOT_SP4_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP4_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_4][cred][pilotboost];
               break;
             case PILOT_SP6_2:
               data_cells = data_cells_table_8K[PILOT_SP6_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP6_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_2][cred][pilotboost];
               break;
             case PILOT_SP6_4:
               data_cells = data_cells_table_8K[PILOT_SP6_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP6_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_4][cred][pilotboost];
               break;
             case PILOT_SP8_2:
               data_cells = data_cells_table_8K[PILOT_SP8_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP8_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_2][cred][pilotboost];
               break;
             case PILOT_SP8_4:
               data_cells = data_cells_table_8K[PILOT_SP8_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP8_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_4][cred][pilotboost];
               break;
             case PILOT_SP12_2:
               data_cells = data_cells_table_8K[PILOT_SP12_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP12_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_2][cred][pilotboost];
               break;
             case PILOT_SP12_4:
               data_cells = data_cells_table_8K[PILOT_SP12_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP12_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_4][cred][pilotboost];
               break;
             case PILOT_SP16_2:
               data_cells = data_cells_table_8K[PILOT_SP16_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP16_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_2][cred][pilotboost];
               break;
             case PILOT_SP16_4:
               data_cells = data_cells_table_8K[PILOT_SP16_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP16_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_4][cred][pilotboost];
               break;
             case PILOT_SP24_2:
               data_cells = data_cells_table_8K[PILOT_SP24_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP24_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_2][cred][pilotboost];
               break;
             case PILOT_SP24_4:
               data_cells = data_cells_table_8K[PILOT_SP24_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP24_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_4][cred][pilotboost];
               break;
             case PILOT_SP32_2:
               data_cells = data_cells_table_8K[PILOT_SP32_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP32_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_2][cred][pilotboost];
               break;
             case PILOT_SP32_4:
               data_cells = data_cells_table_8K[PILOT_SP32_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP32_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_4][cred][pilotboost];
               break;
             default:
               data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
               break;
           }
           break;
@@ -2263,14 +2314,52 @@ namespace gr {
       {{5712, 4856, 4147, 3588, 3146}, {5632, 4788, 4089, 3538, 3102}, {5553, 4720, 4032, 3488, 3058}, {5474, 4653, 3974, 3439, 3015}, {5395, 4586, 3917, 3390, 2972}},
       {{6000, 5716, 5398, 5188, 4971}, {5916, 5636, 5322, 5116, 4901}, {5833, 5557, 5247, 5044, 4833}, {5750, 5478, 5173, 4972, 4764}, {5667, 5399, 5098, 4901, 4695}},
       {{6000, 5168, 4558, 4078, 3697}, {5916, 5096, 4494, 4021, 3645}, {5833, 5024, 4432, 3964, 3595}, {5750, 4953, 4369, 3908, 3544}, {5667, 4881, 4306, 3852, 3493}},
-      {{5976, 5729, 5533, 5379, 12576}, {5892, 5648, 5456, 5304, 12400}, {5810, 5569, 5380, 5229, 12227}, {5727, 5490, 5303, 5155, 12052}, {5644, 5411, 5227, 5081, 11878}},
-      {{5508, 5010, 4616, 4305, 12576}, {5431, 4940, 4552, 4245, 12400}, {5355, 4870, 4488, 4186, 12227}, {5279, 4801, 4425, 4126, 12052}, {5203, 4732, 4361, 4067, 11878}},
-      {{6132, 5919, 5751, 5618, 12864}, {6046, 5836, 5671, 5540, 12684}, {5961, 5754, 5591, 5462, 12507}, {5876, 5672, 5512, 5385, 12328}, {5792, 5591, 5432, 5307, 12150}},
-      {{5691, 5252, 4906, 4633, 12864}, {5608, 5173, 4831, 4559, 12684}, {5532, 5106, 4770, 4504, 12507}, {5450, 5028, 4695, 4432, 12328}, {5375, 4961, 4635, 4377, 12150}},
-      {{6297, 6123, 5986, 5877, 13152}, {6209, 6038, 5902, 5795, 12968}, {6122, 5953, 5820, 5714, 12787}, {6035, 5868, 5737, 5633, 12604}, {5948, 5784, 5654, 5552, 12422}},
-      {{5922, 5564, 5282, 5058, 13152}, {5839, 5486, 5208, 4988, 12968}, {5757, 5409, 5135, 4918, 12787}, {5675, 5333, 5062, 4848, 12604}, {5594, 5256, 4990, 4779, 12422}},
-      {{6384, 6231, 6125, 6015, 13296}, {6294, 6142, 6037, 5928, 13110}, {6207, 6058, 5955, 5848, 12927}, {6117, 5970, 5868, 5762, 12742}, {6030, 5886, 5786, 5682, 12558}},
-      {{6064, 5757, 5515, 5324, 13296}, {5971, 5664, 5422, 5231, 13110}, {5890, 5589, 5351, 5164, 12927}, {5809, 5514, 5281, 5097, 12742}, {5728, 5438, 5210, 5030, 12558}}
+      {{6288, 5976, 5729, 5533, 5379}, {6200, 5892, 5648, 5456, 5304}, {6113, 5810, 5569, 5380, 5229}, {6026, 5727, 5490, 5303, 5155}, {5939, 5644, 5411, 5227, 5081}},
+      {{6288, 5508, 5010, 4616, 4305}, {6200, 5431, 4940, 4552, 4245}, {6113, 5355, 4870, 4488, 4186}, {6026, 5279, 4801, 4425, 4126}, {5939, 5203, 4732, 4361, 4067}},
+      {{6432, 6132, 5919, 5751, 5618}, {6342, 6046, 5836, 5671, 5540}, {6253, 5961, 5754, 5591, 5462}, {6164, 5876, 5672, 5512, 5385}, {6075, 5792, 5591, 5432, 5307}},
+      {{6432, 5691, 5252, 4906, 4633}, {6342, 5608, 5173, 4831, 4559}, {6253, 5532, 5106, 4770, 4504}, {6164, 5450, 5028, 4695, 4432}, {6075, 5375, 4961, 4635, 4377}},
+      {{6576, 6297, 6123, 5986, 5877}, {6484, 6209, 6038, 5902, 5795}, {6393, 6122, 5953, 5820, 5714}, {6302, 6035, 5868, 5737, 5633}, {6211, 5948, 5784, 5654, 5552}},
+      {{6576, 5922, 5564, 5282, 5058}, {6484, 5839, 5486, 5208, 4988}, {6393, 5757, 5409, 5135, 4918}, {6302, 5675, 5333, 5062, 4848}, {6211, 5594, 5256, 4990, 4779}},
+      {{6648, 6384, 6231, 6125, 6015}, {6555, 6294, 6142, 6037, 5928}, {6463, 6207, 6058, 5955, 5848}, {6371, 6117, 5970, 5868, 5762}, {6279, 6030, 5886, 5786, 5682}},
+      {{6648, 6064, 5757, 5515, 5324}, {6555, 5971, 5664, 5422, 5231}, {6463, 5890, 5589, 5351, 5164}, {6371, 5809, 5514, 5281, 5097}, {6279, 5728, 5438, 5210, 5030}}
+    };
+
+    const int framemapper_cc_impl::sbs_data_cells_table_16K[16][5][5] = {
+      {{9120, 9120, 8244, 7601, 6933}, {8992, 8992, 8129, 7495, 6835}, {8867, 8867, 8016, 7391, 6741}, {8740, 8740, 7901, 7285, 6644}, {8614, 8614, 7787, 7180, 6549}},
+      {{9120, 7807, 5841, 4290, 3063}, {8992, 7697, 5758, 4229, 3019}, {8867, 7591, 5679, 4172, 2979}, {8740, 7482, 5597, 4112, 2936}, {8614, 7374, 5517, 4053, 2894}},
+      {{10272, 10017, 9199, 8554, 8043}, {10128, 9876, 9070, 8434, 7930}, {9987, 9739, 8943, 8316, 7820}, {9844, 9599, 8815, 8197, 7708}, {9702, 9461, 8688, 8079, 7597}},
+      {{10272, 8663, 6930, 5731, 4484}, {10128, 8541, 6833, 5650, 4420}, {9987, 8422, 6738, 5572, 4360}, {9844, 8302, 6642, 5492, 4297}, {9702, 8182, 6546, 5413, 4236}},
+      {{11424, 10912, 10225, 9684, 9256}, {11264, 10759, 10082, 9549, 9126}, {11107, 10609, 9942, 9416, 8999}, {10948, 10457, 9799, 9281, 8870}, {10790, 10306, 9658, 9147, 8743}},
+      {{11424, 9708, 8288, 7168, 6282}, {11264, 9572, 8171, 7068, 6194}, {11107, 9438, 8058, 6970, 6108}, {10948, 9303, 7943, 6870, 6021}, {10790, 9169, 7828, 6771, 5934}},
+      {{12000, 11431, 10793, 10375, 9939}, {11832, 11271, 10642, 10229, 9800}, {11667, 11114, 10494, 10087, 9664}, {11500, 10955, 10344, 9942, 9525}, {11334, 10797, 10194, 9799, 9388}},
+      {{12000, 10331, 9109, 8146, 7383}, {11832, 10187, 8982, 8032, 7280}, {11667, 10045, 8857, 7920, 7179}, {11500, 9901, 8730, 7807, 7076}, {11334, 9758, 8604, 7695, 6974}},
+      {{12576, 11950, 11455, 11064, 10755}, {12400, 11783, 11294, 10909, 10604}, {12227, 11619, 11137, 10757, 10456}, {12052, 11452, 10977, 10603, 10307}, {11878, 11287, 10819, 10450, 10158}},
+      {{12576, 11011, 10010, 9221, 8596}, {12400, 10857, 9870, 9091, 8475}, {12227, 10706, 9732, 8965, 8358}, {12052, 10552, 9593, 8837, 8238}, {11878, 10400, 9455, 8710, 8120}},
+      {{12864, 12262, 11835, 11499, 11233}, {12684, 12090, 11669, 11338, 11075}, {12507, 11921, 11507, 11180, 10921}, {12328, 11751, 11342, 11020, 10765}, {12150, 11581, 11178, 10861, 10609}},
+      {{12864, 11374, 10493, 9798, 9248}, {12684, 11215, 10346, 9661, 9118}, {12507, 11058, 10202, 9526, 8992}, {12328, 10900, 10056, 9390, 8863}, {12150, 10743, 9911, 9255, 8736}},
+      {{13152, 12593, 12243, 11968, 11750}, {12968, 12416, 12072, 11800, 11585}, {12787, 12243, 11903, 11636, 11424}, {12604, 12068, 11733, 11469, 11260}, {12422, 11894, 11564, 11304, 11098}},
+      {{13152, 11834, 11113, 10544, 10094}, {12968, 11668, 10957, 10397, 9953}, {12787, 11506, 10805, 10252, 9815}, {12604, 11341, 10650, 10106, 9675}, {12422, 11178, 10497, 9960, 9536}},
+      {{13296, 12766, 12458, 12245, 12024}, {13110, 12587, 12284, 12074, 11856}, {12927, 12412, 12113, 11906, 11691}, {12742, 12234, 11940, 11735, 11523}, {12558, 12058, 11767, 11566, 11357}},
+      {{13296, 12116, 11497, 11008, 10622}, {13110, 11941, 11327, 10844, 10461}, {12927, 11780, 11178, 10703, 10328}, {12742, 11606, 11010, 10540, 10168}, {12558, 11444, 10860, 10399, 10034}}
+    };
+
+    const int framemapper_cc_impl::sbs_data_cells_table_32K[16][5][5] = {
+      {{18240, 18240, 16488, 15202, 13865}, {17984, 17984, 16256, 14988, 13669}, {17734, 17734, 16031, 14780, 13480}, {17480, 17480, 15801, 14568, 13287}, {17228, 17228, 15573, 14359, 13096}},
+      {{18240, 15612, 11678, 8576, 6121}, {17984, 15393, 11513, 8454, 6033}, {17734, 15179, 11354, 8339, 5951}, {17480, 14962, 11192, 8219, 5866}, {17228, 14746, 11031, 8101, 5782}},
+      {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}},
+      {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}},
+      {{22848, 21823, 20449, 19367, 18510}, {22528, 21517, 20163, 19095, 18250}, {22214, 21217, 19882, 18829, 17996}, {21896, 20913, 19597, 18560, 17738}, {21580, 20612, 19315, 18292, 17483}},
+      {{22848, 19412, 16570, 14329, 12555}, {22528, 19140, 16337, 14127, 12378}, {22214, 18873, 16110, 13932, 12207}, {21896, 18603, 15879, 13732, 12032}, {21580, 18335, 15651, 13534, 11859}},
+      {{24000, 22861, 21585, 20747, 19876}, {23664, 22541, 21282, 20456, 19597}, {23334, 22227, 20986, 20171, 19324}, {23000, 21909, 20685, 19882, 19048}, {22668, 21593, 20387, 19596, 18773}},
+      {{24000, 20658, 18212, 16283, 14755}, {23664, 20369, 17956, 16054, 14548}, {23334, 20085, 17707, 15831, 14347}, {23000, 19798, 17453, 15604, 14141}, {22668, 19512, 17202, 15380, 13938}},
+      {{25152, 23899, 22907, 22124, 21505}, {24800, 23564, 22586, 21815, 21204}, {24454, 23236, 22271, 21511, 20909}, {24104, 22903, 21952, 21203, 20609}, {23756, 22572, 21636, 20897, 20312}},
+      {{25152, 22016, 20010, 18429, 17177}, {24800, 21707, 19730, 18170, 16936}, {24454, 21405, 19455, 17918, 16701}, {24104, 21099, 19177, 17661, 16462}, {23756, 20794, 18900, 17407, 16225}},
+      {{25728, 24521, 23667, 22994, 22461}, {25368, 24178, 23336, 22672, 22146}, {25014, 23841, 23011, 22356, 21838}, {24656, 23500, 22681, 22036, 21525}, {24300, 23160, 22354, 21718, 21215}},
+      {{25728, 22740, 20974, 19581, 18479}, {25368, 22422, 20680, 19307, 18220}, {25014, 22109, 20392, 19038, 17967}, {24656, 21793, 20100, 18766, 17710}, {24300, 21478, 19810, 18495, 17454}},
+      {{26304, 25183, 24483, 23931, 23494}, {25936, 24830, 24140, 23596, 23165}, {25574, 24484, 23803, 23267, 22842}, {25208, 24133, 23463, 22934, 22515}, {24844, 23785, 23124, 22603, 22190}},
+      {{26304, 23658, 22211, 21070, 20167}, {25936, 23327, 21900, 20775, 19885}, {25574, 23002, 21595, 20486, 19608}, {25208, 22673, 21286, 20193, 19328}, {24844, 22345, 20979, 19902, 19049}},
+      {{26592, 25529, 24913, 24486, 24042}, {26220, 25172, 24564, 24143, 23705}, {25854, 24821, 24221, 23806, 23375}, {25484, 24465, 23875, 23466, 23040}, {25116, 24112, 23530, 23127, 22708}},
+      {{26592, 24221, 22976, 21995, 21218}, {26220, 23882, 22654, 21687, 20921}, {25854, 23549, 22339, 21385, 20630}, {25484, 23212, 22019, 21079, 20335}, {25116, 22877, 21702, 20775, 20042}}
     };
 
   } /* namespace atsc3 */
