@@ -139,6 +139,7 @@ namespace gr {
       void calculate_crc_table();
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
+      void block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows);
       unsigned char l1_temp[FRAME_SIZE_SHORT];
       unsigned char l1_basic[FRAME_SIZE_SHORT];
       unsigned char l1_detail[FRAME_SIZE_SHORT];

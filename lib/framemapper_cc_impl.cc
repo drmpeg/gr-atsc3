@@ -966,6 +966,175 @@ namespace gr {
       calculate_crc_table();
     }
 
+    void
+    framemapper_cc_impl::block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows)
+    {
+      int temp, index, pack, count;
+      const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
+
+      switch (mode) {
+        case L1_FEC_MODE_1:
+        case L1_FEC_MODE_2:
+        case L1_FEC_MODE_3:
+          c1 = &l1t[0];
+          c2 = &l1t[rows];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1[index++] = c1[j];
+            l1[index++] = c2[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            temp = l1[index++] << 1;
+            temp |= l1[index++];
+            *out++ = m_qpsk[temp];
+          }
+          break;
+        case L1_FEC_MODE_4:
+          c1 = &l1t[0];
+          c2 = &l1t[rows];
+          c3 = &l1t[rows * 2];
+          c4 = &l1t[rows * 3];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1[index++] = c1[j];
+            l1[index++] = c2[j];
+            l1[index++] = c3[j];
+            l1[index++] = c4[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 3; e >= 0; e--) {
+              pack |= l1[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0xf;
+            temp >>= 4;
+            pack |= temp;
+            count = (count + 1) & 0x3;
+            *out++ = m_16qam[pack & 0xf];
+          }
+          break;
+        case L1_FEC_MODE_5:
+          c1 = &l1t[0];
+          c2 = &l1t[rows];
+          c3 = &l1t[rows * 2];
+          c4 = &l1t[rows * 3];
+          c5 = &l1t[rows * 4];
+          c6 = &l1t[rows * 5];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1[index++] = c1[j];
+            l1[index++] = c2[j];
+            l1[index++] = c3[j];
+            l1[index++] = c4[j];
+            l1[index++] = c5[j];
+            l1[index++] = c6[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 5; e >= 0; e--) {
+              pack |= l1[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0x3f;
+            temp >>= 6;
+            pack |= temp;
+            count = (count + 1);
+            if (count == 6) {  /* faster than modulo */
+              count = 0;
+            }
+            *out++ = m_64qam[pack & 0x3f];
+          }
+          break;
+        case L1_FEC_MODE_6:
+          c1 = &l1t[0];
+          c2 = &l1t[rows];
+          c3 = &l1t[rows * 2];
+          c4 = &l1t[rows * 3];
+          c5 = &l1t[rows * 4];
+          c6 = &l1t[rows * 5];
+          c7 = &l1t[rows * 6];
+          c8 = &l1t[rows * 7];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1[index++] = c1[j];
+            l1[index++] = c2[j];
+            l1[index++] = c3[j];
+            l1[index++] = c4[j];
+            l1[index++] = c5[j];
+            l1[index++] = c6[j];
+            l1[index++] = c7[j];
+            l1[index++] = c8[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 7; e >= 0; e--) {
+              pack |= l1[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0xff;
+            temp >>= 8;
+            pack |= temp;
+            count = (count + 1) & 0x7;
+            *out++ = m_l1b_256qam[pack & 0xff];
+          }
+          break;
+        case L1_FEC_MODE_7:
+          c1 = &l1t[0];
+          c2 = &l1t[rows];
+          c3 = &l1t[rows * 2];
+          c4 = &l1t[rows * 3];
+          c5 = &l1t[rows * 4];
+          c6 = &l1t[rows * 5];
+          c7 = &l1t[rows * 6];
+          c8 = &l1t[rows * 7];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1[index++] = c1[j];
+            l1[index++] = c2[j];
+            l1[index++] = c3[j];
+            l1[index++] = c4[j];
+            l1[index++] = c5[j];
+            l1[index++] = c6[j];
+            l1[index++] = c7[j];
+            l1[index++] = c8[j];
+          }
+          index = count = 0;
+          for (int j = 0; j < rows; j++) {
+            pack = 0;
+            for (int e = 7; e >= 0; e--) {
+              pack |= l1[index++] << e;
+            }
+            temp = pack << count;
+            pack = temp & 0xff;
+            temp >>= 8;
+            pack |= temp;
+            count = (count + 1) & 0x7;
+            *out++ = m_l1b_256qam[pack & 0xff];
+          }
+          break;
+        default:
+          c1 = &l1t[0];
+          c2 = &l1t[rows];
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            l1[index++] = c1[j];
+            l1[index++] = c2[j];
+          }
+          index = 0;
+          for (int j = 0; j < rows; j++) {
+            temp = l1[index++] << 1;
+            temp |= l1[index++];
+            *out++ = m_qpsk[temp];
+          }
+          break;
+      }
+    }
+
     int
     framemapper_cc_impl::add_l1basic(gr_complex *out, int time_offset)
     {
@@ -973,7 +1142,7 @@ namespace gr {
       int npad, padbits, count, nrepeat;
       int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
-      int B, mod, rows, pack;
+      int B, mod, rows;
       long long templong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
@@ -985,7 +1154,6 @@ namespace gr {
       const int q1 = q1_val;
       const int q2 = q2_val;
       const int m1 = m1_val;
-      const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
 
       temp = l1basicinit->version;
       for (int n = 2; n >= 0; n--) {
@@ -1275,167 +1443,7 @@ namespace gr {
 
       /* block interleaver, bit demuxing and constellation mapping */
       rows = numbits / mod;
-      switch (l1b_mode) {
-        case L1_FEC_MODE_1:
-        case L1_FEC_MODE_2:
-        case L1_FEC_MODE_3:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1basic[index++] = c1[j];
-            l1basic[index++] = c2[j];
-          }
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            temp = l1basic[index++] << 1;
-            temp |= l1basic[index++];
-            *out++ = m_qpsk[temp];
-          }
-          break;
-        case L1_FEC_MODE_4:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1basic[index++] = c1[j];
-            l1basic[index++] = c2[j];
-            l1basic[index++] = c3[j];
-            l1basic[index++] = c4[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 3; e >= 0; e--) {
-              pack |= l1basic[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0xf;
-            temp >>= 4;
-            pack |= temp;
-            count = (count + 1) & 0x3;
-            *out++ = m_16qam[pack & 0xf];
-          }
-          break;
-        case L1_FEC_MODE_5:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          c5 = &l1temp[rows * 4];
-          c6 = &l1temp[rows * 5];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1basic[index++] = c1[j];
-            l1basic[index++] = c2[j];
-            l1basic[index++] = c3[j];
-            l1basic[index++] = c4[j];
-            l1basic[index++] = c5[j];
-            l1basic[index++] = c6[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 5; e >= 0; e--) {
-              pack |= l1basic[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0x3f;
-            temp >>= 6;
-            pack |= temp;
-            count = (count + 1);
-            if (count == 6) {  /* faster than modulo */
-              count = 0;
-            }
-            *out++ = m_64qam[pack & 0x3f];
-          }
-          break;
-        case L1_FEC_MODE_6:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          c5 = &l1temp[rows * 4];
-          c6 = &l1temp[rows * 5];
-          c7 = &l1temp[rows * 6];
-          c8 = &l1temp[rows * 7];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1basic[index++] = c1[j];
-            l1basic[index++] = c2[j];
-            l1basic[index++] = c3[j];
-            l1basic[index++] = c4[j];
-            l1basic[index++] = c5[j];
-            l1basic[index++] = c6[j];
-            l1basic[index++] = c7[j];
-            l1basic[index++] = c8[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 7; e >= 0; e--) {
-              pack |= l1basic[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0xff;
-            temp >>= 8;
-            pack |= temp;
-            count = (count + 1) & 0x7;
-            *out++ = m_l1b_256qam[pack & 0xff];
-          }
-          break;
-        case L1_FEC_MODE_7:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          c5 = &l1temp[rows * 4];
-          c6 = &l1temp[rows * 5];
-          c7 = &l1temp[rows * 6];
-          c8 = &l1temp[rows * 7];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1basic[index++] = c1[j];
-            l1basic[index++] = c2[j];
-            l1basic[index++] = c3[j];
-            l1basic[index++] = c4[j];
-            l1basic[index++] = c5[j];
-            l1basic[index++] = c6[j];
-            l1basic[index++] = c7[j];
-            l1basic[index++] = c8[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 7; e >= 0; e--) {
-              pack |= l1basic[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0xff;
-            temp >>= 8;
-            pack |= temp;
-            count = (count + 1) & 0x7;
-            *out++ = m_l1b_256qam[pack & 0xff];
-          }
-          break;
-        default:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1basic[index++] = c1[j];
-            l1basic[index++] = c2[j];
-          }
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            temp = l1basic[index++] << 1;
-            temp |= l1basic[index++];
-            *out++ = m_qpsk[temp];
-          }
-          break;
-      }
+      block_interleaver(&l1basic[0], &l1temp[0], out, l1b_mode, rows);
       return (numbits / mod);
     }
 
@@ -1446,7 +1454,7 @@ namespace gr {
       int npad, padbits, count, nrepeat, table;
       int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
-      int Anum, Aden, B, mod, rows, pack;
+      int Anum, Aden, B, mod, rows;
       long long templong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
@@ -1459,7 +1467,6 @@ namespace gr {
       const int q1 = q1_val;
       const int q2 = q2_val;
       const int m1 = m1_val;
-      const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
 
       temp = l1detailinit->version;
       for (int n = 3; n >= 0; n--) {
@@ -1789,167 +1796,7 @@ namespace gr {
 
       /* block interleaver, bit demuxing and constellation mapping */
       rows = numbits / mod;
-      switch (l1d_mode) {
-        case L1_FEC_MODE_1:
-        case L1_FEC_MODE_2:
-        case L1_FEC_MODE_3:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1detail[index++] = c1[j];
-            l1detail[index++] = c2[j];
-          }
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            temp = l1detail[index++] << 1;
-            temp |= l1detail[index++];
-            *out++ = m_qpsk[temp];
-          }
-          break;
-        case L1_FEC_MODE_4:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1detail[index++] = c1[j];
-            l1detail[index++] = c2[j];
-            l1detail[index++] = c3[j];
-            l1detail[index++] = c4[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 3; e >= 0; e--) {
-              pack |= l1detail[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0xf;
-            temp >>= 4;
-            pack |= temp;
-            count = (count + 1) & 0x3;
-            *out++ = m_16qam[pack & 0xf];
-          }
-          break;
-        case L1_FEC_MODE_5:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          c5 = &l1temp[rows * 4];
-          c6 = &l1temp[rows * 5];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1detail[index++] = c1[j];
-            l1detail[index++] = c2[j];
-            l1detail[index++] = c3[j];
-            l1detail[index++] = c4[j];
-            l1detail[index++] = c5[j];
-            l1detail[index++] = c6[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 5; e >= 0; e--) {
-              pack |= l1detail[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0x3f;
-            temp >>= 6;
-            pack |= temp;
-            count = (count + 1);
-            if (count == 6) {  /* faster than modulo */
-              count = 0;
-            }
-            *out++ = m_64qam[pack & 0x3f];
-          }
-          break;
-        case L1_FEC_MODE_6:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          c5 = &l1temp[rows * 4];
-          c6 = &l1temp[rows * 5];
-          c7 = &l1temp[rows * 6];
-          c8 = &l1temp[rows * 7];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1detail[index++] = c1[j];
-            l1detail[index++] = c2[j];
-            l1detail[index++] = c3[j];
-            l1detail[index++] = c4[j];
-            l1detail[index++] = c5[j];
-            l1detail[index++] = c6[j];
-            l1detail[index++] = c7[j];
-            l1detail[index++] = c8[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 7; e >= 0; e--) {
-              pack |= l1detail[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0xff;
-            temp >>= 8;
-            pack |= temp;
-            count = (count + 1) & 0x7;
-            *out++ = m_l1b_256qam[pack & 0xff];
-          }
-          break;
-        case L1_FEC_MODE_7:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          c3 = &l1temp[rows * 2];
-          c4 = &l1temp[rows * 3];
-          c5 = &l1temp[rows * 4];
-          c6 = &l1temp[rows * 5];
-          c7 = &l1temp[rows * 6];
-          c8 = &l1temp[rows * 7];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1detail[index++] = c1[j];
-            l1detail[index++] = c2[j];
-            l1detail[index++] = c3[j];
-            l1detail[index++] = c4[j];
-            l1detail[index++] = c5[j];
-            l1detail[index++] = c6[j];
-            l1detail[index++] = c7[j];
-            l1detail[index++] = c8[j];
-          }
-          index = count = 0;
-          for (int j = 0; j < rows; j++) {
-            pack = 0;
-            for (int e = 7; e >= 0; e--) {
-              pack |= l1detail[index++] << e;
-            }
-            temp = pack << count;
-            pack = temp & 0xff;
-            temp >>= 8;
-            pack |= temp;
-            count = (count + 1) & 0x7;
-            *out++ = m_l1b_256qam[pack & 0xff];
-          }
-          break;
-        default:
-          c1 = &l1temp[0];
-          c2 = &l1temp[rows];
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            l1detail[index++] = c1[j];
-            l1detail[index++] = c2[j];
-          }
-          index = 0;
-          for (int j = 0; j < rows; j++) {
-            temp = l1detail[index++] << 1;
-            temp |= l1detail[index++];
-            *out++ = m_qpsk[temp];
-          }
-          break;
-      }
+      block_interleaver(&l1detail[0], &l1temp[0], out, l1d_mode, rows);
       return (numbits / mod);
     }
 
