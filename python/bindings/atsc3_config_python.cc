@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(15eb14b1f80ca373a4da7b9f2c369b23)                     */
+/* BINDTOOL_HEADER_FILE_HASH(aa3f48c1e44a65788f6b67a0c2c84bf5)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -201,6 +201,16 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_first_sbs_t>();
+    py::enum_<::gr::atsc3::atsc3_scattered_pilot_boost_t>(m,"atsc3_scattered_pilot_boost_t")
+        .value("SPB_0", ::gr::atsc3::SPB_0) // 0
+        .value("SPB_1", ::gr::atsc3::SPB_1) // 1
+        .value("SPB_2", ::gr::atsc3::SPB_2) // 2
+        .value("SPB_3", ::gr::atsc3::SPB_3) // 3
+        .value("SPB_4", ::gr::atsc3::SPB_4) // 4
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_scattered_pilot_boost_t>();
 
 
 

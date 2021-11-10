@@ -150,6 +150,14 @@ namespace gr {
       SBS_ON,
     };
 
+    enum atsc3_scattered_pilot_boost_t {
+      SPB_0 = 0,
+      SPB_1,
+      SPB_2,
+      SPB_3,
+      SPB_4,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -169,5 +177,6 @@ typedef gr::atsc3::atsc3_reduced_carriers_t atsc3_reduced_carriers_t;
 typedef gr::atsc3::atsc3_l1_fec_mode_t atsc3_l1_fec_mode_t;
 typedef gr::atsc3::atsc3_fec_type_t atsc3_fec_type_t;
 typedef gr::atsc3::atsc3_first_sbs_t atsc3_first_sbs_t;
+typedef gr::atsc3::atsc3_scattered_pilot_boost_t atsc3_scattered_pilot_boost_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

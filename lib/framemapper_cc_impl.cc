@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, plpsize, guardinterval, pilotpattern, firstsbs, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, plpsize, guardinterval, pilotpattern, pilotboost, firstsbs, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -39,6 +39,7 @@ namespace gr {
       int preamble_cells;
       int data_cells;
       int sbs_cells;
+      int sbs_data_cells;
 
       samples = 0;
       cells = 0;
@@ -175,8 +176,8 @@ namespace gr {
       l1basicinit->first_sub_reduced_carriers = CRED_0;
       l1basicinit->first_sub_guard_interval = GI_5_1024;
       l1basicinit->first_sub_num_ofdm_symbols = numpayloadsyms - 1;
-      l1basicinit->first_sub_scattered_pilot_pattern = PILOT_SP3_4;
-      l1basicinit->first_sub_scattered_pilot_boost = 4;
+      l1basicinit->first_sub_scattered_pilot_pattern = pilotpattern;
+      l1basicinit->first_sub_scattered_pilot_boost = pilotboost;
       l1basicinit->first_sub_sbs_first = firstsbs;
       l1basicinit->first_sub_sbs_last = TRUE;
       l1basicinit->reserved = 0xffffffffffff;
@@ -239,9 +240,7 @@ namespace gr {
       l1detailinit->plp_type = 0;
       l1detailinit->reserved = 0xfffffffffffff;
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0);
-      printf("l1cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
-      printf("l1cells = %d\n", l1cells);
       switch (fftsize) {
         case FFTSIZE_8K:
           fftsamples = 8192;
@@ -449,70 +448,87 @@ namespace gr {
             case PILOT_SP3_2:
               data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
               break;
             case PILOT_SP3_4:
               data_cells = data_cells_table_8K[PILOT_SP3_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP3_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_4][cred][pilotboost];
               break;
             case PILOT_SP4_2:
               data_cells = data_cells_table_8K[PILOT_SP4_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP4_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_2][cred][pilotboost];
               break;
             case PILOT_SP4_4:
               data_cells = data_cells_table_8K[PILOT_SP4_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP4_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_4][cred][pilotboost];
               break;
             case PILOT_SP6_2:
               data_cells = data_cells_table_8K[PILOT_SP6_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP6_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_2][cred][pilotboost];
               break;
             case PILOT_SP6_4:
               data_cells = data_cells_table_8K[PILOT_SP6_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP6_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_4][cred][pilotboost];
               break;
             case PILOT_SP8_2:
               data_cells = data_cells_table_8K[PILOT_SP8_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP8_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_2][cred][pilotboost];
               break;
             case PILOT_SP8_4:
               data_cells = data_cells_table_8K[PILOT_SP8_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP8_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_4][cred][pilotboost];
               break;
             case PILOT_SP12_2:
               data_cells = data_cells_table_8K[PILOT_SP12_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP12_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_2][cred][pilotboost];
               break;
             case PILOT_SP12_4:
               data_cells = data_cells_table_8K[PILOT_SP12_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP12_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_4][cred][pilotboost];
               break;
             case PILOT_SP16_2:
               data_cells = data_cells_table_8K[PILOT_SP16_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP16_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_2][cred][pilotboost];
               break;
             case PILOT_SP16_4:
               data_cells = data_cells_table_8K[PILOT_SP16_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP16_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_4][cred][pilotboost];
               break;
             case PILOT_SP24_2:
               data_cells = data_cells_table_8K[PILOT_SP24_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP24_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_2][cred][pilotboost];
               break;
             case PILOT_SP24_4:
               data_cells = data_cells_table_8K[PILOT_SP24_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP24_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_4][cred][pilotboost];
               break;
             case PILOT_SP32_2:
               data_cells = data_cells_table_8K[PILOT_SP32_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP32_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_2][cred][pilotboost];
               break;
             case PILOT_SP32_4:
               data_cells = data_cells_table_8K[PILOT_SP32_4][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP32_4][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_4][cred][pilotboost];
               break;
             default:
               data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
               sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
               break;
           }
           break;
@@ -757,11 +773,7 @@ namespace gr {
       else {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
       }
-#if 0
-      l1detailinit->sbs_null_cells = sbsnullcells = totalcells - (plpsize + l1cells);
-#else
-      l1detailinit->sbs_null_cells = sbsnullcells = 3026;
-#endif
+      l1detailinit->sbs_null_cells = sbsnullcells = sbs_cells - sbs_data_cells;
       set_output_multiple(totalcells);
     }
 
@@ -2240,6 +2252,25 @@ namespace gr {
       {26304, 25936, 25574, 25208, 24844},
       {26592, 26220, 25854, 25484, 25116},
       {26592, 26220, 25854, 25484, 25116}
+    };
+
+    const int framemapper_cc_impl::sbs_data_cells_table_8K[16][5][5] = {
+      {{4560, 4560, 4123, 3801, 3467}, {4496, 4496, 4065, 3748, 3418}, {4433, 4433, 4008, 3695, 3371}, {4370, 4370, 3951, 3643, 3323}, {4307, 4307, 3894, 3591, 3275}},
+      {{4560, 3904, 2922, 2148, 1534}, {4496, 3849, 2881, 2117, 1513}, {4433, 3796, 2841, 2088, 1492}, {4370, 3742, 2800, 2058, 1471}, {4307, 3688, 2760, 2029, 1450}},
+      {{5136, 5009, 4600, 4278, 4022}, {5064, 4938, 4535, 4218, 3966}, {4993, 4869, 4472, 4158, 3910}, {4922, 4800, 4408, 4099, 3855}, {4851, 4731, 4345, 4040, 3799}},
+      {{5136, 4332, 3467, 2868, 2245}, {5064, 4272, 3419, 2828, 2214}, {4993, 4212, 3371, 2788, 2183}, {4922, 4152, 3323, 2749, 2152}, {4851, 4092, 3275, 2710, 2121}},
+      {{5712, 5456, 5114, 4843, 4629}, {5632, 5380, 5042, 4775, 4564}, {5553, 5304, 4971, 4708, 4500}, {5474, 5229, 4901, 4641, 4436}, {5395, 5154, 4830, 4575, 4372}},
+      {{5712, 4856, 4147, 3588, 3146}, {5632, 4788, 4089, 3538, 3102}, {5553, 4720, 4032, 3488, 3058}, {5474, 4653, 3974, 3439, 3015}, {5395, 4586, 3917, 3390, 2972}},
+      {{6000, 5716, 5398, 5188, 4971}, {5916, 5636, 5322, 5116, 4901}, {5833, 5557, 5247, 5044, 4833}, {5750, 5478, 5173, 4972, 4764}, {5667, 5399, 5098, 4901, 4695}},
+      {{6000, 5168, 4558, 4078, 3697}, {5916, 5096, 4494, 4021, 3645}, {5833, 5024, 4432, 3964, 3595}, {5750, 4953, 4369, 3908, 3544}, {5667, 4881, 4306, 3852, 3493}},
+      {{5976, 5729, 5533, 5379, 12576}, {5892, 5648, 5456, 5304, 12400}, {5810, 5569, 5380, 5229, 12227}, {5727, 5490, 5303, 5155, 12052}, {5644, 5411, 5227, 5081, 11878}},
+      {{5508, 5010, 4616, 4305, 12576}, {5431, 4940, 4552, 4245, 12400}, {5355, 4870, 4488, 4186, 12227}, {5279, 4801, 4425, 4126, 12052}, {5203, 4732, 4361, 4067, 11878}},
+      {{6132, 5919, 5751, 5618, 12864}, {6046, 5836, 5671, 5540, 12684}, {5961, 5754, 5591, 5462, 12507}, {5876, 5672, 5512, 5385, 12328}, {5792, 5591, 5432, 5307, 12150}},
+      {{5691, 5252, 4906, 4633, 12864}, {5608, 5173, 4831, 4559, 12684}, {5532, 5106, 4770, 4504, 12507}, {5450, 5028, 4695, 4432, 12328}, {5375, 4961, 4635, 4377, 12150}},
+      {{6297, 6123, 5986, 5877, 13152}, {6209, 6038, 5902, 5795, 12968}, {6122, 5953, 5820, 5714, 12787}, {6035, 5868, 5737, 5633, 12604}, {5948, 5784, 5654, 5552, 12422}},
+      {{5922, 5564, 5282, 5058, 13152}, {5839, 5486, 5208, 4988, 12968}, {5757, 5409, 5135, 4918, 12787}, {5675, 5333, 5062, 4848, 12604}, {5594, 5256, 4990, 4779, 12422}},
+      {{6384, 6231, 6125, 6015, 13296}, {6294, 6142, 6037, 5928, 13110}, {6207, 6058, 5955, 5848, 12927}, {6117, 5970, 5868, 5762, 12742}, {6030, 5886, 5786, 5682, 12558}},
+      {{6064, 5757, 5515, 5324, 13296}, {5971, 5664, 5422, 5231, 13110}, {5890, 5589, 5351, 5164, 12927}, {5809, 5514, 5281, 5097, 12742}, {5728, 5438, 5210, 5030, 12558}}
     };
 
   } /* namespace atsc3 */
