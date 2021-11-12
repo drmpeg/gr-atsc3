@@ -955,7 +955,7 @@ namespace gr {
     void
     framemapper_cc_impl::block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows, int l1select)
     {
-      int temp, index, pack, count;
+      int cell, index, pack, count;
       gr_complex *m_256qam;
       const unsigned char *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
 
@@ -972,9 +972,9 @@ namespace gr {
           }
           index = 0;
           for (int j = 0; j < rows; j++) {
-            temp = l1[index++] << 1;
-            temp |= l1[index++];
-            *out++ = m_qpsk[temp];
+            cell = l1[index++] << 1;
+            cell |= l1[index++];
+            *out++ = m_qpsk[cell];
           }
           break;
         case L1_FEC_MODE_4:
@@ -995,10 +995,10 @@ namespace gr {
             for (int e = 3; e >= 0; e--) {
               pack |= l1[index++] << e;
             }
-            temp = pack << count;
-            pack = temp & 0xf;
-            temp >>= 4;
-            pack |= temp;
+            cell = pack << count;
+            pack = cell & 0xf;
+            cell >>= 4;
+            pack |= cell;
             count = (count + 1) & 0x3;
             *out++ = m_16qam[pack & 0xf];
           }
@@ -1025,10 +1025,10 @@ namespace gr {
             for (int e = 5; e >= 0; e--) {
               pack |= l1[index++] << e;
             }
-            temp = pack << count;
-            pack = temp & 0x3f;
-            temp >>= 6;
-            pack |= temp;
+            cell = pack << count;
+            pack = cell & 0x3f;
+            cell >>= 6;
+            pack |= cell;
             count = (count + 1);
             if (count == 6) {  /* faster than modulo */
               count = 0;
@@ -1068,10 +1068,10 @@ namespace gr {
             for (int e = 7; e >= 0; e--) {
               pack |= l1[index++] << e;
             }
-            temp = pack << count;
-            pack = temp & 0xff;
-            temp >>= 8;
-            pack |= temp;
+            cell = pack << count;
+            pack = cell & 0xff;
+            cell >>= 8;
+            pack |= cell;
             count = (count + 1) & 0x7;
             *out++ = m_256qam[pack & 0xff];
           }
@@ -1108,10 +1108,10 @@ namespace gr {
             for (int e = 7; e >= 0; e--) {
               pack |= l1[index++] << e;
             }
-            temp = pack << count;
-            pack = temp & 0xff;
-            temp >>= 8;
-            pack |= temp;
+            cell = pack << count;
+            pack = cell & 0xff;
+            cell >>= 8;
+            pack |= cell;
             count = (count + 1) & 0x7;
             *out++ = m_256qam[pack & 0xff];
           }
@@ -1126,9 +1126,9 @@ namespace gr {
           }
           index = 0;
           for (int j = 0; j < rows; j++) {
-            temp = l1[index++] << 1;
-            temp |= l1[index++];
-            *out++ = m_qpsk[temp];
+            cell = l1[index++] << 1;
+            cell |= l1[index++];
+            *out++ = m_qpsk[cell];
           }
           break;
       }
@@ -1137,12 +1137,12 @@ namespace gr {
     int
     framemapper_cc_impl::add_l1basic(gr_complex *out, int time_offset)
     {
-      int temp, index, offset_bits = 0;
+      int bits, index, offset_bits = 0;
       int npad, padbits, count, nrepeat;
       int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
       int B, mod, rows;
-      long long templong;
+      long long bitslong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
       unsigned char *l1basic = l1_basic;
@@ -1154,116 +1154,116 @@ namespace gr {
       const int q2 = q2_val;
       const int m1 = m1_val;
 
-      temp = l1basicinit->version;
+      bits = l1basicinit->version;
       for (int n = 2; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->mimo_scattered_pilot_encoding;
       l1basic[offset_bits++] = l1basicinit->lls_flag;
-      temp = l1basicinit->time_info_flag;
+      bits = l1basicinit->time_info_flag;
       for (int n = 1; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->return_channel_flag;
-      temp = l1basicinit->papr_reduction;
+      bits = l1basicinit->papr_reduction;
       for (int n = 1; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->frame_length_mode;
       if (l1basicinit->frame_length_mode == FALSE) {
-        temp = l1basicinit->frame_length;
+        bits = l1basicinit->frame_length;
         for (int n = 9; n >= 0; n--) {
-          l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+          l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        temp = l1basicinit->excess_samples_per_symbol;
+        bits = l1basicinit->excess_samples_per_symbol;
         for (int n = 12; n >= 0; n--) {
-          l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+          l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
       }
       else {
-        temp = time_offset;
+        bits = time_offset;
         for (int n = 15; n >= 0; n--) {
-          l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+          l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        temp = l1basicinit->additional_samples;
+        bits = l1basicinit->additional_samples;
         for (int n = 6; n >= 0; n--) {
-          l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+          l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
       }
-      temp = l1basicinit->num_subframes;
+      bits = l1basicinit->num_subframes;
       for (int n = 7; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->preamble_num_symbols;
+      bits = l1basicinit->preamble_num_symbols;
       for (int n = 2; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->preamble_reduced_carriers;
+      bits = l1basicinit->preamble_reduced_carriers;
       for (int n = 2; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->L1_Detail_content_tag;
+      bits = l1basicinit->L1_Detail_content_tag;
       for (int n = 1; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->L1_Detail_size_bytes;
+      bits = l1basicinit->L1_Detail_size_bytes;
       for (int n = 12; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->L1_Detail_fec_type;
+      bits = l1basicinit->L1_Detail_fec_type;
       for (int n = 2; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->L1_Detail_additional_parity_mode;
+      bits = l1basicinit->L1_Detail_additional_parity_mode;
       for (int n = 1; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->L1_Detail_total_cells;
+      bits = l1basicinit->L1_Detail_total_cells;
       for (int n = 18; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->first_sub_mimo;
-      temp = l1basicinit->first_sub_miso;
+      bits = l1basicinit->first_sub_miso;
       for (int n = 1; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->first_sub_fft_size;
+      bits = l1basicinit->first_sub_fft_size;
       for (int n = 1; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->first_sub_reduced_carriers;
+      bits = l1basicinit->first_sub_reduced_carriers;
       for (int n = 2; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->first_sub_guard_interval;
+      bits = l1basicinit->first_sub_guard_interval;
       for (int n = 3; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->first_sub_num_ofdm_symbols;
+      bits = l1basicinit->first_sub_num_ofdm_symbols;
       for (int n = 10; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->first_sub_scattered_pilot_pattern;
+      bits = l1basicinit->first_sub_scattered_pilot_pattern;
       for (int n = 4; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1basicinit->first_sub_scattered_pilot_boost;
+      bits = l1basicinit->first_sub_scattered_pilot_boost;
       for (int n = 2; n >= 0; n--) {
-        l1basic[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->first_sub_sbs_first;
       l1basic[offset_bits++] = l1basicinit->first_sub_sbs_last;
-      templong = l1basicinit->reserved;
+      bitslong = l1basicinit->reserved;
       for (int n = 47; n >= 0; n--) {
-        l1basic[offset_bits++] = templong & (1 << n) ? 1 : 0;
+        l1basic[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
       }
       offset_bits += add_crc32_bits(l1basic, offset_bits);
 
 #if 0
       for (int i = 0; i < offset_bits; i += 8) {
-        temp = index = 0;
+        bits = index = 0;
         for (int j = 7; j >= 0; j--) {
-          temp |= l1basic[i + index] << j;
+          bits |= l1basic[i + index] << j;
           index++;
         }
         if ((i % 256) == 0) {
@@ -1271,23 +1271,23 @@ namespace gr {
             printf("\n");
           }
         }
-        printf("%02X", temp);
+        printf("%02X", bits);
       }
       printf("\n");
 #endif
 
       /* scrambling and BCH encoding */
       for (int i = 0; i < offset_bits; i += 8) {
-        temp = index = 0;
+        bits = index = 0;
         for (int j = 7; j >= 0; j--) {
-          temp |= l1basic[i + index++] << j;
+          bits |= l1basic[i + index++] << j;
         }
-        temp ^= fm_randomize[i / 8];
+        bits ^= fm_randomize[i / 8];
         index = 0;
         for (int n = 7; n >= 0; n--) {
-          l1basic[i + index++] = temp & (1 << n) ? 1 : 0;
+          l1basic[i + index++] = bits & (1 << n) ? 1 : 0;
         }
-        b = temp;
+        b = bits;
         msb = 0;
         for (int n = 1; n <= 8; n++) {
           tempbch = parity_bits[num_parity_bits - n];
@@ -1449,12 +1449,12 @@ namespace gr {
     int
     framemapper_cc_impl::add_l1detail(gr_complex *out, int block_start)
     {
-      int temp, index, offset_bits = 0;
+      int bits, index, offset_bits = 0;
       int npad, padbits, count, nrepeat, table;
       int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
       int Anum, Aden, B, mod, rows;
-      long long templong;
+      long long bitslong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
       unsigned char *l1detail = l1_detail;
@@ -1467,76 +1467,76 @@ namespace gr {
       const int q2 = q2_val;
       const int m1 = m1_val;
 
-      temp = l1detailinit->version;
+      bits = l1detailinit->version;
       for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->num_rf;
+      bits = l1detailinit->num_rf;
       for (int n = 2; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1detail[offset_bits++] = l1detailinit->frequency_interleaver;
-      temp = l1detailinit->sbs_null_cells;
+      bits = l1detailinit->sbs_null_cells;
       for (int n = 12; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->num_plp;
+      bits = l1detailinit->num_plp;
       for (int n = 5; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_id;
+      bits = l1detailinit->plp_id;
       for (int n = 5; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1detail[offset_bits++] = l1detailinit->plp_lls_flag;
-      temp = l1detailinit->plp_layer;
+      bits = l1detailinit->plp_layer;
       for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_start;
+      bits = l1detailinit->plp_start;
       for (int n = 23; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_size;
+      bits = l1detailinit->plp_size;
       for (int n = 23; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_scrambler_type;
+      bits = l1detailinit->plp_scrambler_type;
       for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_fec_type;
+      bits = l1detailinit->plp_fec_type;
       for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_mod;
+      bits = l1detailinit->plp_mod;
       for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_cod;
+      bits = l1detailinit->plp_cod;
       for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = l1detailinit->plp_TI_mode;
+      bits = l1detailinit->plp_TI_mode;
       for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      temp = block_start;
+      bits = block_start;
       for (int n = 14; n >= 0; n--) {
-        l1detail[offset_bits++] = temp & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1detail[offset_bits++] = l1detailinit->plp_type;
-      templong = l1detailinit->reserved;
+      bitslong = l1detailinit->reserved;
       for (int n = 51; n >= 0; n--) {
-        l1detail[offset_bits++] = templong & (1 << n) ? 1 : 0;
+        l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
       }
       offset_bits += add_crc32_bits(l1detail, offset_bits);
 
 #if 0
       for (int i = 0; i < offset_bits; i += 8) {
-        temp = index = 0;
+        bits = index = 0;
         for (int j = 7; j >= 0; j--) {
-          temp |= l1detail[i + index] << j;
+          bits |= l1detail[i + index] << j;
           index++;
         }
         if ((i % 256) == 0) {
@@ -1544,23 +1544,23 @@ namespace gr {
             printf("\n");
           }
         }
-        printf("%02X", temp);
+        printf("%02X", bits);
       }
       printf("\n");
 #endif
 
       /* scrambling and BCH encoding */
       for (int i = 0; i < offset_bits; i += 8) {
-        temp = index = 0;
+        bits = index = 0;
         for (int j = 7; j >= 0; j--) {
-          temp |= l1detail[i + index++] << j;
+          bits |= l1detail[i + index++] << j;
         }
-        temp ^= fm_randomize[i / 8];
+        bits ^= fm_randomize[i / 8];
         index = 0;
         for (int n = 7; n >= 0; n--) {
-          l1detail[i + index++] = temp & (1 << n) ? 1 : 0;
+          l1detail[i + index++] = bits & (1 << n) ? 1 : 0;
         }
-        b = temp;
+        b = bits;
         msb = 0;
         for (int n = 1; n <= 8; n++) {
           tempbch = parity_bits[num_parity_bits - n];
@@ -1812,39 +1812,40 @@ namespace gr {
       int indexin = 0;
       int indexout = 0;
       int preamblesyms = preamble_syms;
-      int temp, l1cells, rows;
+      int rows, datacells;
+      int time_offset, fec_block_start;
       int left_nulls = sbsnullcells / 2;
       int right_nulls = left_nulls;
-      int l1b_l1_detail_total_cells;
+      int l1detailcells, l1totalcells;
 
       for (int i = 0; i < noutput_items; i += noutput_items) {
-        temp = samples % SAMPLES_PER_MILLISECOND_6MHZ;
-        indexout += add_l1basic(&out[0], temp);
-        temp = cells % fec_cells;
-        if (temp) {
-          temp = fec_cells - (cells % fec_cells);
+        time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
+        indexout += add_l1basic(&out[0], time_offset);
+        fec_block_start = cells % fec_cells;
+        if (fec_block_start) {
+          fec_block_start = fec_cells - (cells % fec_cells);
         }
 
-        l1b_l1_detail_total_cells = add_l1detail(&l1_dummy[0], temp);
-        rows = l1b_l1_detail_total_cells / preamblesyms;
-        for (int ii = 0; ii < preamblesyms; ii++) {
+        l1detailcells = add_l1detail(&l1_dummy[0], fec_block_start);
+        rows = l1detailcells / preamblesyms;
+        for (int i = 0; i < preamblesyms; i++) {
           for (int j = 0; j < rows; j++) {
-            out[indexout++] = l1_dummy[j * preamblesyms + ii];
+            out[indexout++] = l1_dummy[j * preamblesyms + i];
           }
         }
-        for (int ii = rows * preamblesyms; ii < l1b_l1_detail_total_cells; ii++) {
-          out[indexout++] = l1_dummy[ii];
+        for (int i = rows * preamblesyms; i < l1detailcells; i++) {
+          out[indexout++] = l1_dummy[i];
         }
 
-        l1cells = indexout;
-        temp = 0;
+        l1totalcells = indexout;
+        datacells = 0;
         for (int n = 0; n < preamblesyms; n++) {
-          temp += frame_symbols[n];
+          datacells += frame_symbols[n];
         }
-        temp -= l1cells;
-        memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * temp);
-        indexin += temp;
-        indexout += temp;
+        datacells -= l1totalcells;
+        memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * datacells);
+        indexin += datacells;
+        indexout += datacells;
         if (first_sbs) {
           for (int n = 0; n < right_nulls; n++) {
             out[indexout++] = zero;
@@ -1857,10 +1858,10 @@ namespace gr {
           indexin += frame_symbols[preamblesyms] - sbsnullcells;
           preamblesyms++;
         }
-        for (int j = preamblesyms; j < symbols - 1; j++) {
-          memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * frame_symbols[j]);
-          indexin += frame_symbols[j];
-          indexout += frame_symbols[j];
+        for (int n = preamblesyms; n < symbols - 1; n++) {
+          memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * frame_symbols[n]);
+          indexin += frame_symbols[n];
+          indexout += frame_symbols[n];
         }
         for (int n = 0; n < right_nulls; n++) {
           out[indexout++] = zero;
