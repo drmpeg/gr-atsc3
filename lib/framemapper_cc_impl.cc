@@ -1816,7 +1816,7 @@ namespace gr {
       int temp, l1cells, rows;
       int left_nulls = sbsnullcells / 2;
       int right_nulls = left_nulls;
-      const gr_complex *c1, *c2;
+      int l1b_l1_detail_total_cells;
 
       for (int i = 0; i < noutput_items; i += noutput_items) {
         temp = samples % SAMPLES_PER_MILLISECOND_6MHZ;
@@ -1825,21 +1825,17 @@ namespace gr {
         if (temp) {
           temp = fec_cells - (cells % fec_cells);
         }
-#if 0
-        rows = add_l1detail(&l1_dummy[0], temp);
-        rows /= preamblesyms;
-        c1 = &l1_dummy[1];
-        c2 = &l1_dummy[rows + 1];
-        out[indexout++] = l1_dummy[0];
-        for (int j = 0; j < rows; j++) {
-          out[indexout++] = c1[j];
-          out[indexout++] = c2[j];
+
+        l1b_l1_detail_total_cells = add_l1detail(&l1_dummy[0], temp);
+        rows = l1b_l1_detail_total_cells / preamblesyms;
+        for (int ii = 0; ii < preamblesyms; ii++) {
+          for (int j = 0; j < rows; j++) {
+            out[indexout++] = l1_dummy[j * preamblesyms + ii];
+          }
         }
-        printf("indexout = %d\n", indexout);
-#else
-        indexout += add_l1detail(&out[indexout], temp);
-        printf("indexout = %d\n", indexout);
-#endif
+        for (int ii = rows * preamblesyms; ii < l1b_l1_detail_total_cells; ii++) {
+          out[indexout++] = l1_dummy[ii];
+        }
 
         l1cells = indexout;
         temp = 0;
