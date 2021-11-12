@@ -158,6 +158,11 @@ namespace gr {
       SPB_4,
     };
 
+    enum atsc3_l1_select_t {
+      L1_BASIC = 0,
+      L1_DETAIL,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -178,5 +183,6 @@ typedef gr::atsc3::atsc3_l1_fec_mode_t atsc3_l1_fec_mode_t;
 typedef gr::atsc3::atsc3_fec_type_t atsc3_fec_type_t;
 typedef gr::atsc3::atsc3_first_sbs_t atsc3_first_sbs_t;
 typedef gr::atsc3::atsc3_scattered_pilot_boost_t atsc3_scattered_pilot_boost_t;
+typedef gr::atsc3::atsc3_l1_select_t atsc3_l1_select_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

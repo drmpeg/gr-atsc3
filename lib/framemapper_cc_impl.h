@@ -139,11 +139,11 @@ namespace gr {
       void calculate_crc_table();
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
-      void block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows);
+      void block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows, int l1select);
       unsigned char l1_temp[FRAME_SIZE_SHORT];
       unsigned char l1_basic[FRAME_SIZE_SHORT];
       unsigned char l1_detail[FRAME_SIZE_SHORT];
-      unsigned char fm_randomize[FRAME_SIZE_SHORT];
+      unsigned char fm_randomize[MAX_L1DETAIL_MSG_SIZE];
       std::bitset<MAX_BCH_PARITY_BITS> crc_table[256];
       int num_parity_bits;
       std::bitset<MAX_BCH_PARITY_BITS> polynome;
@@ -162,7 +162,7 @@ namespace gr {
       gr_complex m_64qam[64];
       gr_complex m_l1b_256qam[256];
       gr_complex m_l1d_256qam[256];
-      int frame_symbols[4123];
+      int frame_symbols[4352];
       long long samples;
       int frame_samples;
       long long cells;
