@@ -21,7 +21,7 @@ enum atsc3_carrier_type_t {
     CONTINUAL_CARRIER
 };
 
-enum atsc_symbol_type_t {
+enum atsc3_symbol_type_t {
     PREAMBLE_SYMBOL = 1,
     SBS_SYMBOL,
     DATA_SYMBOL
@@ -37,10 +37,13 @@ namespace gr {
       int pilot_pattern;
       int symbols;
       int carriers;
-      int preamblecarriers;
+      int max_carriers;
+      int preamble_carriers;
       int preamble_dx;
+      int preamble_symbols;
       int dx;
       int dy;
+      int input_cells;
       gr_complex pr_bpsk[2];
       gr_complex sp_bpsk[2];
       gr_complex cp_bpsk[2];
@@ -54,6 +57,7 @@ namespace gr {
       const static int preamble_dx_table[32];
       const static double preamble_power_table[32];
       const static double scattered_power_table[16][5];
+      const static int continual_pilot_table_8K[48];
       const static int preamble_cells_table[32][5];
       const static int data_cells_table_8K[16][5];
       const static int data_cells_table_16K[16][5];

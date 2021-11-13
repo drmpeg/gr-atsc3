@@ -39,12 +39,14 @@ namespace gr {
 
       fft_size = fftsize;
       symbols = numpreamblesyms + numpayloadsyms;
+      preamble_symbols = numpreamblesyms;
       switch (fftsize) {
         case FFTSIZE_8K:
           fftsamples = 8192;
           first_preamble_cells = 4307;
           carriers = carriers_table[FFTSIZE_8K][cred];
-          preamblecarriers = carriers_table[FFTSIZE_8K][4];
+          max_carriers = carriers_table[FFTSIZE_8K][0];
+          preamble_carriers = carriers_table[FFTSIZE_8K][4];
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -170,7 +172,8 @@ namespace gr {
           fftsamples = 16384;
           first_preamble_cells = 8614;
           carriers = carriers_table[FFTSIZE_16K][cred];
-          preamblecarriers = carriers_table[FFTSIZE_16K][4];
+          max_carriers = carriers_table[FFTSIZE_16K][0];
+          preamble_carriers = carriers_table[FFTSIZE_16K][4];
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -320,7 +323,8 @@ namespace gr {
           fftsamples = 32768;
           first_preamble_cells = 17288;
           carriers = carriers_table[FFTSIZE_32K][cred];
-          preamblecarriers = carriers_table[FFTSIZE_32K][4];
+          max_carriers = carriers_table[FFTSIZE_32K][0];
+          preamble_carriers = carriers_table[FFTSIZE_32K][4];
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -490,7 +494,8 @@ namespace gr {
           fftsamples = 8192;
           first_preamble_cells = 4307;
           carriers = carriers_table[FFTSIZE_8K][cred];
-          preamblecarriers = carriers_table[FFTSIZE_8K][4];
+          max_carriers = carriers_table[FFTSIZE_8K][0];
+          preamble_carriers = carriers_table[FFTSIZE_8K][4];
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -731,14 +736,19 @@ namespace gr {
         }
       }
       frame_symbols[numpreamblesyms + numpayloadsyms - 1] = SBS_SYMBOL;
+      data_carrier_map.resize(symbols);
+      for (std::vector<std::vector<int>>::size_type i = 0; i != data_carrier_map.size(); i++) {
+        data_carrier_map[i].resize(max_carriers);
+      }
+      init_pilots();
       if (firstsbs) {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * data_cells) + (sbs_cells * 2);
       }
       else {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
       }
-      printf("pg total cells = %d\n", totalcells);
-      set_output_multiple(carriers);
+      input_cells = totalcells;
+      set_output_multiple((carriers * (symbols - 1)) + preamble_carriers);
     }
 
     /*
@@ -751,7 +761,7 @@ namespace gr {
     void
     pilotgenerator_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = noutput_items;
+      ninput_items_required[0] = input_cells;
     }
 
     void
@@ -773,32 +783,77 @@ namespace gr {
     pilotgenerator_cc_impl::init_pilots()
     {
       for (int symbol = 0; symbol < symbols; ++symbol) {
-        int remainder, shift;
+        int remainder, shift, index, preamblecarriers;
         std::vector<int>& data_carrier_map = this->data_carrier_map[symbol];
         for (int i = 0; i < carriers; i++) {
           data_carrier_map[i] = DATA_CARRIER;
         }
-        switch (fft_size) {
-          case FFTSIZE_8K:
-            switch (pilot_pattern) {
-              case PILOT_SP3_2:
-                break;
+        if (frame_symbols[symbol] == PREAMBLE_SYMBOL) {
+          index = 0;
+          if (symbol == 0) {
+            preamblecarriers = preamble_carriers;
+            shift = (max_carriers - preamble_carriers) / 2;
+          }
+          else {
+            preamblecarriers = carriers;
+            shift = 0;
+          }
+          for (int i = 0; i < max_carriers; i++) {
+            if (continual_pilot_table_8K[index] == i) {
+              if (continual_pilot_table_8K[index] > shift) {
+                data_carrier_map[i - shift] = CONTINUAL_CARRIER;
+              }
+              index++;
             }
-          case FFTSIZE_16K:
-            switch (pilot_pattern) {
-              case PILOT_SP3_2:
-                break;
+          }
+          for (int i = 0; i < preamblecarriers; i++) {
+            if ((i % preamble_dx) == 0) {
+              data_carrier_map[i] = PREAMBLE_CARRIER;
             }
-          case FFTSIZE_32K:
-            switch (pilot_pattern) {
-              case PILOT_SP3_2:
-                break;
+          }
+        }
+        else if (frame_symbols[symbol] == SBS_SYMBOL) {
+          index = shift = 0;
+          for (int i = 0; i < max_carriers; i++) {
+            if (continual_pilot_table_8K[index] == i) {
+              if (continual_pilot_table_8K[index] > shift) {
+                data_carrier_map[i] = CONTINUAL_CARRIER;
+              }
+              index++;
             }
-          default:
-            switch (pilot_pattern) {
-              case PILOT_SP3_2:
-                break;
+          }
+          for (int i = 0; i < carriers; i++) {
+            if ((i % dx) == 0) {
+              data_carrier_map[i] = SCATTERED_CARRIER;
             }
+          }
+          data_carrier_map[0] = SCATTERED_CARRIER;
+          data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
+          data_carrier_map[1731] = SCATTERED_CARRIER; /* fix me */
+          data_carrier_map[2886] = SCATTERED_CARRIER;
+          data_carrier_map[5733] = SCATTERED_CARRIER;
+        }
+        else {
+          index = shift = 0;
+          for (int i = 0; i < max_carriers; i++) {
+            if (continual_pilot_table_8K[index] == i) {
+              if (continual_pilot_table_8K[index] > shift) {
+                data_carrier_map[i] = CONTINUAL_CARRIER;
+              }
+              index++;
+            }
+          }
+          for (int i = 0; i < carriers; i++) {
+            remainder = i % (dx * dy);
+            if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
+              data_carrier_map[i] = SCATTERED_CARRIER;
+            }
+          }
+          data_carrier_map[0] = SCATTERED_CARRIER;
+          data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
+          data_carrier_map[1731] = SCATTERED_CARRIER; /* fix me */
+          data_carrier_map[2886] = SCATTERED_CARRIER;
+          data_carrier_map[5733] = SCATTERED_CARRIER;
         }
       }
     }
@@ -811,10 +866,64 @@ namespace gr {
     {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
+      int indexin = 0;
+      int indexout = 0;
+      int preamblecarriers;
 
+      for (int i = 0; i < noutput_items; i += (carriers * (symbols - 1)) + preamble_carriers) {
+        for (int j = 0; j < symbols; j++) {
+          if (frame_symbols[j] == PREAMBLE_SYMBOL) {
+            if (j == 0) {
+              preamblecarriers = preamble_carriers;
+            }
+            else {
+              preamblecarriers = carriers;
+            }
+            for (int n = 0; n < preamblecarriers; n++) {
+              if (data_carrier_map[j][n] == PREAMBLE_CARRIER) {
+                out[indexout++] = pr_bpsk[prbs[n]];
+              }
+              else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
+                out[indexout++] = cp_bpsk[prbs[n]];
+              }
+              else {
+                out[indexout++] = in[indexin++];
+              }
+            }
+          }
+          else if (frame_symbols[j] == SBS_SYMBOL) {
+            for (int n = 0; n < carriers; n++) {
+              if (data_carrier_map[j][n] == SCATTERED_CARRIER) {
+                out[indexout++] = sp_bpsk[prbs[n]];
+              }
+              else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
+                out[indexout++] = cp_bpsk[prbs[n]];
+              }
+              else {
+                out[indexout++] = in[indexin++];
+              }
+            }
+          }
+          else {
+            for (int n = 0; n < carriers; n++) {
+              if (data_carrier_map[j][n] == SCATTERED_CARRIER) {
+                out[indexout++] = sp_bpsk[prbs[n]];
+              }
+              else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
+                out[indexout++] = cp_bpsk[prbs[n]];
+              }
+              else {
+                out[indexout++] = in[indexin++];
+              }
+            }
+          }
+        }
+      }
+
+      printf("indexin = %d, indexout = %d\n", indexin, indexout);
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each (noutput_items);
+      consume_each (input_cells);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;
@@ -853,6 +962,12 @@ namespace gr {
       {0.00 , 6.10 , 7.60 , 8.50 , 9.10},
       {0.00 , 5.40 , 6.90 , 7.70 , 8.40},
       {0.00 , 6.70 , 8.20 , 9.10 , 9.70}
+    };
+
+    const int pilotgenerator_cc_impl::continual_pilot_table_8K[48] = {
+      59, 167, 307, 469, 637, 751, 865, 1031, 1159, 1333, 1447, 1607, 1811, 1943, 2041, 2197,
+      2323, 2519, 2605, 2767, 2963, 3029, 3175, 3325, 3467, 3665, 3833, 3901, 4073, 4235, 4325, 4511,
+      4627, 4825, 4907, 5051, 5227, 5389, 5531, 5627, 5833, 5905, 6053, 6197, 6353, 6563, 6637, 6809
     };
 
     const int pilotgenerator_cc_impl::preamble_cells_table[32][5] = {
