@@ -18,6 +18,7 @@ list(APPEND atsc3_sources
     interleaver_bb_impl.cc
     modulator_bc_impl.cc
     framemapper_cc_impl.cc
+    pilotgenerator_cc_impl.cc
 )
 
 set(atsc3_sources "${atsc3_sources}" PARENT_SCOPE)

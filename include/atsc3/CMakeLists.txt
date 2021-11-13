@@ -17,5 +17,6 @@ install(FILES
     ldpc_bb.h
     interleaver_bb.h
     modulator_bc.h
-    framemapper_cc.h DESTINATION include/atsc3
+    framemapper_cc.h
+    pilotgenerator_cc.h DESTINATION include/atsc3
 )

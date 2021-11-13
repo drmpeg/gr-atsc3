@@ -413,7 +413,7 @@ namespace gr {
               break;
             default:
               gisamples = 192;
-              preamble_cells = preamble_cells_table[0][cred];
+              preamble_cells = preamble_cells_table[7][cred];
               break;
           }
           switch (pilotpattern) {
@@ -568,7 +568,7 @@ namespace gr {
               break;
             default:
               gisamples = 192;
-              preamble_cells = preamble_cells_table[0][cred];
+              preamble_cells = preamble_cells_table[18][cred];
               break;
           }
           switch (pilotpattern) {
