@@ -38,3 +38,4 @@ GR_ADD_TEST(qa_interleaver_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/q
 GR_ADD_TEST(qa_modulator_bc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_modulator_bc.py)
 GR_ADD_TEST(qa_framemapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_framemapper_cc.py)
 GR_ADD_TEST(qa_pilotgenerator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_pilotgenerator_cc.py)
+GR_ADD_TEST(qa_freqinterleaver_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_freqinterleaver_cc.py)

@@ -163,6 +163,11 @@ namespace gr {
       L1_DETAIL,
     };
 
+    enum atsc3_frequency_interleaver_t {
+      FREQ_PREAMBLE_ONLY = 0,
+      FREQ_ALL_SYMBOLS,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -184,5 +189,6 @@ typedef gr::atsc3::atsc3_fec_type_t atsc3_fec_type_t;
 typedef gr::atsc3::atsc3_first_sbs_t atsc3_first_sbs_t;
 typedef gr::atsc3::atsc3_scattered_pilot_boost_t atsc3_scattered_pilot_boost_t;
 typedef gr::atsc3::atsc3_l1_select_t atsc3_l1_select_t;
+typedef gr::atsc3::atsc3_frequency_interleaver_t atsc3_frequency_interleaver_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

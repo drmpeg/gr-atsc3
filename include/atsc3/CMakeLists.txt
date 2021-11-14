@@ -18,5 +18,6 @@ install(FILES
     interleaver_bb.h
     modulator_bc.h
     framemapper_cc.h
-    pilotgenerator_cc.h DESTINATION include/atsc3
+    pilotgenerator_cc.h
+    freqinterleaver_cc.h DESTINATION include/atsc3
 )

@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(416bbefa8a68661e63105b8dab18eaaa)                     */
+/* BINDTOOL_HEADER_FILE_HASH(453c39a8f01176fcc905635a1ca9dd73)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -218,6 +218,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_l1_select_t>();
+    py::enum_<::gr::atsc3::atsc3_frequency_interleaver_t>(m,"atsc3_frequency_interleaver_t")
+        .value("FREQ_PREAMBLE_ONLY", ::gr::atsc3::FREQ_PREAMBLE_ONLY) // 0
+        .value("FREQ_ALL_SYMBOLS", ::gr::atsc3::FREQ_ALL_SYMBOLS) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_frequency_interleaver_t>();
 
 
 

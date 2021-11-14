@@ -13,5 +13,6 @@ install(FILES
     atsc3_interleaver_bb.block.yml
     atsc3_modulator_bc.block.yml
     atsc3_framemapper_cc.block.yml
-    atsc3_pilotgenerator_cc.block.yml DESTINATION share/gnuradio/grc/blocks
+    atsc3_pilotgenerator_cc.block.yml
+    atsc3_freqinterleaver_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )
