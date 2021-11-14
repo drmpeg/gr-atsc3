@@ -540,16 +540,25 @@ namespace gr {
     void
     freqinterleaver_cc_impl::init_address(int firstpreamblecells, int preamblecells, int sbscells, int datacells)
     {
-      int max_states, xor_size, pn_mask, result;
-      int q_even = 0;
-      int q_odd = 0;
+      int max_states, xor_size, xor_size2, pn_mask, result;
+      int q_evenFP = 0;
+      int q_oddFP = 0;
       int q_evenP = 0;
       int q_oddP = 0;
+      int q_evenSBS = 0;
+      int q_oddSBS = 0;
+      int q_even = 0;
+      int q_odd = 0;
       int lfsr = 0;
+      int lfsr2 = 0;
       int logic8k[4] = {0, 1, 4, 6};
       int logic16k[6] = {0, 1, 4, 5, 9, 11};
       int logic32k[4] = {0, 1, 2, 12};
+      int logic8k2[6] = {0, 1, 4, 5, 9, 11};
+      int logic16k2[4] = {0, 1, 2, 12};
+      int logic32k2[2] = {0, 1};
       int* logic;
+      int* logic2;
       const int *bitpermeven, *bitpermodd;
       int pn_degree, even, odd;
 
@@ -559,7 +568,9 @@ namespace gr {
           pn_mask = 0xfff;
           max_states = 8192;
           logic = &logic8k[0];
+          logic2 = &logic8k2[0];
           xor_size = 4;
+          xor_size2 = 6;
           bitpermeven = &bitperm8keven[0];
           bitpermodd = &bitperm8kodd[0];
           break;
@@ -568,7 +579,9 @@ namespace gr {
           pn_mask = 0x1fff;
           max_states = 16384;
           logic = &logic16k[0];
+          logic2 = &logic16k2[0];
           xor_size = 6;
+          xor_size2 = 4;
           bitpermeven = &bitperm16keven[0];
           bitpermodd = &bitperm16kodd[0];
           break;
@@ -577,7 +590,9 @@ namespace gr {
           pn_mask = 0x3fff;
           max_states = 32768;
           logic = &logic32k[0];
+          logic2 = &logic32k2[0];
           xor_size = 4;
+          xor_size2 = 2;
           bitpermeven = &bitperm32k[0];
           bitpermodd = &bitperm32k[0];
           break;
@@ -586,11 +601,23 @@ namespace gr {
           pn_mask = 0xfff;
           max_states = 8192;
           logic = &logic8k[0];
+          logic2 = &logic8k2[0];
           xor_size = 4;
+          xor_size2 = 6;
           bitpermeven = &bitperm8keven[0];
           bitpermodd = &bitperm8kodd[0];
           break;
       }
+
+      lfsr2 = 1;
+      result = 0;
+      for (int k = 0; k < xor_size2; k++) {
+        result ^= (lfsr2 >> logic2[k]) & 1;
+      }
+      lfsr2 &= (pn_mask << 1) | 0x1;
+      lfsr2 >>= 1;
+      lfsr2 |= result << (pn_degree);
+
       for (int i = 0; i < max_states; i++) {
         if (i == 0 || i == 1) {
           lfsr = 0;
@@ -615,13 +642,21 @@ namespace gr {
         for (int n = 0; n < pn_degree; n++) {
           odd |= ((lfsr >> n) & 0x1) << bitpermodd[n];
         }
+#if 0
+        even ^= lfsr2;
+        odd ^= lfsr2;
+#endif
         even = even + ((i % 2) * (max_states / 2));
         odd = odd + ((i % 2) * (max_states / 2));
+#if 1
+        even ^= lfsr2;
+        odd ^= lfsr2;
+#endif
         if (even < firstpreamblecells) {
-          HevenFP[q_even++] = even;
+          HevenFP[q_evenFP++] = even;
         }
         if (odd < firstpreamblecells) {
-          HoddFP[q_odd++] = odd;
+          HoddFP[q_oddFP++] = odd;
         }
         if (even < preamblecells) {
           HevenP[q_evenP++] = even;
@@ -630,10 +665,10 @@ namespace gr {
           HoddP[q_oddP++] = odd;
         }
         if (even < sbscells) {
-          HevenSBS[q_evenP++] = even;
+          HevenSBS[q_evenSBS++] = even;
         }
         if (odd < sbscells) {
-          HoddSBS[q_oddP++] = odd;
+          HoddSBS[q_oddSBS++] = odd;
         }
         if (even < datacells) {
           Heven[q_even++] = even;
