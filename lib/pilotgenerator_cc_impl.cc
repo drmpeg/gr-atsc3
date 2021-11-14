@@ -14,22 +14,22 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     pilotgenerator_cc::sptr
-    pilotgenerator_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs)
     {
       return gnuradio::make_block_sptr<pilotgenerator_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, plpsize, guardinterval, pilotpattern, pilotboost, firstsbs, l1bmode, l1dmode);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs);
     }
 
 
     /*
      * The private constructor
      */
-    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs)
       : gr::block("pilotgenerator_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
-      int fftsamples, gisamples, cred = CRED_0;
+      int cred = CRED_0;
       double power, preamble_power, scattered_power;
       int total_preamble_cells, totalcells;
       int first_preamble_cells;
@@ -38,60 +38,53 @@ namespace gr {
       int sbs_cells;
 
       fft_size = fftsize;
+      pilot_pattern = pilotpattern;
+      cred_coeff = cred;
       symbols = numpreamblesyms + numpayloadsyms;
       preamble_symbols = numpreamblesyms;
       switch (fftsize) {
         case FFTSIZE_8K:
-          fftsamples = 8192;
           first_preamble_cells = 4307;
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
           switch (guardinterval) {
             case GI_1_192:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
               break;
             case GI_2_384:
-              gisamples = 384;
               preamble_cells = preamble_cells_table[1][cred];
               preamble_dx = preamble_dx_table[1];
               preamble_power = preamble_power_table[1];
               break;
             case GI_3_512:
-              gisamples = 512;
               preamble_cells = preamble_cells_table[2][cred];
               preamble_dx = preamble_dx_table[2];
               preamble_power = preamble_power_table[2];
               break;
             case GI_4_768:
-              gisamples = 768;
               preamble_cells = preamble_cells_table[3][cred];
               preamble_dx = preamble_dx_table[3];
               preamble_power = preamble_power_table[3];
               break;
             case GI_5_1024:
-              gisamples = 1024;
               preamble_cells = preamble_cells_table[4][cred];
               preamble_dx = preamble_dx_table[4];
               preamble_power = preamble_power_table[4];
               break;
             case GI_6_1536:
-              gisamples = 1536;
               preamble_cells = preamble_cells_table[5][cred];
               preamble_dx = preamble_dx_table[5];
               preamble_power = preamble_power_table[5];
               break;
             case GI_7_2048:
-              gisamples = 2048;
               preamble_cells = preamble_cells_table[6][cred];
               preamble_dx = preamble_dx_table[6];
               preamble_power = preamble_power_table[6];
               break;
             default:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
@@ -169,80 +162,67 @@ namespace gr {
           }
           break;
         case FFTSIZE_16K:
-          fftsamples = 16384;
           first_preamble_cells = 8614;
           carriers = carriers_table[FFTSIZE_16K][cred];
           max_carriers = carriers_table[FFTSIZE_16K][0];
           preamble_carriers = carriers_table[FFTSIZE_16K][4];
           switch (guardinterval) {
             case GI_1_192:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[7][cred];
               preamble_dx = preamble_dx_table[7];
               preamble_power = preamble_power_table[7];
               break;
             case GI_2_384:
-              gisamples = 384;
               preamble_cells = preamble_cells_table[8][cred];
               preamble_dx = preamble_dx_table[8];
               preamble_power = preamble_power_table[8];
               break;
             case GI_3_512:
-              gisamples = 512;
               preamble_cells = preamble_cells_table[9][cred];
               preamble_dx = preamble_dx_table[9];
               preamble_power = preamble_power_table[9];
               break;
             case GI_4_768:
-              gisamples = 768;
               preamble_cells = preamble_cells_table[10][cred];
               preamble_dx = preamble_dx_table[10];
               preamble_power = preamble_power_table[10];
               break;
             case GI_5_1024:
-              gisamples = 1024;
               preamble_cells = preamble_cells_table[11][cred];
               preamble_dx = preamble_dx_table[11];
               preamble_power = preamble_power_table[11];
               break;
             case GI_6_1536:
-              gisamples = 1536;
               preamble_cells = preamble_cells_table[12][cred];
               preamble_dx = preamble_dx_table[12];
               preamble_power = preamble_power_table[12];
               break;
             case GI_7_2048:
-              gisamples = 2048;
               preamble_cells = preamble_cells_table[13][cred];
               preamble_dx = preamble_dx_table[13];
               preamble_power = preamble_power_table[13];
               break;
             case GI_8_2432:
-              gisamples = 2432;
               preamble_cells = preamble_cells_table[14][cred];
               preamble_dx = preamble_dx_table[14];
               preamble_power = preamble_power_table[14];
               break;
             case GI_9_3072:
-              gisamples = 3072;
               preamble_cells = preamble_cells_table[15][cred];
               preamble_dx = preamble_dx_table[15];
               preamble_power = preamble_power_table[15];
               break;
             case GI_10_3648:
-              gisamples = 3648;
               preamble_cells = preamble_cells_table[16][cred];
               preamble_dx = preamble_dx_table[16];
               preamble_power = preamble_power_table[16];
               break;
             case GI_11_4096:
-              gisamples = 4096;
               preamble_cells = preamble_cells_table[17][cred];
               preamble_dx = preamble_dx_table[17];
               preamble_power = preamble_power_table[17];
               break;
             default:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[7][cred];
               preamble_dx = preamble_dx_table[7];
               preamble_power = preamble_power_table[7];
@@ -320,62 +300,52 @@ namespace gr {
           }
           break;
         case FFTSIZE_32K:
-          fftsamples = 32768;
           first_preamble_cells = 17288;
           carriers = carriers_table[FFTSIZE_32K][cred];
           max_carriers = carriers_table[FFTSIZE_32K][0];
           preamble_carriers = carriers_table[FFTSIZE_32K][4];
           switch (guardinterval) {
             case GI_1_192:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[18][cred];
               preamble_dx = preamble_dx_table[18];
               preamble_power = preamble_power_table[18];
               break;
             case GI_2_384:
-              gisamples = 384;
               preamble_cells = preamble_cells_table[19][cred];
               preamble_dx = preamble_dx_table[19];
               preamble_power = preamble_power_table[19];
               break;
             case GI_3_512:
-              gisamples = 512;
               preamble_cells = preamble_cells_table[20][cred];
               preamble_dx = preamble_dx_table[20];
               preamble_power = preamble_power_table[20];
               break;
             case GI_4_768:
-              gisamples = 768;
               preamble_cells = preamble_cells_table[21][cred];
               preamble_dx = preamble_dx_table[21];
               preamble_power = preamble_power_table[21];
               break;
             case GI_5_1024:
-              gisamples = 1024;
               preamble_cells = preamble_cells_table[22][cred];
               preamble_dx = preamble_dx_table[22];
               preamble_power = preamble_power_table[22];
               break;
             case GI_6_1536:
-              gisamples = 1536;
               preamble_cells = preamble_cells_table[23][cred];
               preamble_dx = preamble_dx_table[23];
               preamble_power = preamble_power_table[23];
               break;
             case GI_7_2048:
-              gisamples = 2048;
               preamble_cells = preamble_cells_table[24][cred];
               preamble_dx = preamble_dx_table[24];
               preamble_power = preamble_power_table[24];
               break;
             case GI_8_2432:
-              gisamples = 2432;
               preamble_cells = preamble_cells_table[25][cred];
               preamble_dx = preamble_dx_table[25];
               preamble_power = preamble_power_table[25];
               break;
             case GI_9_3072:
-              gisamples = 3072;
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
                 preamble_cells = preamble_cells_table[26][cred];
                 preamble_dx = preamble_dx_table[26];
@@ -388,7 +358,6 @@ namespace gr {
               }
               break;
             case GI_10_3648:
-              gisamples = 3648;
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
                 preamble_cells = preamble_cells_table[28][cred];
                 preamble_dx = preamble_dx_table[28];
@@ -401,19 +370,16 @@ namespace gr {
               }
               break;
             case GI_11_4096:
-              gisamples = 4096;
               preamble_cells = preamble_cells_table[30][cred];
               preamble_dx = preamble_dx_table[30];
               preamble_power = preamble_power_table[30];
               break;
             case GI_12_4864:
-              gisamples = 4864;
               preamble_cells = preamble_cells_table[31][cred];
               preamble_dx = preamble_dx_table[31];
               preamble_power = preamble_power_table[31];
               break;
             default:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[18][cred];
               preamble_dx = preamble_dx_table[18];
               preamble_power = preamble_power_table[18];
@@ -491,56 +457,47 @@ namespace gr {
           }
           break;
         default:
-          fftsamples = 8192;
           first_preamble_cells = 4307;
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
           switch (guardinterval) {
             case GI_1_192:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
               break;
             case GI_2_384:
-              gisamples = 384;
               preamble_cells = preamble_cells_table[1][cred];
               preamble_dx = preamble_dx_table[1];
               preamble_power = preamble_power_table[1];
               break;
             case GI_3_512:
-              gisamples = 512;
               preamble_cells = preamble_cells_table[2][cred];
               preamble_dx = preamble_dx_table[2];
               preamble_power = preamble_power_table[2];
               break;
             case GI_4_768:
-              gisamples = 768;
               preamble_cells = preamble_cells_table[3][cred];
               preamble_dx = preamble_dx_table[3];
               preamble_power = preamble_power_table[3];
               break;
             case GI_5_1024:
-              gisamples = 1024;
               preamble_cells = preamble_cells_table[4][cred];
               preamble_dx = preamble_dx_table[4];
               preamble_power = preamble_power_table[4];
               break;
             case GI_6_1536:
-              gisamples = 1536;
               preamble_cells = preamble_cells_table[5][cred];
               preamble_dx = preamble_dx_table[5];
               preamble_power = preamble_power_table[5];
               break;
             case GI_7_2048:
-              gisamples = 2048;
               preamble_cells = preamble_cells_table[6][cred];
               preamble_dx = preamble_dx_table[6];
               preamble_power = preamble_power_table[6];
               break;
             default:
-              gisamples = 192;
               preamble_cells = preamble_cells_table[0][cred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
@@ -748,6 +705,7 @@ namespace gr {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
       }
       input_cells = totalcells;
+      printf("input cells = %d\n", input_cells);
       set_output_multiple((carriers * (symbols - 1)) + preamble_carriers);
     }
 
@@ -788,72 +746,394 @@ namespace gr {
         for (int i = 0; i < carriers; i++) {
           data_carrier_map[i] = DATA_CARRIER;
         }
-        if (frame_symbols[symbol] == PREAMBLE_SYMBOL) {
-          index = 0;
-          if (symbol == 0) {
-            preamblecarriers = preamble_carriers;
-            shift = (max_carriers - preamble_carriers) / 2;
-          }
-          else {
-            preamblecarriers = carriers;
-            shift = 0;
-          }
-          for (int i = 0; i < max_carriers; i++) {
-            if (continual_pilot_table_8K[index] == i) {
-              if (continual_pilot_table_8K[index] > shift) {
-                data_carrier_map[i - shift] = CONTINUAL_CARRIER;
+        switch (fft_size) {
+          case FFTSIZE_8K:
+            if (frame_symbols[symbol] == PREAMBLE_SYMBOL) {
+              index = 0;
+              if (symbol == 0) {
+                preamblecarriers = preamble_carriers;
+                shift = (max_carriers - preamble_carriers) / 2;
               }
-              index++;
-            }
-          }
-          for (int i = 0; i < preamblecarriers; i++) {
-            if ((i % preamble_dx) == 0) {
-              data_carrier_map[i] = PREAMBLE_CARRIER;
-            }
-          }
-        }
-        else if (frame_symbols[symbol] == SBS_SYMBOL) {
-          index = shift = 0;
-          for (int i = 0; i < max_carriers; i++) {
-            if (continual_pilot_table_8K[index] == i) {
-              if (continual_pilot_table_8K[index] > shift) {
-                data_carrier_map[i] = CONTINUAL_CARRIER;
+              else {
+                preamblecarriers = carriers;
+                shift = 0;
               }
-              index++;
-            }
-          }
-          for (int i = 0; i < carriers; i++) {
-            if ((i % dx) == 0) {
-              data_carrier_map[i] = SCATTERED_CARRIER;
-            }
-          }
-          data_carrier_map[0] = SCATTERED_CARRIER;
-          data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
-          data_carrier_map[1731] = SCATTERED_CARRIER; /* fix me */
-          data_carrier_map[2886] = SCATTERED_CARRIER;
-          data_carrier_map[5733] = SCATTERED_CARRIER;
-        }
-        else {
-          index = shift = 0;
-          for (int i = 0; i < max_carriers; i++) {
-            if (continual_pilot_table_8K[index] == i) {
-              if (continual_pilot_table_8K[index] > shift) {
-                data_carrier_map[i] = CONTINUAL_CARRIER;
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_8K[index] == i) {
+                  if (continual_pilot_table_8K[index] > shift) {
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
               }
-              index++;
+              for (int i = 0; i < preamblecarriers; i++) {
+                if ((i % preamble_dx) == 0) {
+                  data_carrier_map[i] = PREAMBLE_CARRIER;
+                }
+              }
             }
-          }
-          for (int i = 0; i < carriers; i++) {
-            remainder = i % (dx * dy);
-            if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
-              data_carrier_map[i] = SCATTERED_CARRIER;
+            else if (frame_symbols[symbol] == SBS_SYMBOL) {
+              index = shift = 0;
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_8K[index] == i) {
+                  if (continual_pilot_table_8K[index] > shift) {
+                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < carriers; i++) {
+                if ((i % dx) == 0) {
+                  data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
             }
-          }
-          data_carrier_map[0] = SCATTERED_CARRIER;
-          data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
-          data_carrier_map[1731] = SCATTERED_CARRIER; /* fix me */
-          data_carrier_map[2886] = SCATTERED_CARRIER;
-          data_carrier_map[5733] = SCATTERED_CARRIER;
+            else {
+              index = shift = 0;
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_8K[index] == i) {
+                  if (continual_pilot_table_8K[index] > shift) {
+                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < carriers; i++) {
+                remainder = i % (dx * dy);
+                if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
+                  data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+            }
+            if ((frame_symbols[symbol] == SBS_SYMBOL) || (frame_symbols[symbol] == DATA_SYMBOL)) {
+              data_carrier_map[0] = SCATTERED_CARRIER;
+              data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
+              shift = 0;
+              switch (pilot_pattern) {
+                case PILOT_SP3_2:
+                  data_carrier_map[1731 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP3_4:
+                  data_carrier_map[1731 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[2886 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5733 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP4_2:
+                  data_carrier_map[1732 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP4_4:
+                  data_carrier_map[1732 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[2888 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5724 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP6_2:
+                  data_carrier_map[1734 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP6_4:
+                  data_carrier_map[1734 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[2892 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5730 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP8_2:
+                  data_carrier_map[1736 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP8_4:
+                  data_carrier_map[1736 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[2896 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5720 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP12_2:
+                  data_carrier_map[1740 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP12_4:
+                  data_carrier_map[1740 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[2904 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5748 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP16_2:
+                  data_carrier_map[1744 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP16_4:
+                  data_carrier_map[1744 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[2912 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5744 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP24_2:
+                  break;
+                case PILOT_SP24_4:
+                  break;
+                case PILOT_SP32_2:
+                  data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP32_4:
+                  switch (cred_coeff) {
+                    case CRED_0:
+                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[2880 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[5728 - shift] = SCATTERED_CARRIER;
+                      break;
+                    case CRED_1:
+                      break;
+                    case CRED_2:
+                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
+                      break;
+                    case CRED_3:
+                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[2880 - shift] = SCATTERED_CARRIER;
+                      break;
+                    case CRED_4:
+                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[2880 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[5728 - shift] = SCATTERED_CARRIER;
+                      break;
+                    default:
+                      break;
+                  }
+                  break;
+                default:
+                  break;
+              }
+            }
+            break;
+          case FFTSIZE_16K:
+            if (frame_symbols[symbol] == PREAMBLE_SYMBOL) {
+              index = 0;
+              if (symbol == 0) {
+                preamblecarriers = preamble_carriers;
+                shift = (max_carriers - preamble_carriers) / 2;
+              }
+              else {
+                preamblecarriers = carriers;
+                shift = 0;
+              }
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_16K[index] == i) {
+                  if (continual_pilot_table_16K[index] > shift) {
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < preamblecarriers; i++) {
+                if ((i % preamble_dx) == 0) {
+                  data_carrier_map[i] = PREAMBLE_CARRIER;
+                }
+              }
+            }
+            else if (frame_symbols[symbol] == SBS_SYMBOL) {
+              index = shift = 0;
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_16K[index] == i) {
+                  if (continual_pilot_table_16K[index] > shift) {
+                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < carriers; i++) {
+                if ((i % dx) == 0) {
+                  data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+            }
+            else {
+              index = shift = 0;
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_16K[index] == i) {
+                  if (continual_pilot_table_16K[index] > shift) {
+                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < carriers; i++) {
+                remainder = i % (dx * dy);
+                if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
+                  data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+            }
+            if ((frame_symbols[symbol] == SBS_SYMBOL) || (frame_symbols[symbol] == DATA_SYMBOL)) {
+              data_carrier_map[0] = SCATTERED_CARRIER;
+              data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
+              shift = 0;
+              switch (pilot_pattern) {
+                case PILOT_SP3_2:
+                  data_carrier_map[3471 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP3_4:
+                  data_carrier_map[3471 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5778 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11469 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP4_2:
+                  data_carrier_map[3460 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP4_4:
+                  data_carrier_map[3460 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5768 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11452 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP6_2:
+                  data_carrier_map[3462 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP6_4:
+                  data_carrier_map[3462 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5772 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11466 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP8_2:
+                  data_carrier_map[3464 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP8_4:
+                  data_carrier_map[3464 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5776 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11448 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP12_2:
+                  data_carrier_map[3468 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP12_4:
+                  data_carrier_map[3468 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5784 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11460 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP16_2:
+                  data_carrier_map[3472 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP16_4:
+                  data_carrier_map[3472 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5792 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11440 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP24_2:
+                  data_carrier_map[3480 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP24_4:
+                  data_carrier_map[3480 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5808 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11496 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP32_2:
+                  data_carrier_map[3488 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP32_4:
+                  data_carrier_map[3488 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[5824 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[11488 - shift] = SCATTERED_CARRIER;
+                  break;
+                default:
+                  break;
+              }
+            }
+            break;
+          case FFTSIZE_32K:
+            if (frame_symbols[symbol] == PREAMBLE_SYMBOL) {
+              index = 0;
+              if (symbol == 0) {
+                preamblecarriers = preamble_carriers;
+                shift = (max_carriers - preamble_carriers) / 2;
+              }
+              else {
+                preamblecarriers = carriers;
+                shift = 0;
+              }
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_32K[index] == i) {
+                  if (continual_pilot_table_32K[index] > shift) {
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < preamblecarriers; i++) {
+                if ((i % preamble_dx) == 0) {
+                  data_carrier_map[i] = PREAMBLE_CARRIER;
+                }
+              }
+            }
+            else if (frame_symbols[symbol] == SBS_SYMBOL) {
+              index = shift = 0;
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_32K[index] == i) {
+                  if (continual_pilot_table_32K[index] > shift) {
+                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < carriers; i++) {
+                if ((i % dx) == 0) {
+                  data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+            }
+            else {
+              index = shift = 0;
+              for (int i = 0; i < max_carriers; i++) {
+                if (continual_pilot_table_32K[index] == i) {
+                  if (continual_pilot_table_32K[index] > shift) {
+                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                  }
+                  index++;
+                }
+              }
+              for (int i = 0; i < carriers; i++) {
+                remainder = i % (dx * dy);
+                if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
+                  data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+            }
+            if ((frame_symbols[symbol] == SBS_SYMBOL) || (frame_symbols[symbol] == DATA_SYMBOL)) {
+              data_carrier_map[0] = SCATTERED_CARRIER;
+              data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
+              shift = 0;
+              switch (pilot_pattern) {
+                case PILOT_SP3_2:
+                  data_carrier_map[6939 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP3_4:
+                  break;
+                case PILOT_SP4_2:
+                  break;
+                case PILOT_SP4_4:
+                  break;
+                case PILOT_SP6_2:
+                  data_carrier_map[6942 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP6_4:
+                  break;
+                case PILOT_SP8_2:
+                  data_carrier_map[6920 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP8_4:
+                  break;
+                case PILOT_SP12_2:
+                  data_carrier_map[6924 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP12_4:
+                  break;
+                case PILOT_SP16_2:
+                  data_carrier_map[6928 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP16_4:
+                  break;
+                case PILOT_SP24_2:
+                  data_carrier_map[6936 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP24_4:
+                  break;
+                case PILOT_SP32_2:
+                  data_carrier_map[6944 - shift] = SCATTERED_CARRIER;
+                  break;
+                case PILOT_SP32_4:
+                  break;
+                default:
+                  break;
+              }
+            }
+            break;
         }
       }
     }
@@ -882,19 +1162,6 @@ namespace gr {
             for (int n = 0; n < preamblecarriers; n++) {
               if (data_carrier_map[j][n] == PREAMBLE_CARRIER) {
                 out[indexout++] = pr_bpsk[prbs[n]];
-              }
-              else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
-                out[indexout++] = cp_bpsk[prbs[n]];
-              }
-              else {
-                out[indexout++] = in[indexin++];
-              }
-            }
-          }
-          else if (frame_symbols[j] == SBS_SYMBOL) {
-            for (int n = 0; n < carriers; n++) {
-              if (data_carrier_map[j][n] == SCATTERED_CARRIER) {
-                out[indexout++] = sp_bpsk[prbs[n]];
               }
               else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
                 out[indexout++] = cp_bpsk[prbs[n]];
@@ -968,6 +1235,30 @@ namespace gr {
       59, 167, 307, 469, 637, 751, 865, 1031, 1159, 1333, 1447, 1607, 1811, 1943, 2041, 2197,
       2323, 2519, 2605, 2767, 2963, 3029, 3175, 3325, 3467, 3665, 3833, 3901, 4073, 4235, 4325, 4511,
       4627, 4825, 4907, 5051, 5227, 5389, 5531, 5627, 5833, 5905, 6053, 6197, 6353, 6563, 6637, 6809
+    };
+
+    const int pilotgenerator_cc_impl::continual_pilot_table_16K[96] = {
+      118, 178, 334, 434, 614, 670, 938, 1070, 1274, 1358, 1502, 1618, 1730, 1918, 2062, 2078,
+      2318, 2566, 2666, 2750, 2894, 3010, 3214, 3250, 3622, 3686, 3886, 3962, 4082, 4166, 4394, 4558,
+      4646, 4718, 5038, 5170, 5210, 5342, 5534, 5614, 5926, 5942, 6058, 6134, 6350, 6410, 6650, 6782,
+      6934, 7154, 7330, 7438, 7666, 7742, 7802, 7894, 8146, 8258, 8470, 8494, 8650, 8722, 9022, 9118,
+      9254, 9422, 9650, 9670, 9814, 9902, 10102, 10166, 10454, 10598, 10778, 10822, 11062, 11138, 11254, 11318,
+      11666, 11758, 11810, 11974, 12106, 12242, 12394, 12502, 12706, 12866, 13126, 13190, 13274, 13466, 13618, 13666
+    };
+
+    const int pilotgenerator_cc_impl::continual_pilot_table_32K[192] = {
+      236, 316, 356, 412, 668, 716, 868, 1100, 1228, 1268, 1340, 1396, 1876, 1916, 2140, 2236,
+      2548, 2644, 2716, 2860, 3004, 3164, 3236, 3436, 3460, 3700, 3836, 4028, 4124, 4132, 4156, 4316,
+      4636, 5012, 5132, 5140, 5332, 5372, 5500, 5524, 5788, 6004, 6020, 6092, 6428, 6452, 6500, 6740,
+      7244, 7316, 7372, 7444, 7772, 7844, 7924, 8020, 8164, 8308, 8332, 8348, 8788, 8804, 9116, 9140,
+      9292, 9412, 9436, 9604, 10076, 10204, 10340, 10348, 10420, 10660, 10684, 10708, 11068, 11132, 11228, 11356,
+      11852, 11860, 11884, 12044, 12116, 12164, 12268, 12316, 12700, 12772, 12820, 12988, 13300, 13340, 13564, 13780,
+      13868, 14084, 14308, 14348, 14660, 14828, 14876, 14948, 15332, 15380, 15484, 15532, 15604, 15764, 15788, 15796,
+      16292, 16420, 16516, 16580, 16940, 16964, 16988, 17228, 17300, 17308, 17444, 17572, 18044, 18212, 18236, 18356,
+      18508, 18532, 18844, 18860, 19300, 19316, 19340, 19484, 19628, 19724, 19804, 19876, 20204, 20276, 20332, 20404,
+      20908, 21148, 21196, 21220, 21556, 21628, 21644, 21860, 22124, 22148, 22276, 22316, 22508, 22516, 22636, 23012,
+      23332, 23492, 23516, 23524, 23620, 23812, 23948, 24188, 24212, 24412, 24484, 24644, 24788, 24932, 25004, 25100,
+      25412, 25508, 25732, 25772, 26252, 26308, 26380, 26420, 26548, 26780, 26932, 26980, 27236, 27292, 27332, 27412
     };
 
     const int pilotgenerator_cc_impl::preamble_cells_table[32][5] = {

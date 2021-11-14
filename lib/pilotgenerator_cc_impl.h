@@ -35,6 +35,7 @@ namespace gr {
      private:
       int fft_size;
       int pilot_pattern;
+      int cred_coeff;
       int symbols;
       int carriers;
       int max_carriers;
@@ -58,6 +59,8 @@ namespace gr {
       const static double preamble_power_table[32];
       const static double scattered_power_table[16][5];
       const static int continual_pilot_table_8K[48];
+      const static int continual_pilot_table_16K[96];
+      const static int continual_pilot_table_32K[192];
       const static int preamble_cells_table[32][5];
       const static int data_cells_table_8K[16][5];
       const static int data_cells_table_16K[16][5];
@@ -67,7 +70,7 @@ namespace gr {
       const static int sbs_cells_table_32K[16][5];
 
      public:
-      pilotgenerator_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs);
       ~pilotgenerator_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
