@@ -18,7 +18,8 @@ namespace gr {
     {
      private:
       int kbch;
-      unsigned char bb_randomize[FRAME_SIZE_NORMAL];
+      __GR_ATTR_ALIGNED(8) unsigned char bb_randomize[FRAME_SIZE_NORMAL];
+      uint64_t* bb_randomize64;
       void init_bb_randomizer(void);
 
      public:

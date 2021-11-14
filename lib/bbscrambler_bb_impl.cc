@@ -116,7 +116,7 @@ namespace gr {
         }
       }
       init_bb_randomizer();
-      set_output_multiple(kbch / 8);
+      set_output_multiple(kbch);
     }
 
     /*
@@ -130,18 +130,22 @@ namespace gr {
     bbscrambler_bb_impl::init_bb_randomizer(void)
     {
       int sr = 0x18f;
-      int b;
+      int b, packed;
 
-      for (int i = 0; i < FRAME_SIZE_NORMAL; i++) {
-        bb_randomize[i] = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+      for (int i = 0; i < FRAME_SIZE_NORMAL;) {
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
                           ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
                           ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        for (int n = 7; n >= 0; n--) {
+          bb_randomize[i++] = packed & (1 << n) ? 1 : 0;
+        }
         b = sr & 1;
         sr >>= 1;
         if (b) {
           sr ^= POLYNOMIAL;
         }
       }
+      bb_randomize64 = (uint64_t*)&bb_randomize[0];
     }
 
     int
@@ -149,12 +153,12 @@ namespace gr {
         gr_vector_const_void_star &input_items,
         gr_vector_void_star &output_items)
     {
-      auto in = static_cast<const input_type*>(input_items[0]);
-      auto out = static_cast<output_type*>(output_items[0]);
+      auto in = static_cast<const uint64_t*>(input_items[0]);
+      auto out = static_cast<uint64_t*>(output_items[0]);
 
-      for (int i = 0; i < noutput_items; i += kbch / 8) {
-        for (int j = 0; j < kbch / 8; ++j) {
-          out[i + j] = in[i + j] ^ bb_randomize[j];
+      for (int i = 0; i < noutput_items; i += kbch) {
+        for (int j = 0; j < kbch / 8; j++) {
+          *out++ = *in++ ^ bb_randomize64[j];
         }
       }
 
