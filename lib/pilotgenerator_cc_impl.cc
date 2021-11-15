@@ -45,9 +45,6 @@ namespace gr {
       cred_coeff = cred;
       symbols = numpreamblesyms + numpayloadsyms;
       preamble_symbols = numpreamblesyms;
-      first_preamble_normalization = 1.0 / std::sqrt((7737.10 * ((double)preamble_carriers / (double)carriers) - 1.98));
-      preamble_normalization = 1.0 / std::sqrt(7737.10);
-      data_normalization = 1.0 / std::sqrt(8223.83);
       switch (fftsize) {
         case FFTSIZE_8K:
           first_preamble_cells = 4307;
@@ -709,6 +706,9 @@ namespace gr {
       }
       input_cells = totalcells;
       printf("input cells = %d\n", input_cells);
+      first_preamble_normalization = 1.0 / std::sqrt((7737.10 * ((double)preamble_carriers / (double)carriers) - 1.98));
+      preamble_normalization = 1.0 / std::sqrt(7737.10);
+      data_normalization = 1.0 / std::sqrt(8223.83);
       set_output_multiple(symbols);
     }
 
@@ -1225,7 +1225,9 @@ namespace gr {
         }
       }
 
-      printf("indexin = %d\n", indexin);
+      if (indexin != input_cells) {
+        printf("input_cells = %d, indexin = %d\n", input_cells, indexin);
+      }
       // Tell runtime system how many input items we consumed on
       // each input stream.
       consume_each (input_cells);
