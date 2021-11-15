@@ -35,12 +35,14 @@ namespace gr {
       int preamble_cells;
       int data_cells;
       int sbs_cells;
+      int maxstates;
 
       fft_size = fftsize;
       interleaver_mode = mode;
       symbols = numpreamblesyms + numpayloadsyms;
       switch (fftsize) {
         case FFTSIZE_8K:
+          maxstates = 8192;
           first_preamble_cells = 4307;
           switch (guardinterval) {
             case GI_1_192:
@@ -140,6 +142,7 @@ namespace gr {
           }
           break;
         case FFTSIZE_16K:
+          maxstates = 16384;
           first_preamble_cells = 8614;
           switch (guardinterval) {
             case GI_1_192:
@@ -251,6 +254,7 @@ namespace gr {
           }
           break;
         case FFTSIZE_32K:
+          maxstates = 32768;
           first_preamble_cells = 17288;
           switch (guardinterval) {
             case GI_1_192:
@@ -375,6 +379,7 @@ namespace gr {
           }
           break;
         default:
+          maxstates = 8192;
           first_preamble_cells = 4307;
           switch (guardinterval) {
             case GI_1_192:
@@ -511,12 +516,25 @@ namespace gr {
         }
       }
       frame_cells[numpreamblesyms + numpayloadsyms - 1] = sbs_cells;
-#if 0
-      data_carrier_map.resize(symbols);
-      for (std::vector<std::vector<int>>::size_type i = 0; i != data_carrier_map.size(); i++) {
-        data_carrier_map[i].resize(max_carriers);
+
+      HevenFP.resize(symbols);
+      HoddFP.resize(symbols);
+      HevenP.resize(symbols);
+      HoddP.resize(symbols);
+      HevenSBS.resize(symbols);
+      HoddSBS.resize(symbols);
+      Heven.resize(symbols);
+      Hodd.resize(symbols);
+      for (std::vector<std::vector<int>>::size_type i = 0; i != Heven.size(); i++) {
+        HevenFP[i].resize(maxstates);
+        HoddFP[i].resize(maxstates);
+        HevenP[i].resize(maxstates);
+        HoddP[i].resize(maxstates);
+        HevenSBS[i].resize(maxstates);
+        HoddSBS[i].resize(maxstates);
+        Heven[i].resize(maxstates);
+        Hodd[i].resize(maxstates);
       }
-#endif
       init_address(first_preamble_cells, preamble_cells, sbs_cells, data_cells);
 
       if (firstsbs) {
@@ -541,15 +559,15 @@ namespace gr {
     freqinterleaver_cc_impl::init_address(int firstpreamblecells, int preamblecells, int sbscells, int datacells)
     {
       int max_states, xor_size, xor_size2, pn_mask, result;
-      int q_evenFP = 0;
-      int q_oddFP = 0;
-      int q_evenP = 0;
-      int q_oddP = 0;
-      int q_evenSBS = 0;
-      int q_oddSBS = 0;
-      int q_even = 0;
-      int q_odd = 0;
-      int lfsr = 0;
+      int q_evenFP;
+      int q_oddFP;
+      int q_evenP;
+      int q_oddP;
+      int q_evenSBS;
+      int q_oddSBS;
+      int q_even;
+      int q_odd;
+      int lfsr;
       int lfsr2 = 0;
       int logic8k[4] = {0, 1, 4, 6};
       int logic16k[6] = {0, 1, 4, 5, 9, 11};
@@ -609,84 +627,104 @@ namespace gr {
           break;
       }
 
-      lfsr2 = 1;
-      result = 0;
-      for (int k = 0; k < xor_size2; k++) {
-        result ^= (lfsr2 >> logic2[k]) & 1;
-      }
-      lfsr2 &= (pn_mask << 1) | 0x1;
-      lfsr2 >>= 1;
-      lfsr2 |= result << (pn_degree);
-
-      for (int i = 0; i < max_states; i++) {
-        if (i == 0 || i == 1) {
-          lfsr = 0;
-        }
-        else if (i == 2) {
-          lfsr = 1;
-        }
-        else {
-          result = 0;
-          for (int k = 0; k < xor_size; k++) {
-            result ^= (lfsr >> logic[k]) & 1;
+      for (int i = 0; i < symbols; i++) {
+        std::vector<int>& HevenFP = this->HevenFP[i];
+        std::vector<int>& HoddFP = this->HoddFP[i];
+        std::vector<int>& HevenP = this->HevenP[i];
+        std::vector<int>& HoddP = this->HoddP[i];
+        std::vector<int>& HevenSBS = this->HevenSBS[i];
+        std::vector<int>& HoddSBS = this->HoddSBS[i];
+        std::vector<int>& Heven = this->Heven[i];
+        std::vector<int>& Hodd = this->Hodd[i];
+        q_evenFP = 0;
+        q_oddFP = 0;
+        q_evenP = 0;
+        q_oddP = 0;
+        q_evenSBS = 0;
+        q_oddSBS = 0;
+        q_even = 0;
+        q_odd = 0;
+        if ((i % 2) == 0) {
+          if (i == 0) {
+            lfsr2 = 0x1fff;
           }
-          lfsr &= pn_mask;
-          lfsr >>= 1;
-          lfsr |= result << (pn_degree - 1);
+          else {
+            result = 0;
+            for (int k = 0; k < xor_size2; k++) {
+              result ^= (lfsr2 >> logic2[k]) & 1;
+            }
+            lfsr2 &= (pn_mask << 1) | 0x1;
+            lfsr2 >>= 1;
+            lfsr2 |= result << (pn_degree);
+          }
         }
-        even = 0;
-        odd = 0;
-        for (int n = 0; n < pn_degree; n++) {
-          even |= ((lfsr >> n) & 0x1) << bitpermeven[n];
+
+        printf("lfsr2 = 0x%08x\n", lfsr2);
+
+        for (int j = 0; j < max_states; j++) {
+          if (j == 0 || j == 1) {
+            lfsr = 0;
+          }
+          else if (j == 2) {
+            lfsr = 1;
+          }
+          else {
+            result = 0;
+            for (int k = 0; k < xor_size; k++) {
+              result ^= (lfsr >> logic[k]) & 1;
+            }
+            lfsr &= pn_mask;
+            lfsr >>= 1;
+            lfsr |= result << (pn_degree - 1);
+          }
+          even = 0;
+          odd = 0;
+          for (int n = 0; n < pn_degree; n++) {
+            even |= ((lfsr >> n) & 0x1) << bitpermeven[n];
+          }
+          for (int n = 0; n < pn_degree; n++) {
+            odd |= ((lfsr >> n) & 0x1) << bitpermodd[n];
+          }
+          even = even + ((j % 2) * (max_states / 2));
+          odd = odd + ((j % 2) * (max_states / 2));
+          even ^= lfsr2;
+          odd ^= lfsr2;
+          if (even < firstpreamblecells) {
+            HevenFP[q_evenFP++] = even;
+          }
+          if (odd < firstpreamblecells) {
+            HoddFP[q_oddFP++] = odd;
+          }
+          if (even < preamblecells) {
+            HevenP[q_evenP++] = even;
+          }
+          if (odd < preamblecells) {
+            HoddP[q_oddP++] = odd;
+          }
+          if (even < sbscells) {
+            HevenSBS[q_evenSBS++] = even;
+          }
+          if (odd < sbscells) {
+            HoddSBS[q_oddSBS++] = odd;
+          }
+          if (even < datacells) {
+            Heven[q_even++] = even;
+          }
+          if (odd < datacells) {
+            Hodd[q_odd++] = odd;
+          }
         }
-        for (int n = 0; n < pn_degree; n++) {
-          odd |= ((lfsr >> n) & 0x1) << bitpermodd[n];
-        }
-#if 0
-        even ^= lfsr2;
-        odd ^= lfsr2;
-#endif
-        even = even + ((i % 2) * (max_states / 2));
-        odd = odd + ((i % 2) * (max_states / 2));
-#if 1
-        even ^= lfsr2;
-        odd ^= lfsr2;
-#endif
-        if (even < firstpreamblecells) {
-          HevenFP[q_evenFP++] = even;
-        }
-        if (odd < firstpreamblecells) {
-          HoddFP[q_oddFP++] = odd;
-        }
-        if (even < preamblecells) {
-          HevenP[q_evenP++] = even;
-        }
-        if (odd < preamblecells) {
-          HoddP[q_oddP++] = odd;
-        }
-        if (even < sbscells) {
-          HevenSBS[q_evenSBS++] = even;
-        }
-        if (odd < sbscells) {
-          HoddSBS[q_oddSBS++] = odd;
-        }
-        if (even < datacells) {
-          Heven[q_even++] = even;
-        }
-        if (odd < datacells) {
-          Hodd[q_odd++] = odd;
-        }
-      }
-      if (fft_size == FFTSIZE_32K) {
-        for (int j = 0; j < q_odd; j++) {
-          int a;
-          a = Hodd[j];
-          Heven[a] = j;
-        }
-        for (int j = 0; j < q_oddP; j++) {
-          int a;
-          a = HoddP[j];
-          HevenP[a] = j;
+        if (fft_size == FFTSIZE_32K) {
+          for (int n = 0; n < q_odd; n++) {
+            int a;
+            a = Hodd[n];
+            Heven[a] = n;
+          }
+          for (int n = 0; n < q_oddP; n++) {
+            int a;
+            a = HoddP[n];
+            HevenP[a] = n;
+          }
         }
       }
     }
@@ -698,26 +736,26 @@ namespace gr {
     {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
-      int* H;
+      std::vector<int> H;
       int index;
 
       for (int i = 0; i < noutput_items; i += output_cells) {
         for (int j = 0; j < symbols; j++) {
           if (frame_symbols[j] == PREAMBLE_SYMBOL) {
             if (j == 0) {
-              if ((symbols % 2) == 0) {
-                H = HevenFP;
+              if ((j % 2) == 0) {
+                H = HevenFP[j];
               }
               else {
-                H = HoddFP;
+                H = HoddFP[j];
               }
             }
             else {
-              if ((symbols % 2) == 0) {
-                H = HevenP;
+              if ((j % 2) == 0) {
+                H = HevenP[j];
               }
               else {
-                H = HoddP;
+                H = HoddP[j];
               }
             }
             for (int n = 0; n < frame_cells[j]; n++) {
@@ -727,19 +765,19 @@ namespace gr {
           }
           else if (interleaver_mode == FREQ_ALL_SYMBOLS) {
             if (frame_symbols[j] == SBS_SYMBOL) {
-              if ((symbols % 2) == 0) {
-                H = HevenSBS;
+              if ((j % 2) == 0) {
+                H = HevenSBS[j];
               }
               else {
-                H = HoddSBS;
+                H = HoddSBS[j];
               }
             }
             else {
-              if ((symbols % 2) == 0) {
-                H = Heven;
+              if ((j % 2) == 0) {
+                H = Heven[j];
               }
               else {
-                H = Hodd;
+                H = Hodd[j];
               }
             }
             for (int n = 0; n < frame_cells[j]; n++) {
