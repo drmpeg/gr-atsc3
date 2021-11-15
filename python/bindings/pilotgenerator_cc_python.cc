@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(pilotgenerator_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(a79fdc1863170d5246610be11a321fd2)                     */
+/* BINDTOOL_HEADER_FILE_HASH(174fdae2d82b7598ad94771f4f9b2705)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -44,6 +44,7 @@ void bind_pilotgenerator_cc(py::module& m)
            py::arg("pilotpattern"),
            py::arg("pilotboost"),
            py::arg("firstsbs"),
+           py::arg("vlength"),
            D(pilotgenerator_cc,make)
         )
         

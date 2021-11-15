@@ -44,7 +44,8 @@ templates:
           % else:
           ${pilotboost16.val},
           % endif
-          ${firstsbs.val})
+          ${firstsbs.val},
+          ${fftsize.vlength})
 
 parameters:
 -   id: fftsize
@@ -54,6 +55,7 @@ parameters:
     option_labels: [8K, 16K, 32K]
     option_attributes:
         val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
+        vlength: [8192, 16384, 32768]
 -   id: numpayloadsyms
     label: Number of Payload Symbols
     dtype: int
@@ -235,5 +237,6 @@ inputs:
 outputs:
 -   domain: stream
     dtype: complex
+    vlen: ${fftsize.vlength}
 
 file_format: 1

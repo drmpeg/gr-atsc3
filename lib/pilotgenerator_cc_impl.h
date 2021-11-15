@@ -10,6 +10,7 @@
 
 #include <atsc3/pilotgenerator_cc.h>
 #include "atsc3_defines.h"
+#include <gnuradio/fft/fft.h>
 #include <vector>
 
 #define MAX_CARRIERS 27649
@@ -45,6 +46,9 @@ namespace gr {
       int dx;
       int dy;
       int input_cells;
+      float first_preamble_normalization;
+      float preamble_normalization;
+      float data_normalization;
       gr_complex pr_bpsk[2];
       gr_complex sp_bpsk[2];
       gr_complex cp_bpsk[2];
@@ -53,6 +57,9 @@ namespace gr {
       std::vector<std::vector<int>> data_carrier_map;
       void init_prbs(void);
       void init_pilots(void);
+
+      fft::fft_complex_rev ofdm_fft;
+      int ofdm_fft_size;
 
       const static int carriers_table[3][5];
       const static int preamble_dx_table[32];
@@ -70,7 +77,7 @@ namespace gr {
       const static int sbs_cells_table_32K[16][5];
 
      public:
-      pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs);
+      pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, unsigned int vlength);
       ~pilotgenerator_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

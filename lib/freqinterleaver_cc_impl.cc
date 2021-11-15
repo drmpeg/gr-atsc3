@@ -658,8 +658,7 @@ namespace gr {
             lfsr2 |= result << (pn_degree);
           }
         }
-
-        printf("lfsr2 = 0x%08x\n", lfsr2);
+//        printf("lfsr2 = 0x%08x\n", lfsr2);
 
         for (int j = 0; j < max_states; j++) {
           if (j == 0 || j == 1) {

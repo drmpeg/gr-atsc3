@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "pilotgenerator_cc_impl.h"
+#include <volk/volk.h>
 
 namespace gr {
   namespace atsc3 {
@@ -14,20 +15,22 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     pilotgenerator_cc::sptr
-    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs)
+    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<pilotgenerator_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, vlength);
     }
 
 
     /*
      * The private constructor
      */
-    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs)
+    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, unsigned int vlength)
       : gr::block("pilotgenerator_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
-              gr::io_signature::make(1, 1, sizeof(output_type)))
+              gr::io_signature::make(1, 1, sizeof(output_type) * vlength)),
+        ofdm_fft(vlength, 1),
+        ofdm_fft_size(vlength)
     {
       int cred = CRED_0;
       double power, preamble_power, scattered_power;
@@ -42,6 +45,9 @@ namespace gr {
       cred_coeff = cred;
       symbols = numpreamblesyms + numpayloadsyms;
       preamble_symbols = numpreamblesyms;
+      first_preamble_normalization = 1.0 / std::sqrt((7737.10 * ((double)preamble_carriers / (double)carriers) - 1.98));
+      preamble_normalization = 1.0 / std::sqrt(7737.10);
+      data_normalization = 1.0 / std::sqrt(8223.83);
       switch (fftsize) {
         case FFTSIZE_8K:
           first_preamble_cells = 4307;
@@ -663,15 +669,12 @@ namespace gr {
           break;
       }
       power = pow(10, preamble_power / 20.0);
-      printf("preamble power = %f\n", power);
       pr_bpsk[0] = gr_complex(power, 0.0);
       pr_bpsk[1] = gr_complex(-(power), 0.0);
       power = pow(10, scattered_power / 20.0);
-      printf("scattered power = %f\n", power);
       sp_bpsk[0] = gr_complex(power, 0.0);
       sp_bpsk[1] = gr_complex(-(power), 0.0);
       power = pow(10, 8.52 / 20.0);
-      printf("continual power = %f\n", power);
       cp_bpsk[0] = gr_complex(power, 0.0);
       cp_bpsk[1] = gr_complex(-(power), 0.0);
       init_prbs();
@@ -706,7 +709,7 @@ namespace gr {
       }
       input_cells = totalcells;
       printf("input cells = %d\n", input_cells);
-      set_output_multiple((carriers * (symbols - 1)) + preamble_carriers);
+      set_output_multiple(symbols);
     }
 
     /*
@@ -1138,6 +1141,8 @@ namespace gr {
       }
     }
 
+    const gr_complex zero = gr_complex(0.0, 0.0);
+
     int
     pilotgenerator_cc_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
@@ -1147,47 +1152,80 @@ namespace gr {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin = 0;
-      int indexout = 0;
       int preamblecarriers;
+      int left_nulls, right_nulls;
+      float normalization;
+      gr_complex* dst;
 
       for (int i = 0; i < noutput_items; i += (carriers * (symbols - 1)) + preamble_carriers) {
         for (int j = 0; j < symbols; j++) {
           if (frame_symbols[j] == PREAMBLE_SYMBOL) {
             if (j == 0) {
               preamblecarriers = preamble_carriers;
+              normalization = first_preamble_normalization;
             }
             else {
               preamblecarriers = carriers;
+              normalization = preamble_normalization;
+            }
+            left_nulls = ((ofdm_fft_size - preamblecarriers) / 2) + 1;
+            right_nulls = (ofdm_fft_size - preamblecarriers) / 2;
+            for (int n = 0; n < left_nulls; n++) {
+              *out++ = zero;
             }
             for (int n = 0; n < preamblecarriers; n++) {
               if (data_carrier_map[j][n] == PREAMBLE_CARRIER) {
-                out[indexout++] = pr_bpsk[prbs[n]];
+                *out++ = pr_bpsk[prbs[n]];
               }
               else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
-                out[indexout++] = cp_bpsk[prbs[n]];
+                *out++ = cp_bpsk[prbs[n]];
               }
               else {
-                out[indexout++] = in[indexin++];
+                *out++ = in[indexin++];
               }
+            }
+            for (int n = 0; n < right_nulls; n++) {
+              *out++ = zero;
             }
           }
           else {
+            normalization = data_normalization;
+            left_nulls = ((ofdm_fft_size - carriers) / 2) + 1;
+            right_nulls = (ofdm_fft_size - carriers) / 2;
+            for (int n = 0; n < left_nulls; n++) {
+              *out++ = zero;
+            }
             for (int n = 0; n < carriers; n++) {
               if (data_carrier_map[j][n] == SCATTERED_CARRIER) {
-                out[indexout++] = sp_bpsk[prbs[n]];
+                *out++ = sp_bpsk[prbs[n]];
               }
               else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
-                out[indexout++] = cp_bpsk[prbs[n]];
+                *out++ = cp_bpsk[prbs[n]];
               }
               else {
-                out[indexout++] = in[indexin++];
+                *out++ = in[indexin++];
               }
             }
+            for (int n = 0; n < right_nulls; n++) {
+              *out++ = zero;
+            }
           }
+          out -= ofdm_fft_size;
+#if 0
+          if (equalization_enable == EQUALIZATION_ON) {
+              volk_32fc_x2_multiply_32fc(out, out, inverse_sinc, ofdm_fft_size);
+          }
+#endif
+          dst = ofdm_fft.get_inbuf();
+          memcpy(&dst[ofdm_fft_size / 2], &out[0], sizeof(gr_complex) * ofdm_fft_size / 2);
+          memcpy(&dst[0], &out[ofdm_fft_size / 2], sizeof(gr_complex) * ofdm_fft_size / 2);
+          ofdm_fft.execute();
+          volk_32fc_s32fc_multiply_32fc(out, ofdm_fft.get_outbuf(), normalization, ofdm_fft_size);
+          out += ofdm_fft_size;
         }
       }
 
-      printf("indexin = %d, indexout = %d\n", indexin, indexout);
+      printf("indexin = %d\n", indexin);
       // Tell runtime system how many input items we consumed on
       // each input stream.
       consume_each (input_cells);
