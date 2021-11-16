@@ -65,6 +65,10 @@ namespace gr {
       const static int preamble_dx_table[32];
       const static double preamble_power_table[32];
       const static double scattered_power_table[16][5];
+      const static double preamble_ifft_power_table[32][5];
+      const static double data_ifft_power_table_8K[16][5][5];
+      const static double data_ifft_power_table_16K[16][5][5];
+      const static double data_ifft_power_table_32K[16][5][5];
       const static int continual_pilot_table_8K[48];
       const static int continual_pilot_table_16K[96];
       const static int continual_pilot_table_32K[192];

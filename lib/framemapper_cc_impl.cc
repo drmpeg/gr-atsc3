@@ -158,10 +158,10 @@ namespace gr {
       l1basicinit->papr_reduction = PAPR_OFF;
       l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
       l1basicinit->time_offset = 0;
-      l1basicinit->additional_samples = 0;
+      l1basicinit->additional_samples = 0; /* always 0 */
       l1basicinit->num_subframes = 0;
       l1basicinit->preamble_num_symbols = numpreamblesyms - 1;
-      l1basicinit->preamble_reduced_carriers = 0;
+      l1basicinit->preamble_reduced_carriers = cred; /* make it the same as the first subframe */
       l1basicinit->L1_Detail_content_tag = 0;
       l1basicinit->L1_Detail_size_bytes = 25;
       l1basicinit->L1_Detail_fec_type = l1dmode;
