@@ -1,0 +1,49 @@
+id: atsc3_bootstrap_cc
+label: ATSC3.0 Bootstrap Insertion
+category: '[ATSC3.0]'
+
+templates:
+  imports: import atsc3
+  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${showlevels.val})
+
+parameters:
+-   id: fftsize
+    label: FFT Size
+    dtype: enum
+    options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
+    option_labels: [8K, 16K, 32K]
+    option_attributes:
+        val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
+        vlength: [8192, 16384, 32768]
+-   id: numpayloadsyms
+    label: Number of Payload Symbols
+    dtype: int
+    default: '72'
+-   id: numpreamblesyms
+    label: Number of Preamble Symbols
+    dtype: int
+    default: '2'
+-   id: guardinterval
+    label: Guard Interval samples
+    dtype: enum
+    options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
+    option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
+    option_attributes:
+        val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
+-   id: showlevels
+    label: Show Peak IQ Levels
+    dtype: enum
+    options: [SHOWLEVELS_OFF, SHOWLEVELS_ON]
+    option_labels: ['Off', 'On']
+    option_attributes:
+        val: [atsc3.SHOWLEVELS_OFF, atsc3.SHOWLEVELS_ON]
+
+inputs:
+-   domain: stream
+    dtype: complex
+
+outputs:
+-   domain: stream
+    dtype: complex
+
+file_format: 1

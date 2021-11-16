@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(453c39a8f01176fcc905635a1ca9dd73)                     */
+/* BINDTOOL_HEADER_FILE_HASH(a8592ff6f6c1a3dd2226d0300581566a)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -225,6 +225,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_frequency_interleaver_t>();
+    py::enum_<::gr::atsc3::atsc3_showlevels_t>(m,"atsc3_showlevels_t")
+        .value("SHOWLEVELS_OFF", ::gr::atsc3::SHOWLEVELS_OFF) // 0
+        .value("SHOWLEVELS_ON", ::gr::atsc3::SHOWLEVELS_ON) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_showlevels_t>();
 
 
 

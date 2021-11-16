@@ -37,7 +37,8 @@ list(APPEND atsc3_python_files
     modulator_bc_python.cc
     framemapper_cc_python.cc
     pilotgenerator_cc_python.cc
-    freqinterleaver_cc_python.cc python_bindings.cc)
+    freqinterleaver_cc_python.cc
+    bootstrap_cc_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(atsc3
    ../..

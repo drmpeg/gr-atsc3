@@ -817,6 +817,7 @@ namespace gr {
       }
       input_cells = totalcells;
       printf("input cells = %d\n", input_cells);
+      /* -1.98 is a tweak factor to match verification files */
       first_preamble_normalization = 1.0 / std::sqrt((preamble_ifft_power * ((double)preamble_carriers / (double)carriers) - 1.98));
       preamble_normalization = 1.0 / std::sqrt(preamble_ifft_power);
       data_normalization = 1.0 / std::sqrt(data_ifft_power);

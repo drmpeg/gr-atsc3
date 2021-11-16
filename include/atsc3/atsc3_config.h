@@ -168,6 +168,11 @@ namespace gr {
       FREQ_ALL_SYMBOLS,
     };
 
+    enum atsc3_showlevels_t {
+      SHOWLEVELS_OFF = 0,
+      SHOWLEVELS_ON,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -190,5 +195,6 @@ typedef gr::atsc3::atsc3_first_sbs_t atsc3_first_sbs_t;
 typedef gr::atsc3::atsc3_scattered_pilot_boost_t atsc3_scattered_pilot_boost_t;
 typedef gr::atsc3::atsc3_l1_select_t atsc3_l1_select_t;
 typedef gr::atsc3::atsc3_frequency_interleaver_t atsc3_frequency_interleaver_t;
+typedef gr::atsc3::atsc3_showlevels_t atsc3_showlevels_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */
