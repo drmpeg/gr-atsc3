@@ -12,6 +12,8 @@ templates:
           ${guardinterval.val},
           ${pilotpattern.val},
           ${firstsbs.val},
+          ${cred.val},
+          ${pcred.val},
           ${mode.val})
 
 parameters:
@@ -58,6 +60,20 @@ parameters:
     option_labels: [Disabled, Enabled]
     option_attributes:
         val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+-   id: cred
+    label: Reduced Carriers
+    dtype: enum
+    options: [CRED_0, CRED_1, CRED_2, CRED_3, CRED_4]
+    option_labels: [5.83 MHz, 5.75 MHz, 5.67 MHz, 5.59 MHz, 5.51 MHz]
+    option_attributes:
+        val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: pcred
+    label: Preamble Reduced Carriers
+    dtype: enum
+    options: [CRED_0, CRED_1, CRED_2, CRED_3, CRED_4]
+    option_labels: [5.83 MHz, 5.75 MHz, 5.67 MHz, 5.59 MHz, 5.51 MHz]
+    option_attributes:
+        val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
 
 inputs:
 -   domain: stream

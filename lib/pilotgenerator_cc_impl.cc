@@ -15,24 +15,23 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     pilotgenerator_cc::sptr
-    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, unsigned int vlength)
+    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<pilotgenerator_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, vlength);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, cred, pcred, vlength);
     }
 
 
     /*
      * The private constructor
      */
-    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, unsigned int vlength)
+    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, unsigned int vlength)
       : gr::block("pilotgenerator_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type) * vlength)),
         ofdm_fft(vlength, 1),
         ofdm_fft_size(vlength)
     {
-      int cred = CRED_0;
       double power, preamble_power, scattered_power;
       double preamble_ifft_power, data_ifft_power;
       int total_preamble_cells, totalcells;
@@ -54,52 +53,52 @@ namespace gr {
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
           switch (guardinterval) {
             case GI_1_192:
-              preamble_cells = preamble_cells_table[0][cred];
+              preamble_cells = preamble_cells_table[0][pcred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
-              preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              preamble_ifft_power = preamble_ifft_power_table[0][pcred];
               break;
             case GI_2_384:
-              preamble_cells = preamble_cells_table[1][cred];
+              preamble_cells = preamble_cells_table[1][pcred];
               preamble_dx = preamble_dx_table[1];
               preamble_power = preamble_power_table[1];
-              preamble_ifft_power = preamble_ifft_power_table[1][cred];
+              preamble_ifft_power = preamble_ifft_power_table[1][pcred];
               break;
             case GI_3_512:
-              preamble_cells = preamble_cells_table[2][cred];
+              preamble_cells = preamble_cells_table[2][pcred];
               preamble_dx = preamble_dx_table[2];
               preamble_power = preamble_power_table[2];
-              preamble_ifft_power = preamble_ifft_power_table[2][cred];
+              preamble_ifft_power = preamble_ifft_power_table[2][pcred];
               break;
             case GI_4_768:
-              preamble_cells = preamble_cells_table[3][cred];
+              preamble_cells = preamble_cells_table[3][pcred];
               preamble_dx = preamble_dx_table[3];
               preamble_power = preamble_power_table[3];
-              preamble_ifft_power = preamble_ifft_power_table[3][cred];
+              preamble_ifft_power = preamble_ifft_power_table[3][pcred];
               break;
             case GI_5_1024:
-              preamble_cells = preamble_cells_table[4][cred];
+              preamble_cells = preamble_cells_table[4][pcred];
               preamble_dx = preamble_dx_table[4];
               preamble_power = preamble_power_table[4];
-              preamble_ifft_power = preamble_ifft_power_table[4][cred];
+              preamble_ifft_power = preamble_ifft_power_table[4][pcred];
               break;
             case GI_6_1536:
-              preamble_cells = preamble_cells_table[5][cred];
+              preamble_cells = preamble_cells_table[5][pcred];
               preamble_dx = preamble_dx_table[5];
               preamble_power = preamble_power_table[5];
-              preamble_ifft_power = preamble_ifft_power_table[5][cred];
+              preamble_ifft_power = preamble_ifft_power_table[5][pcred];
               break;
             case GI_7_2048:
-              preamble_cells = preamble_cells_table[6][cred];
+              preamble_cells = preamble_cells_table[6][pcred];
               preamble_dx = preamble_dx_table[6];
               preamble_power = preamble_power_table[6];
-              preamble_ifft_power = preamble_ifft_power_table[6][cred];
+              preamble_ifft_power = preamble_ifft_power_table[6][pcred];
               break;
             default:
-              preamble_cells = preamble_cells_table[0][cred];
+              preamble_cells = preamble_cells_table[0][pcred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
-              preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              preamble_ifft_power = preamble_ifft_power_table[0][pcred];
               break;
           }
           switch (pilotpattern) {
@@ -197,76 +196,76 @@ namespace gr {
           preamble_carriers = carriers_table[FFTSIZE_16K][4];
           switch (guardinterval) {
             case GI_1_192:
-              preamble_cells = preamble_cells_table[7][cred];
+              preamble_cells = preamble_cells_table[7][pcred];
               preamble_dx = preamble_dx_table[7];
               preamble_power = preamble_power_table[7];
-              preamble_ifft_power = preamble_ifft_power_table[7][cred];
+              preamble_ifft_power = preamble_ifft_power_table[7][pcred];
               break;
             case GI_2_384:
-              preamble_cells = preamble_cells_table[8][cred];
+              preamble_cells = preamble_cells_table[8][pcred];
               preamble_dx = preamble_dx_table[8];
               preamble_power = preamble_power_table[8];
-              preamble_ifft_power = preamble_ifft_power_table[8][cred];
+              preamble_ifft_power = preamble_ifft_power_table[8][pcred];
               break;
             case GI_3_512:
-              preamble_cells = preamble_cells_table[9][cred];
+              preamble_cells = preamble_cells_table[9][pcred];
               preamble_dx = preamble_dx_table[9];
               preamble_power = preamble_power_table[9];
-              preamble_ifft_power = preamble_ifft_power_table[9][cred];
+              preamble_ifft_power = preamble_ifft_power_table[9][pcred];
               break;
             case GI_4_768:
-              preamble_cells = preamble_cells_table[10][cred];
+              preamble_cells = preamble_cells_table[10][pcred];
               preamble_dx = preamble_dx_table[10];
               preamble_power = preamble_power_table[10];
-              preamble_ifft_power = preamble_ifft_power_table[10][cred];
+              preamble_ifft_power = preamble_ifft_power_table[10][pcred];
               break;
             case GI_5_1024:
-              preamble_cells = preamble_cells_table[11][cred];
+              preamble_cells = preamble_cells_table[11][pcred];
               preamble_dx = preamble_dx_table[11];
               preamble_power = preamble_power_table[11];
-              preamble_ifft_power = preamble_ifft_power_table[11][cred];
+              preamble_ifft_power = preamble_ifft_power_table[11][pcred];
               break;
             case GI_6_1536:
-              preamble_cells = preamble_cells_table[12][cred];
+              preamble_cells = preamble_cells_table[12][pcred];
               preamble_dx = preamble_dx_table[12];
               preamble_power = preamble_power_table[12];
-              preamble_ifft_power = preamble_ifft_power_table[12][cred];
+              preamble_ifft_power = preamble_ifft_power_table[12][pcred];
               break;
             case GI_7_2048:
-              preamble_cells = preamble_cells_table[13][cred];
+              preamble_cells = preamble_cells_table[13][pcred];
               preamble_dx = preamble_dx_table[13];
               preamble_power = preamble_power_table[13];
-              preamble_ifft_power = preamble_ifft_power_table[13][cred];
+              preamble_ifft_power = preamble_ifft_power_table[13][pcred];
               break;
             case GI_8_2432:
-              preamble_cells = preamble_cells_table[14][cred];
+              preamble_cells = preamble_cells_table[14][pcred];
               preamble_dx = preamble_dx_table[14];
               preamble_power = preamble_power_table[14];
-              preamble_ifft_power = preamble_ifft_power_table[14][cred];
+              preamble_ifft_power = preamble_ifft_power_table[14][pcred];
               break;
             case GI_9_3072:
-              preamble_cells = preamble_cells_table[15][cred];
+              preamble_cells = preamble_cells_table[15][pcred];
               preamble_dx = preamble_dx_table[15];
               preamble_power = preamble_power_table[15];
-              preamble_ifft_power = preamble_ifft_power_table[15][cred];
+              preamble_ifft_power = preamble_ifft_power_table[15][pcred];
               break;
             case GI_10_3648:
-              preamble_cells = preamble_cells_table[16][cred];
+              preamble_cells = preamble_cells_table[16][pcred];
               preamble_dx = preamble_dx_table[16];
               preamble_power = preamble_power_table[16];
-              preamble_ifft_power = preamble_ifft_power_table[16][cred];
+              preamble_ifft_power = preamble_ifft_power_table[16][pcred];
               break;
             case GI_11_4096:
-              preamble_cells = preamble_cells_table[17][cred];
+              preamble_cells = preamble_cells_table[17][pcred];
               preamble_dx = preamble_dx_table[17];
               preamble_power = preamble_power_table[17];
-              preamble_ifft_power = preamble_ifft_power_table[17][cred];
+              preamble_ifft_power = preamble_ifft_power_table[17][pcred];
               break;
             default:
-              preamble_cells = preamble_cells_table[7][cred];
+              preamble_cells = preamble_cells_table[7][pcred];
               preamble_dx = preamble_dx_table[7];
               preamble_power = preamble_power_table[7];
-              preamble_ifft_power = preamble_ifft_power_table[7][cred];
+              preamble_ifft_power = preamble_ifft_power_table[7][pcred];
               break;
           }
           switch (pilotpattern) {
@@ -364,98 +363,98 @@ namespace gr {
           preamble_carriers = carriers_table[FFTSIZE_32K][4];
           switch (guardinterval) {
             case GI_1_192:
-              preamble_cells = preamble_cells_table[18][cred];
+              preamble_cells = preamble_cells_table[18][pcred];
               preamble_dx = preamble_dx_table[18];
               preamble_power = preamble_power_table[18];
-              preamble_ifft_power = preamble_ifft_power_table[18][cred];
+              preamble_ifft_power = preamble_ifft_power_table[18][pcred];
               break;
             case GI_2_384:
-              preamble_cells = preamble_cells_table[19][cred];
+              preamble_cells = preamble_cells_table[19][pcred];
               preamble_dx = preamble_dx_table[19];
               preamble_power = preamble_power_table[19];
-              preamble_ifft_power = preamble_ifft_power_table[19][cred];
+              preamble_ifft_power = preamble_ifft_power_table[19][pcred];
               break;
             case GI_3_512:
-              preamble_cells = preamble_cells_table[20][cred];
+              preamble_cells = preamble_cells_table[20][pcred];
               preamble_dx = preamble_dx_table[20];
               preamble_power = preamble_power_table[20];
-              preamble_ifft_power = preamble_ifft_power_table[20][cred];
+              preamble_ifft_power = preamble_ifft_power_table[20][pcred];
               break;
             case GI_4_768:
-              preamble_cells = preamble_cells_table[21][cred];
+              preamble_cells = preamble_cells_table[21][pcred];
               preamble_dx = preamble_dx_table[21];
               preamble_power = preamble_power_table[21];
-              preamble_ifft_power = preamble_ifft_power_table[21][cred];
+              preamble_ifft_power = preamble_ifft_power_table[21][pcred];
               break;
             case GI_5_1024:
-              preamble_cells = preamble_cells_table[22][cred];
+              preamble_cells = preamble_cells_table[22][pcred];
               preamble_dx = preamble_dx_table[22];
               preamble_power = preamble_power_table[22];
-              preamble_ifft_power = preamble_ifft_power_table[22][cred];
+              preamble_ifft_power = preamble_ifft_power_table[22][pcred];
               break;
             case GI_6_1536:
-              preamble_cells = preamble_cells_table[23][cred];
+              preamble_cells = preamble_cells_table[23][pcred];
               preamble_dx = preamble_dx_table[23];
               preamble_power = preamble_power_table[23];
-              preamble_ifft_power = preamble_ifft_power_table[23][cred];
+              preamble_ifft_power = preamble_ifft_power_table[23][pcred];
               break;
             case GI_7_2048:
-              preamble_cells = preamble_cells_table[24][cred];
+              preamble_cells = preamble_cells_table[24][pcred];
               preamble_dx = preamble_dx_table[24];
               preamble_power = preamble_power_table[24];
-              preamble_ifft_power = preamble_ifft_power_table[24][cred];
+              preamble_ifft_power = preamble_ifft_power_table[24][pcred];
               break;
             case GI_8_2432:
-              preamble_cells = preamble_cells_table[25][cred];
+              preamble_cells = preamble_cells_table[25][pcred];
               preamble_dx = preamble_dx_table[25];
               preamble_power = preamble_power_table[25];
-              preamble_ifft_power = preamble_ifft_power_table[25][cred];
+              preamble_ifft_power = preamble_ifft_power_table[25][pcred];
               break;
             case GI_9_3072:
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
-                preamble_cells = preamble_cells_table[26][cred];
+                preamble_cells = preamble_cells_table[26][pcred];
                 preamble_dx = preamble_dx_table[26];
                 preamble_power = preamble_power_table[26];
-              preamble_ifft_power = preamble_ifft_power_table[26][cred];
+              preamble_ifft_power = preamble_ifft_power_table[26][pcred];
               }
               else {
-                preamble_cells = preamble_cells_table[27][cred];
+                preamble_cells = preamble_cells_table[27][pcred];
                 preamble_dx = preamble_dx_table[27];
                 preamble_power = preamble_power_table[27];
-              preamble_ifft_power = preamble_ifft_power_table[27][cred];
+              preamble_ifft_power = preamble_ifft_power_table[27][pcred];
               }
               break;
             case GI_10_3648:
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
-                preamble_cells = preamble_cells_table[28][cred];
+                preamble_cells = preamble_cells_table[28][pcred];
                 preamble_dx = preamble_dx_table[28];
                 preamble_power = preamble_power_table[28];
-              preamble_ifft_power = preamble_ifft_power_table[28][cred];
+              preamble_ifft_power = preamble_ifft_power_table[28][pcred];
               }
               else {
-                preamble_cells = preamble_cells_table[29][cred];
+                preamble_cells = preamble_cells_table[29][pcred];
                 preamble_dx = preamble_dx_table[29];
                 preamble_power = preamble_power_table[29];
-              preamble_ifft_power = preamble_ifft_power_table[29][cred];
+              preamble_ifft_power = preamble_ifft_power_table[29][pcred];
               }
               break;
             case GI_11_4096:
-              preamble_cells = preamble_cells_table[30][cred];
+              preamble_cells = preamble_cells_table[30][pcred];
               preamble_dx = preamble_dx_table[30];
               preamble_power = preamble_power_table[30];
-              preamble_ifft_power = preamble_ifft_power_table[30][cred];
+              preamble_ifft_power = preamble_ifft_power_table[30][pcred];
               break;
             case GI_12_4864:
-              preamble_cells = preamble_cells_table[31][cred];
+              preamble_cells = preamble_cells_table[31][pcred];
               preamble_dx = preamble_dx_table[31];
               preamble_power = preamble_power_table[31];
-              preamble_ifft_power = preamble_ifft_power_table[31][cred];
+              preamble_ifft_power = preamble_ifft_power_table[31][pcred];
               break;
             default:
-              preamble_cells = preamble_cells_table[18][cred];
+              preamble_cells = preamble_cells_table[18][pcred];
               preamble_dx = preamble_dx_table[18];
               preamble_power = preamble_power_table[18];
-              preamble_ifft_power = preamble_ifft_power_table[18][cred];
+              preamble_ifft_power = preamble_ifft_power_table[18][pcred];
               break;
           }
           switch (pilotpattern) {
@@ -553,52 +552,52 @@ namespace gr {
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
           switch (guardinterval) {
             case GI_1_192:
-              preamble_cells = preamble_cells_table[0][cred];
+              preamble_cells = preamble_cells_table[0][pcred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
-              preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              preamble_ifft_power = preamble_ifft_power_table[0][pcred];
               break;
             case GI_2_384:
-              preamble_cells = preamble_cells_table[1][cred];
+              preamble_cells = preamble_cells_table[1][pcred];
               preamble_dx = preamble_dx_table[1];
               preamble_power = preamble_power_table[1];
-              preamble_ifft_power = preamble_ifft_power_table[1][cred];
+              preamble_ifft_power = preamble_ifft_power_table[1][pcred];
               break;
             case GI_3_512:
-              preamble_cells = preamble_cells_table[2][cred];
+              preamble_cells = preamble_cells_table[2][pcred];
               preamble_dx = preamble_dx_table[2];
               preamble_power = preamble_power_table[2];
-              preamble_ifft_power = preamble_ifft_power_table[2][cred];
+              preamble_ifft_power = preamble_ifft_power_table[2][pcred];
               break;
             case GI_4_768:
-              preamble_cells = preamble_cells_table[3][cred];
+              preamble_cells = preamble_cells_table[3][pcred];
               preamble_dx = preamble_dx_table[3];
               preamble_power = preamble_power_table[3];
-              preamble_ifft_power = preamble_ifft_power_table[3][cred];
+              preamble_ifft_power = preamble_ifft_power_table[3][pcred];
               break;
             case GI_5_1024:
-              preamble_cells = preamble_cells_table[4][cred];
+              preamble_cells = preamble_cells_table[4][pcred];
               preamble_dx = preamble_dx_table[4];
               preamble_power = preamble_power_table[4];
-              preamble_ifft_power = preamble_ifft_power_table[4][cred];
+              preamble_ifft_power = preamble_ifft_power_table[4][pcred];
               break;
             case GI_6_1536:
-              preamble_cells = preamble_cells_table[5][cred];
+              preamble_cells = preamble_cells_table[5][pcred];
               preamble_dx = preamble_dx_table[5];
               preamble_power = preamble_power_table[5];
-              preamble_ifft_power = preamble_ifft_power_table[5][cred];
+              preamble_ifft_power = preamble_ifft_power_table[5][pcred];
               break;
             case GI_7_2048:
-              preamble_cells = preamble_cells_table[6][cred];
+              preamble_cells = preamble_cells_table[6][pcred];
               preamble_dx = preamble_dx_table[6];
               preamble_power = preamble_power_table[6];
-              preamble_ifft_power = preamble_ifft_power_table[6][cred];
+              preamble_ifft_power = preamble_ifft_power_table[6][pcred];
               break;
             default:
-              preamble_cells = preamble_cells_table[0][cred];
+              preamble_cells = preamble_cells_table[0][pcred];
               preamble_dx = preamble_dx_table[0];
               preamble_power = preamble_power_table[0];
-              preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              preamble_ifft_power = preamble_ifft_power_table[0][pcred];
               break;
           }
           switch (pilotpattern) {
@@ -834,7 +833,7 @@ namespace gr {
     void
     pilotgenerator_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = input_cells;
+      ninput_items_required[0] = input_cells * (noutput_items / symbols);
     }
 
     void
