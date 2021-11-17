@@ -47,6 +47,14 @@ namespace gr {
       int symbols;
       int symbol_size;
       int guard_interval;
+      int bootstrap_fft_size = BOOTSTRAP_FFT_SIZE;
+      int index;
+      int reverse;
+      int left_nulls = 275;
+      gr_complex phase_shift;
+      gr_complex zero = gr_complex(0.0, 0.0);
+      const gr_complex* in = (const gr_complex*)bootstrap_freq;
+      gr_complex* out = (gr_complex*)bootstrap_time[0];
 
       symbols = numpreamblesyms + numpayloadsyms;
       switch (fftsize) {
@@ -106,6 +114,56 @@ namespace gr {
       }
       init_pseudo_noise_sequence();
       init_zadoff_chu_sequence();
+      index = 0;
+      std::fill_n(&bootstrap_freq[0], BOOTSTRAP_FFT_SIZE, 0);
+      for (int i = 0; i < ZADOFF_CHU_LENGTH / 2; i++) {
+        if (pnseq[i]) {
+          bootstrap_freq[index + left_nulls] = -zcseq[index];
+        }
+        else {
+          bootstrap_freq[index + left_nulls] = zcseq[index];
+        }
+        index++;
+      }
+      bootstrap_freq[index + left_nulls] = zero;
+      index++;
+      reverse = (ZADOFF_CHU_LENGTH / 2) - 1;
+      for (int i = 0; i < ZADOFF_CHU_LENGTH / 2; i++) {
+        if (pnseq[reverse--]) {
+          bootstrap_freq[index + left_nulls] = -zcseq[index];
+        }
+        else {
+          bootstrap_freq[index + left_nulls] = zcseq[index];
+        }
+        index++;
+      }
+      gr_complex* dst = bootstrap_fft.get_inbuf();
+      memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
+      memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
+      bootstrap_fft.execute();
+      memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
+      for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
+        bootstrap_time[0][i] *= 1.0 / std::sqrt(1498.0);
+      }
+
+      for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
+        bootstrap_freqshift[i + 1] = bootstrap_freq[i];
+      }
+      bootstrap_freqshift[0] = bootstrap_freq[BOOTSTRAP_FFT_SIZE - 1];
+      phase_shift = std::exp(gr_complexd(0.0, GR_M_PI));
+      for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
+        bootstrap_freqshift[i] *= phase_shift;
+      }
+      in = (const gr_complex*)bootstrap_freqshift;
+      out = (gr_complex*)bootstrap_timeshift;
+      dst = bootstrap_fft.get_inbuf();
+      memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
+      memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
+      bootstrap_fft.execute();
+      memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
+      for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
+        bootstrap_timeshift[i] *= 1.0 / std::sqrt(1498.0);
+      }
       frame_items = (symbols * symbol_size) + (symbols * guard_interval);
       insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + guard_interval) * 4);
       set_output_multiple(insertion_items);
@@ -143,20 +201,11 @@ namespace gr {
     bootstrap_cc_impl::init_zadoff_chu_sequence(void)
     {
       int q = 137;
-      double normalization = 2048.0 / std::sqrt(1498.0);
 
       for (int n = 0; n < ZADOFF_CHU_LENGTH; n++) {
         zcseq[n] = std::exp(gr_complexd(0.0, 1.0) * gr_complexd(GR_M_PI * q * double(-1 * n * (n + 1)) / 1499.0, 0.0));
-        if (pnseq[n]) {
-          zcseq[n] = -zcseq[n];
-        }
-        if (n < 32) {
-          printf("%f, %f\n", zcseq[n].real() * normalization, zcseq[n].imag() * normalization);
-        }
       }
     }
-
-    const gr_complex zero = gr_complex(0.0, 0.0);
 
     int
     bootstrap_cc_impl::general_work (int noutput_items,
@@ -167,19 +216,20 @@ namespace gr {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       gr_complex* level;
+      gr_complex zero = gr_complex(0.0, 0.0);
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
         level = out;
         for (int j = 0; j < NUM_BOOTSTRAP_SYMBOLS; j++) {
           if (j == 0) {
             for (int n = 0; n < C_SIZE; n++) {
-              *out++ = zero;
+              *out++ = bootstrap_time[0][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
             }
             for (int n = 0; n < BOOTSTRAP_FFT_SIZE; n++) {
-              *out++ = zero;
+              *out++ = bootstrap_time[0][n];
             }
             for (int n = 0; n < B_SIZE; n++) {
-              *out++ = zero;
+              *out++ = bootstrap_timeshift[n + (BOOTSTRAP_FFT_SIZE - B_SIZE)];
             }
           }
           else {
