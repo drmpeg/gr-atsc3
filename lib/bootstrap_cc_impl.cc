@@ -130,11 +130,11 @@ namespace gr {
       int sr = 0x19d;
 
       for (int i = 0; i < ZADOFF_CHU_LENGTH; i++) {
-        int b = ((sr) ^ (sr >> 1) ^ (sr >> 2) ^ (sr >> 15) ^ (sr >> 16)) & 1;
+        int b = ((sr) ^ (sr >> 1) ^ (sr >> 14) ^ (sr >> 15) ^ (sr >> 16)) & 1;
         pnseq[i] = sr & 1;
         sr >>= 1;
         if (b) {
-          sr |= 0x10000;
+          sr |= 0x8000;
         }
       }
     }
