@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "bootstrap_cc_impl.h"
+#include <gnuradio/math.h>
 
 namespace gr {
   namespace atsc3 {
@@ -103,6 +104,8 @@ namespace gr {
           guard_interval = 192;
           break;
       }
+      init_pseudo_noise_sequence();
+      init_zadoff_chu_sequence();
       frame_items = (symbols * symbol_size) + (symbols * guard_interval);
       insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + guard_interval) * 4);
       set_output_multiple(insertion_items);
@@ -119,6 +122,38 @@ namespace gr {
     bootstrap_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
       ninput_items_required[0] = frame_items * (noutput_items / insertion_items);
+    }
+
+    void
+    bootstrap_cc_impl::init_pseudo_noise_sequence(void)
+    {
+      int sr = 0x19d;
+
+      for (int i = 0; i < ZADOFF_CHU_LENGTH; i++) {
+        int b = ((sr) ^ (sr >> 1) ^ (sr >> 2) ^ (sr >> 15) ^ (sr >> 16)) & 1;
+        pnseq[i] = sr & 1;
+        sr >>= 1;
+        if (b) {
+          sr |= 0x10000;
+        }
+      }
+    }
+
+    void
+    bootstrap_cc_impl::init_zadoff_chu_sequence(void)
+    {
+      int q = 137;
+      double normalization = 2048.0 / std::sqrt(1498.0);
+
+      for (int n = 0; n < ZADOFF_CHU_LENGTH; n++) {
+        zcseq[n] = std::exp(gr_complexd(0.0, 1.0) * gr_complexd(GR_M_PI * q * double(-1 * n * (n + 1)) / 1499.0, 0.0));
+        if (pnseq[n]) {
+          zcseq[n] = -zcseq[n];
+        }
+        if (n < 32) {
+          printf("%f, %f\n", zcseq[n].real() * normalization, zcseq[n].imag() * normalization);
+        }
+      }
     }
 
     const gr_complex zero = gr_complex(0.0, 0.0);

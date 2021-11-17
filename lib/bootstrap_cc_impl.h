@@ -16,6 +16,7 @@
 #define B_SIZE 504
 #define C_SIZE 520
 #define NUM_BOOTSTRAP_SYMBOLS 4
+#define ZADOFF_CHU_LENGTH 1499
 
 namespace gr {
   namespace atsc3 {
@@ -25,6 +26,10 @@ namespace gr {
      private:
       int frame_items;
       int insertion_items;
+      int pnseq[ZADOFF_CHU_LENGTH];
+      gr_complex zcseq[ZADOFF_CHU_LENGTH];
+      void init_pseudo_noise_sequence(void);
+      void init_zadoff_chu_sequence(void);
 
       int show_levels;
       float real_positive;
