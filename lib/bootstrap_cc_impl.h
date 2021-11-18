@@ -17,6 +17,9 @@
 #define C_SIZE 520
 #define NUM_BOOTSTRAP_SYMBOLS 4
 #define ZADOFF_CHU_LENGTH 1499
+#define VALID_SIGNALLING_BITS 8
+#define SYSTEM_BANDWIDTH_6MHZ 0
+#define BSR_COEFFICIENT 2
 
 namespace gr {
   namespace atsc3 {
@@ -34,6 +37,8 @@ namespace gr {
       gr_complex bootstrap_timeshift[4][BOOTSTRAP_FFT_SIZE];
       void init_pseudo_noise_sequence(void);
       void init_zadoff_chu_sequence(void);
+      int gray_code_cyclic_shift(int signal_bits);
+      unsigned char reversebits(unsigned char b);
 
       int show_levels;
       float real_positive;
@@ -52,7 +57,7 @@ namespace gr {
       fft::fft_complex_rev bootstrap_fft;
 
      public:
-      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_showlevels_t showlevels);
+      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_showlevels_t showlevels);
       ~bootstrap_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(a8592ff6f6c1a3dd2226d0300581566a)                     */
+/* BINDTOOL_HEADER_FILE_HASH(23d4381009ad8c0041054ef181b8261e)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -232,6 +232,42 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_showlevels_t>();
+    py::enum_<::gr::atsc3::atsc3_min_time_to_next_t>(m,"atsc3_min_time_to_next_t")
+        .value("MTTN_50", ::gr::atsc3::MTTN_50) // 0
+        .value("MTTN_100", ::gr::atsc3::MTTN_100) // 1
+        .value("MTTN_150", ::gr::atsc3::MTTN_150) // 2
+        .value("MTTN_200", ::gr::atsc3::MTTN_200) // 3
+        .value("MTTN_250", ::gr::atsc3::MTTN_250) // 4
+        .value("MTTN_300", ::gr::atsc3::MTTN_300) // 5
+        .value("MTTN_350", ::gr::atsc3::MTTN_350) // 6
+        .value("MTTN_400", ::gr::atsc3::MTTN_400) // 7
+        .value("MTTN_500", ::gr::atsc3::MTTN_500) // 8
+        .value("MTTN_600", ::gr::atsc3::MTTN_600) // 9
+        .value("MTTN_700", ::gr::atsc3::MTTN_700) // 10
+        .value("MTTN_800", ::gr::atsc3::MTTN_800) // 11
+        .value("MTTN_900", ::gr::atsc3::MTTN_900) // 12
+        .value("MTTN_1000", ::gr::atsc3::MTTN_1000) // 13
+        .value("MTTN_1100", ::gr::atsc3::MTTN_1100) // 14
+        .value("MTTN_1200", ::gr::atsc3::MTTN_1200) // 15
+        .value("MTTN_1300", ::gr::atsc3::MTTN_1300) // 16
+        .value("MTTN_1500", ::gr::atsc3::MTTN_1500) // 17
+        .value("MTTN_1700", ::gr::atsc3::MTTN_1700) // 18
+        .value("MTTN_1900", ::gr::atsc3::MTTN_1900) // 19
+        .value("MTTN_2100", ::gr::atsc3::MTTN_2100) // 20
+        .value("MTTN_2300", ::gr::atsc3::MTTN_2300) // 21
+        .value("MTTN_2500", ::gr::atsc3::MTTN_2500) // 22
+        .value("MTTN_2700", ::gr::atsc3::MTTN_2700) // 23
+        .value("MTTN_2900", ::gr::atsc3::MTTN_2900) // 24
+        .value("MTTN_3300", ::gr::atsc3::MTTN_3300) // 25
+        .value("MTTN_3700", ::gr::atsc3::MTTN_3700) // 26
+        .value("MTTN_4100", ::gr::atsc3::MTTN_4100) // 27
+        .value("MTTN_4500", ::gr::atsc3::MTTN_4500) // 28
+        .value("MTTN_4900", ::gr::atsc3::MTTN_4900) // 29
+        .value("MTTN_5300", ::gr::atsc3::MTTN_5300) // 30
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_min_time_to_next_t>();
 
 
 

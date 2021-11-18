@@ -173,6 +173,40 @@ namespace gr {
       SHOWLEVELS_ON,
     };
 
+    enum atsc3_min_time_to_next_t {
+      MTTN_50 = 0,
+      MTTN_100,
+      MTTN_150,
+      MTTN_200,
+      MTTN_250,
+      MTTN_300,
+      MTTN_350,
+      MTTN_400,
+      MTTN_500,
+      MTTN_600,
+      MTTN_700,
+      MTTN_800,
+      MTTN_900,
+      MTTN_1000,
+      MTTN_1100,
+      MTTN_1200,
+      MTTN_1300,
+      MTTN_1500,
+      MTTN_1700,
+      MTTN_1900,
+      MTTN_2100,
+      MTTN_2300,
+      MTTN_2500,
+      MTTN_2700,
+      MTTN_2900,
+      MTTN_3300,
+      MTTN_3700,
+      MTTN_4100,
+      MTTN_4500,
+      MTTN_4900,
+      MTTN_5300,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -196,5 +230,6 @@ typedef gr::atsc3::atsc3_scattered_pilot_boost_t atsc3_scattered_pilot_boost_t;
 typedef gr::atsc3::atsc3_l1_select_t atsc3_l1_select_t;
 typedef gr::atsc3::atsc3_frequency_interleaver_t atsc3_frequency_interleaver_t;
 typedef gr::atsc3::atsc3_showlevels_t atsc3_showlevels_t;
+typedef gr::atsc3::atsc3_min_time_to_next_t atsc3_min_time_to_next_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

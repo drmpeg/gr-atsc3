@@ -277,10 +277,10 @@ parameters:
 -   id: l1bmode
     label: L1 Basic Mode
     dtype: enum
-    options: [L1_FEC_MODE_1, L1_FEC_MODE_2, L1_FEC_MODE_3, L1_FEC_MODE_4, L1_FEC_MODE_5, L1_FEC_MODE_6, L1_FEC_MODE_7]
-    option_labels: [Mode 1, Mode 2, Mode 3, Mode 4, Mode 5, Mode 6, Mode 7]
+    options: [L1_FEC_MODE_1, L1_FEC_MODE_2, L1_FEC_MODE_3, L1_FEC_MODE_4, L1_FEC_MODE_5]
+    option_labels: [Mode 1, Mode 2, Mode 3, Mode 4, Mode 5]
     option_attributes:
-        val: [atsc3.L1_FEC_MODE_1, atsc3.L1_FEC_MODE_2, atsc3.L1_FEC_MODE_3, atsc3.L1_FEC_MODE_4, atsc3.L1_FEC_MODE_5, atsc3.L1_FEC_MODE_6, atsc3.L1_FEC_MODE_7]
+        val: [atsc3.L1_FEC_MODE_1, atsc3.L1_FEC_MODE_2, atsc3.L1_FEC_MODE_3, atsc3.L1_FEC_MODE_4, atsc3.L1_FEC_MODE_5]
 -   id: l1dmode
     label: L1 Detail Mode
     dtype: enum

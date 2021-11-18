@@ -15,17 +15,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     bootstrap_cc::sptr
-    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_showlevels_t showlevels)
+    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_showlevels_t showlevels)
     {
       return gnuradio::make_block_sptr<bootstrap_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, showlevels);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, l1bmode, showlevels);
     }
 
 
     /*
      * The private constructor
      */
-    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_showlevels_t showlevels)
+    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_showlevels_t showlevels)
       : gr::block("bootstrap_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -51,28 +51,991 @@ namespace gr {
       int zcindex, pnindex;
       int reverse;
       int left_nulls = 275;
-      int cyclic_shift;
+      int relative_cyclic_shift;
+      int absolute_cyclic_shift;
+      int preamble_structure;
       gr_complex phase_shift;
       gr_complex zero = gr_complex(0.0, 0.0);
       gr_complex* dst;
       gr_complex* in;
       gr_complex* out;
+      unsigned char bootstrap_signal[3] = {4, 2, 20};
 
       symbols = numpreamblesyms + numpayloadsyms;
+      bootstrap_signal[0] = (frameinterval << 2) | SYSTEM_BANDWIDTH_6MHZ;
+      bootstrap_signal[1] = BSR_COEFFICIENT;
       switch (fftsize) {
         case FFTSIZE_8K:
           symbol_size = 8192;
+          switch (guardinterval) {
+            case GI_1_192:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 0;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 1;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 2;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 3;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 4;
+                  break;
+                default:
+                  preamble_structure = 0;
+                  break;
+              }
+              break;
+            case GI_2_384:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 5;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 6;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 7;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 8;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 9;
+                  break;
+                default:
+                  preamble_structure = 5;
+                  break;
+              }
+              break;
+            case GI_3_512:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 10;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 11;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 12;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 13;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 14;
+                  break;
+                default:
+                  preamble_structure = 10;
+                  break;
+              }
+              break;
+            case GI_4_768:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 15;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 16;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 17;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 18;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 19;
+                  break;
+                default:
+                  preamble_structure = 15;
+                  break;
+              }
+              break;
+            case GI_5_1024:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 20;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 21;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 22;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 23;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 24;
+                  break;
+                default:
+                  preamble_structure = 20;
+                  break;
+              }
+              break;
+            case GI_6_1536:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 25;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 26;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 27;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 28;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 29;
+                  break;
+                default:
+                  preamble_structure = 25;
+                  break;
+              }
+              break;
+            case GI_7_2048:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 30;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 31;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 32;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 33;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 34;
+                  break;
+                default:
+                  preamble_structure = 30;
+                  break;
+              }
+              break;
+            default:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 0;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 1;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 2;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 3;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 4;
+                  break;
+                default:
+                  preamble_structure = 0;
+                  break;
+              }
+              break;
+          }
           break;
         case FFTSIZE_16K:
           symbol_size = 16384;
+          switch (guardinterval) {
+            case GI_1_192:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 35;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 36;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 37;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 38;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 39;
+                  break;
+                default:
+                  preamble_structure = 35;
+                  break;
+              }
+              break;
+            case GI_2_384:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 40;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 41;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 42;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 43;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 44;
+                  break;
+                default:
+                  preamble_structure = 40;
+                  break;
+              }
+              break;
+            case GI_3_512:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 45;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 46;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 47;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 48;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 49;
+                  break;
+                default:
+                  preamble_structure = 45;
+                  break;
+              }
+              break;
+            case GI_4_768:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 50;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 51;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 52;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 53;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 54;
+                  break;
+                default:
+                  preamble_structure = 50;
+                  break;
+              }
+              break;
+            case GI_5_1024:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 55;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 56;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 57;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 58;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 59;
+                  break;
+                default:
+                  preamble_structure = 55;
+                  break;
+              }
+              break;
+            case GI_6_1536:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 60;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 61;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 62;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 63;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 64;
+                  break;
+                default:
+                  preamble_structure = 60;
+                  break;
+              }
+              break;
+            case GI_7_2048:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 65;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 66;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 67;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 68;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 69;
+                  break;
+                default:
+                  preamble_structure = 65;
+                  break;
+              }
+              break;
+            case GI_8_2432:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 70;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 71;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 72;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 73;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 74;
+                  break;
+                default:
+                  preamble_structure = 70;
+                  break;
+              }
+              break;
+            case GI_9_3072:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 75;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 76;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 77;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 78;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 79;
+                  break;
+                default:
+                  preamble_structure = 75;
+                  break;
+              }
+              break;
+            case GI_10_3648:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 80;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 81;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 82;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 83;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 84;
+                  break;
+                default:
+                  preamble_structure = 80;
+                  break;
+              }
+              break;
+            case GI_11_4096:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 85;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 86;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 87;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 88;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 89;
+                  break;
+                default:
+                  preamble_structure = 85;
+                  break;
+              }
+              break;
+            default:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 35;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 36;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 37;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 38;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 39;
+                  break;
+                default:
+                  preamble_structure = 35;
+                  break;
+              }
+          }
           break;
         case FFTSIZE_32K:
           symbol_size = 32768;
+          switch (guardinterval) {
+            case GI_1_192:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 90;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 91;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 92;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 93;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 94;
+                  break;
+                default:
+                  preamble_structure = 90;
+                  break;
+              }
+              break;
+            case GI_2_384:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 95;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 96;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 97;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 98;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 99;
+                  break;
+                default:
+                  preamble_structure = 95;
+                  break;
+              }
+              break;
+            case GI_3_512:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 100;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 101;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 102;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 103;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 104;
+                  break;
+                default:
+                  preamble_structure = 100;
+                  break;
+              }
+              break;
+            case GI_4_768:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 105;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 106;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 107;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 108;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 109;
+                  break;
+                default:
+                  preamble_structure = 105;
+                  break;
+              }
+              break;
+            case GI_5_1024:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 110;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 111;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 112;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 113;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 114;
+                  break;
+                default:
+                  preamble_structure = 110;
+                  break;
+              }
+              break;
+            case GI_6_1536:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 115;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 116;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 117;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 118;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 119;
+                  break;
+                default:
+                  preamble_structure = 115;
+                  break;
+              }
+              break;
+            case GI_7_2048:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 120;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 121;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 122;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 123;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 124;
+                  break;
+                default:
+                  preamble_structure = 120;
+                  break;
+              }
+              break;
+            case GI_8_2432:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 125;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 126;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 127;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 128;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 129;
+                  break;
+                default:
+                  preamble_structure = 125;
+                  break;
+              }
+              break;
+            case GI_9_3072:
+              if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
+                switch (l1bmode) {
+                  case L1_FEC_MODE_1:
+                    preamble_structure = 130;
+                    break;
+                  case L1_FEC_MODE_2:
+                    preamble_structure = 131;
+                    break;
+                  case L1_FEC_MODE_3:
+                    preamble_structure = 132;
+                    break;
+                  case L1_FEC_MODE_4:
+                    preamble_structure = 133;
+                    break;
+                  case L1_FEC_MODE_5:
+                    preamble_structure = 134;
+                    break;
+                  default:
+                    preamble_structure = 130;
+                    break;
+                }
+              }
+              else {
+                switch (l1bmode) {
+                  case L1_FEC_MODE_1:
+                    preamble_structure = 135;
+                    break;
+                  case L1_FEC_MODE_2:
+                    preamble_structure = 136;
+                    break;
+                  case L1_FEC_MODE_3:
+                    preamble_structure = 137;
+                    break;
+                  case L1_FEC_MODE_4:
+                    preamble_structure = 138;
+                    break;
+                  case L1_FEC_MODE_5:
+                    preamble_structure = 139;
+                    break;
+                  default:
+                    preamble_structure = 135;
+                    break;
+                }
+              }
+              break;
+            case GI_10_3648:
+              if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
+                switch (l1bmode) {
+                  case L1_FEC_MODE_1:
+                    preamble_structure = 140;
+                    break;
+                  case L1_FEC_MODE_2:
+                    preamble_structure = 141;
+                    break;
+                  case L1_FEC_MODE_3:
+                    preamble_structure = 142;
+                    break;
+                  case L1_FEC_MODE_4:
+                    preamble_structure = 143;
+                    break;
+                  case L1_FEC_MODE_5:
+                    preamble_structure = 144;
+                    break;
+                  default:
+                    preamble_structure = 140;
+                    break;
+                }
+              }
+              else {
+                switch (l1bmode) {
+                  case L1_FEC_MODE_1:
+                    preamble_structure = 145;
+                    break;
+                  case L1_FEC_MODE_2:
+                    preamble_structure = 146;
+                    break;
+                  case L1_FEC_MODE_3:
+                    preamble_structure = 147;
+                    break;
+                  case L1_FEC_MODE_4:
+                    preamble_structure = 148;
+                    break;
+                  case L1_FEC_MODE_5:
+                    preamble_structure = 149;
+                    break;
+                  default:
+                    preamble_structure = 145;
+                    break;
+                }
+              }
+              break;
+            case GI_11_4096:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 150;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 151;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 152;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 153;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 154;
+                  break;
+                default:
+                  preamble_structure = 150;
+                  break;
+              }
+              break;
+            case GI_12_4864:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 155;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 156;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 157;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 158;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 159;
+                  break;
+                default:
+                  preamble_structure = 155;
+                  break;
+              }
+              break;
+            default:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 90;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 91;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 92;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 93;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 94;
+                  break;
+                default:
+                  preamble_structure = 90;
+                  break;
+              }
+              break;
+          }
           break;
         default:
           symbol_size = 8192;
+          switch (guardinterval) {
+            case GI_1_192:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 0;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 1;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 2;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 3;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 4;
+                  break;
+                default:
+                  preamble_structure = 0;
+                  break;
+              }
+              break;
+            case GI_2_384:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 5;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 6;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 7;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 8;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 9;
+                  break;
+                default:
+                  preamble_structure = 5;
+                  break;
+              }
+              break;
+            case GI_3_512:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 10;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 11;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 12;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 13;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 14;
+                  break;
+                default:
+                  preamble_structure = 10;
+                  break;
+              }
+              break;
+            case GI_4_768:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 15;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 16;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 17;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 18;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 19;
+                  break;
+                default:
+                  preamble_structure = 15;
+                  break;
+              }
+              break;
+            case GI_5_1024:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 20;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 21;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 22;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 23;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 24;
+                  break;
+                default:
+                  preamble_structure = 20;
+                  break;
+              }
+              break;
+            case GI_6_1536:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 25;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 26;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 27;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 28;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 29;
+                  break;
+                default:
+                  preamble_structure = 25;
+                  break;
+              }
+              break;
+            case GI_7_2048:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 30;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 31;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 32;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 33;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 34;
+                  break;
+                default:
+                  preamble_structure = 30;
+                  break;
+              }
+              break;
+            default:
+              switch (l1bmode) {
+                case L1_FEC_MODE_1:
+                  preamble_structure = 0;
+                  break;
+                case L1_FEC_MODE_2:
+                  preamble_structure = 1;
+                  break;
+                case L1_FEC_MODE_3:
+                  preamble_structure = 2;
+                  break;
+                case L1_FEC_MODE_4:
+                  preamble_structure = 3;
+                  break;
+                case L1_FEC_MODE_5:
+                  preamble_structure = 4;
+                  break;
+                default:
+                  preamble_structure = 0;
+                  break;
+              }
+              break;
+          }
           break;
       }
+      bootstrap_signal[3] = preamble_structure;
       switch (guardinterval) {
         case GI_1_192:
           guard_interval = 192;
@@ -116,6 +1079,7 @@ namespace gr {
       }
       init_pseudo_noise_sequence();
       init_zadoff_chu_sequence();
+      absolute_cyclic_shift = 0;
       pnindex = 0;
       for (int k = 0; k < NUM_BOOTSTRAP_SYMBOLS; k++) {
         zcindex = 0;
@@ -155,28 +1119,16 @@ namespace gr {
         bootstrap_fft.execute();
         memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
         if (k != 0) {
-          switch (k) {
-            case 0:
-              cyclic_shift = 0;
-              break;
-            case 1:
-              cyclic_shift = 1988;
-              break;
-            case 2:
-              cyclic_shift = 1960;
-              break;
-            case 3:
-              cyclic_shift = 1764;
-              break;
-            default:
-              cyclic_shift = 0;
-              break;
+          relative_cyclic_shift = gray_code_cyclic_shift(reversebits(bootstrap_signal[k - 1]));
+          absolute_cyclic_shift = (absolute_cyclic_shift - relative_cyclic_shift) % BOOTSTRAP_FFT_SIZE;
+          if (absolute_cyclic_shift < 0) {
+            absolute_cyclic_shift += BOOTSTRAP_FFT_SIZE;
           }
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - cyclic_shift; i++) {
-            bootstrap_time[k][i + cyclic_shift] = bootstrap_freqshift[i];
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift; i++) {
+            bootstrap_time[k][i + absolute_cyclic_shift] = bootstrap_freqshift[i];
           }
-          for (int i = 0; i < cyclic_shift; i++) {
-            bootstrap_time[k][i] = bootstrap_freqshift[i + (BOOTSTRAP_FFT_SIZE - cyclic_shift)];
+          for (int i = 0; i < absolute_cyclic_shift; i++) {
+            bootstrap_time[k][i] = bootstrap_freqshift[i + (BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift)];
           }
         }
         if (k == 3) {
@@ -223,28 +1175,11 @@ namespace gr {
         bootstrap_fft.execute();
         memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
         if (k != 0) {
-          switch (k) {
-            case 0:
-              cyclic_shift = 0;
-              break;
-            case 1:
-              cyclic_shift = 1988;
-              break;
-            case 2:
-              cyclic_shift = 1960;
-              break;
-            case 3:
-              cyclic_shift = 1764;
-              break;
-            default:
-              cyclic_shift = 0;
-              break;
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift; i++) {
+            bootstrap_timeshift[k][i + absolute_cyclic_shift] = bootstrap_freq[i];
           }
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - cyclic_shift; i++) {
-            bootstrap_timeshift[k][i + cyclic_shift] = bootstrap_freq[i];
-          }
-          for (int i = 0; i < cyclic_shift; i++) {
-            bootstrap_timeshift[k][i] = bootstrap_freq[i + (BOOTSTRAP_FFT_SIZE - cyclic_shift)];
+          for (int i = 0; i < absolute_cyclic_shift; i++) {
+            bootstrap_timeshift[k][i] = bootstrap_freq[i + (BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift)];
           }
         }
         if (k == 3) {
@@ -300,6 +1235,44 @@ namespace gr {
         zcseq[n] = std::exp(gr_complexd(0.0, 1.0) * gr_complexd(GR_M_PI * q * double(-1 * n * (n + 1)) / 1499.0, 0.0));
       }
     }
+
+    int
+    bootstrap_cc_impl::gray_code_cyclic_shift(int signal_bits)
+    {
+      int m[11];
+      int sum, weight;
+
+      for (int i = 0; i < 11; i++) {
+        if (i < (10 - VALID_SIGNALLING_BITS)) {
+          m[i] = 0;
+        }
+        else if (i == 10 - (VALID_SIGNALLING_BITS)) {
+          m[i] = 1;
+        }
+        else {
+          sum = 0;
+          for (int k = 0; k <= (10 - i); k++) {
+            sum += ((signal_bits) >> k) & 0x1;
+          }
+          m[i] = sum % 2;
+        }
+      }
+      sum = 0;
+      weight = 1;
+      for (int n = 0; n < 11; n++) {
+        sum += m[n] * weight;
+        weight <<= 1;
+      }
+      return sum;
+    }
+
+   unsigned char
+   bootstrap_cc_impl::reversebits(unsigned char b) {
+     b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+     b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+     b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+     return b;
+   }
 
     int
     bootstrap_cc_impl::general_work (int noutput_items,
