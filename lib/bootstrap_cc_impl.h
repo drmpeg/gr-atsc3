@@ -26,12 +26,12 @@ namespace gr {
      private:
       int frame_items;
       int insertion_items;
-      int pnseq[ZADOFF_CHU_LENGTH];
+      int pnseq[ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2)];
       gr_complex zcseq[ZADOFF_CHU_LENGTH];
       gr_complex bootstrap_freq[BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_freqshift[BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_time[4][BOOTSTRAP_FFT_SIZE];
-      gr_complex bootstrap_timeshift[BOOTSTRAP_FFT_SIZE];
+      gr_complex bootstrap_timeshift[4][BOOTSTRAP_FFT_SIZE];
       void init_pseudo_noise_sequence(void);
       void init_zadoff_chu_sequence(void);
 

@@ -48,13 +48,15 @@ namespace gr {
       int symbol_size;
       int guard_interval;
       int bootstrap_fft_size = BOOTSTRAP_FFT_SIZE;
-      int index;
+      int zcindex, pnindex;
       int reverse;
       int left_nulls = 275;
+      int cyclic_shift;
       gr_complex phase_shift;
       gr_complex zero = gr_complex(0.0, 0.0);
-      const gr_complex* in = (const gr_complex*)bootstrap_freq;
-      gr_complex* out = (gr_complex*)bootstrap_time[0];
+      gr_complex* dst;
+      gr_complex* in;
+      gr_complex* out;
 
       symbols = numpreamblesyms + numpayloadsyms;
       switch (fftsize) {
@@ -114,55 +116,147 @@ namespace gr {
       }
       init_pseudo_noise_sequence();
       init_zadoff_chu_sequence();
-      index = 0;
-      std::fill_n(&bootstrap_freq[0], BOOTSTRAP_FFT_SIZE, 0);
-      for (int i = 0; i < ZADOFF_CHU_LENGTH / 2; i++) {
-        if (pnseq[i]) {
-          bootstrap_freq[index + left_nulls] = -zcseq[index];
+      pnindex = 0;
+      for (int k = 0; k < NUM_BOOTSTRAP_SYMBOLS; k++) {
+        zcindex = 0;
+        std::fill_n(&bootstrap_freq[0], BOOTSTRAP_FFT_SIZE, 0);
+        for (int i = 0; i < ZADOFF_CHU_LENGTH / 2; i++) {
+          if (pnseq[pnindex]) {
+            bootstrap_freq[zcindex + left_nulls] = -zcseq[zcindex];
+          }
+          else {
+            bootstrap_freq[zcindex + left_nulls] = zcseq[zcindex];
+          }
+          zcindex++;
+          pnindex++;
+        }
+        bootstrap_freq[zcindex + left_nulls] = zero;
+        zcindex++;
+        reverse = pnindex - 1;
+        for (int i = 0; i < ZADOFF_CHU_LENGTH / 2; i++) {
+          if (pnseq[reverse--]) {
+            bootstrap_freq[zcindex + left_nulls] = -zcseq[zcindex];
+          }
+          else {
+            bootstrap_freq[zcindex + left_nulls] = zcseq[zcindex];
+          }
+          zcindex++;
+        }
+        in = &bootstrap_freq[0];
+        dst = bootstrap_fft.get_inbuf();
+        if (k == 0) {
+          out = &bootstrap_time[k][0];
         }
         else {
-          bootstrap_freq[index + left_nulls] = zcseq[index];
+          out = &bootstrap_freqshift[0]; /* use as temporary storage */
         }
-        index++;
-      }
-      bootstrap_freq[index + left_nulls] = zero;
-      index++;
-      reverse = (ZADOFF_CHU_LENGTH / 2) - 1;
-      for (int i = 0; i < ZADOFF_CHU_LENGTH / 2; i++) {
-        if (pnseq[reverse--]) {
-          bootstrap_freq[index + left_nulls] = -zcseq[index];
+        memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
+        memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
+        bootstrap_fft.execute();
+        memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
+        if (k != 0) {
+          switch (k) {
+            case 0:
+              cyclic_shift = 0;
+              break;
+            case 1:
+              cyclic_shift = 1988;
+              break;
+            case 2:
+              cyclic_shift = 1960;
+              break;
+            case 3:
+              cyclic_shift = 1764;
+              break;
+            default:
+              cyclic_shift = 0;
+              break;
+          }
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - cyclic_shift; i++) {
+            bootstrap_time[k][i + cyclic_shift] = bootstrap_freqshift[i];
+          }
+          for (int i = 0; i < cyclic_shift; i++) {
+            bootstrap_time[k][i] = bootstrap_freqshift[i + (BOOTSTRAP_FFT_SIZE - cyclic_shift)];
+          }
+        }
+        if (k == 3) {
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
+            bootstrap_time[k][i] *= -1.0 / std::sqrt(1498.0);
+          }
         }
         else {
-          bootstrap_freq[index + left_nulls] = zcseq[index];
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
+            bootstrap_time[k][i] *= 1.0 / std::sqrt(1498.0);
+          }
         }
-        index++;
-      }
-      gr_complex* dst = bootstrap_fft.get_inbuf();
-      memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
-      memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
-      bootstrap_fft.execute();
-      memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
-      for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
-        bootstrap_time[0][i] *= 1.0 / std::sqrt(1498.0);
-      }
 
-      for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
-        bootstrap_freqshift[i + 1] = bootstrap_freq[i];
-      }
-      bootstrap_freqshift[0] = bootstrap_freq[BOOTSTRAP_FFT_SIZE - 1];
-      phase_shift = std::exp(gr_complexd(0.0, GR_M_PI));
-      for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
-        bootstrap_freqshift[i] *= phase_shift;
-      }
-      in = (const gr_complex*)bootstrap_freqshift;
-      out = (gr_complex*)bootstrap_timeshift;
-      dst = bootstrap_fft.get_inbuf();
-      memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
-      memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
-      bootstrap_fft.execute();
-      memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
-      for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
-        bootstrap_timeshift[i] *= 1.0 / std::sqrt(1498.0);
+        if (k == 0) {
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
+            bootstrap_freqshift[i + 1] = bootstrap_freq[i];
+          }
+          bootstrap_freqshift[0] = bootstrap_freq[BOOTSTRAP_FFT_SIZE - 1];
+          phase_shift = std::exp(gr_complexd(0.0, GR_M_PI));
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
+            bootstrap_freqshift[i] *= phase_shift;
+          }
+        }
+        else {
+          bootstrap_freqshift[BOOTSTRAP_FFT_SIZE - 1] = bootstrap_freq[0];
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
+            bootstrap_freqshift[i] = bootstrap_freq[i + 1];
+          }
+          phase_shift = std::exp(gr_complexd(0.0, -GR_M_PI));
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
+            bootstrap_freqshift[i] *= phase_shift;
+          }
+        }
+        in = &bootstrap_freqshift[0];
+        dst = bootstrap_fft.get_inbuf();
+        if (k == 0) {
+          out = &bootstrap_timeshift[k][0];
+        }
+        else {
+          out = &bootstrap_freq[0]; /* use as temporary storage */
+        }
+        memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
+        memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
+        bootstrap_fft.execute();
+        memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
+        if (k != 0) {
+          switch (k) {
+            case 0:
+              cyclic_shift = 0;
+              break;
+            case 1:
+              cyclic_shift = 1988;
+              break;
+            case 2:
+              cyclic_shift = 1960;
+              break;
+            case 3:
+              cyclic_shift = 1764;
+              break;
+            default:
+              cyclic_shift = 0;
+              break;
+          }
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - cyclic_shift; i++) {
+            bootstrap_timeshift[k][i + cyclic_shift] = bootstrap_freq[i];
+          }
+          for (int i = 0; i < cyclic_shift; i++) {
+            bootstrap_timeshift[k][i] = bootstrap_freq[i + (BOOTSTRAP_FFT_SIZE - cyclic_shift)];
+          }
+        }
+        if (k == 3) {
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
+            bootstrap_timeshift[k][i] *= -1.0 / std::sqrt(1498.0);
+          }
+        }
+        else {
+          for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
+            bootstrap_timeshift[k][i] *= 1.0 / std::sqrt(1498.0);
+          }
+        }
       }
       frame_items = (symbols * symbol_size) + (symbols * guard_interval);
       insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + guard_interval) * 4);
@@ -187,7 +281,7 @@ namespace gr {
     {
       int sr = 0x19d;
 
-      for (int i = 0; i < ZADOFF_CHU_LENGTH; i++) {
+      for (int i = 0; i < ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2); i++) {
         int b = ((sr) ^ (sr >> 1) ^ (sr >> 14) ^ (sr >> 15) ^ (sr >> 16)) & 1;
         pnseq[i] = sr & 1;
         sr >>= 1;
@@ -216,31 +310,30 @@ namespace gr {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       gr_complex* level;
-      gr_complex zero = gr_complex(0.0, 0.0);
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
         level = out;
         for (int j = 0; j < NUM_BOOTSTRAP_SYMBOLS; j++) {
           if (j == 0) {
             for (int n = 0; n < C_SIZE; n++) {
-              *out++ = bootstrap_time[0][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
+              *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
             }
             for (int n = 0; n < BOOTSTRAP_FFT_SIZE; n++) {
-              *out++ = bootstrap_time[0][n];
+              *out++ = bootstrap_time[j][n];
             }
             for (int n = 0; n < B_SIZE; n++) {
-              *out++ = bootstrap_timeshift[n + (BOOTSTRAP_FFT_SIZE - B_SIZE)];
+              *out++ = bootstrap_timeshift[j][n + (BOOTSTRAP_FFT_SIZE - B_SIZE)];
             }
           }
           else {
             for (int n = 0; n < B_SIZE; n++) {
-              *out++ = zero;
+              *out++ = bootstrap_timeshift[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
             }
             for (int n = 0; n < C_SIZE; n++) {
-              *out++ = zero;
+              *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
             }
             for (int n = 0; n < BOOTSTRAP_FFT_SIZE; n++) {
-              *out++ = zero;
+              *out++ = bootstrap_time[j][n];
             }
           }
         }
