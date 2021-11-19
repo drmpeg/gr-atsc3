@@ -32,8 +32,8 @@ namespace gr {
       int pnseq[ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2)];
       gr_complex zcseq[ZADOFF_CHU_LENGTH];
       gr_complex bootstrap_freq[BOOTSTRAP_FFT_SIZE];
-      gr_complex tmp[BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_time[4][BOOTSTRAP_FFT_SIZE];
+      gr_complex bootstrap_partb[4][BOOTSTRAP_FFT_SIZE];
       void init_pseudo_noise_sequence(void);
       void init_zadoff_chu_sequence(void);
       int gray_code_cyclic_shift(int signal_bits);
