@@ -1112,7 +1112,7 @@ namespace gr {
           out = &bootstrap_time[k][0];
         }
         else {
-          out = &bootstrap_freqshift[0]; /* use as temporary storage */
+          out = &tmp[0]; /* use as temporary storage */
         }
         memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
         memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
@@ -1125,10 +1125,10 @@ namespace gr {
             absolute_cyclic_shift += BOOTSTRAP_FFT_SIZE;
           }
           for (int i = 0; i < BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift; i++) {
-            bootstrap_time[k][i + absolute_cyclic_shift] = bootstrap_freqshift[i];
+            bootstrap_time[k][i + absolute_cyclic_shift] = tmp[i];
           }
           for (int i = 0; i < absolute_cyclic_shift; i++) {
-            bootstrap_time[k][i] = bootstrap_freqshift[i + (BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift)];
+            bootstrap_time[k][i] = tmp[i + (BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift)];
           }
         }
         if (k == 3) {
@@ -1139,57 +1139,6 @@ namespace gr {
         else {
           for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
             bootstrap_time[k][i] *= 1.0 / std::sqrt(1498.0);
-          }
-        }
-
-        if (k == 0) {
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
-            bootstrap_freqshift[i + 1] = bootstrap_freq[i];
-          }
-          bootstrap_freqshift[0] = bootstrap_freq[BOOTSTRAP_FFT_SIZE - 1];
-          phase_shift = std::exp(gr_complexd(0.0, GR_M_PI));
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
-            bootstrap_freqshift[i] *= phase_shift;
-          }
-        }
-        else {
-          bootstrap_freqshift[BOOTSTRAP_FFT_SIZE - 1] = bootstrap_freq[0];
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
-            bootstrap_freqshift[i] = bootstrap_freq[i + 1];
-          }
-          phase_shift = std::exp(gr_complexd(0.0, -GR_M_PI));
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - 1; i++) {
-            bootstrap_freqshift[i] *= phase_shift;
-          }
-        }
-        in = &bootstrap_freqshift[0];
-        dst = bootstrap_fft.get_inbuf();
-        if (k == 0) {
-          out = &bootstrap_timeshift[k][0];
-        }
-        else {
-          out = &bootstrap_freq[0]; /* use as temporary storage */
-        }
-        memcpy(&dst[bootstrap_fft_size / 2], &in[0], sizeof(gr_complex) * bootstrap_fft_size / 2);
-        memcpy(&dst[0], &in[bootstrap_fft_size / 2], sizeof(gr_complex) * bootstrap_fft_size / 2);
-        bootstrap_fft.execute();
-        memcpy(out, bootstrap_fft.get_outbuf(), sizeof(gr_complex) * bootstrap_fft_size);
-        if (k != 0) {
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift; i++) {
-            bootstrap_timeshift[k][i + absolute_cyclic_shift] = bootstrap_freq[i];
-          }
-          for (int i = 0; i < absolute_cyclic_shift; i++) {
-            bootstrap_timeshift[k][i] = bootstrap_freq[i + (BOOTSTRAP_FFT_SIZE - absolute_cyclic_shift)];
-          }
-        }
-        if (k == 3) {
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
-            bootstrap_timeshift[k][i] *= -1.0 / std::sqrt(1498.0);
-          }
-        }
-        else {
-          for (int i = 0; i < BOOTSTRAP_FFT_SIZE; i++) {
-            bootstrap_timeshift[k][i] *= 1.0 / std::sqrt(1498.0);
           }
         }
       }
@@ -1295,12 +1244,12 @@ namespace gr {
               *out++ = bootstrap_time[j][n];
             }
             for (int n = 0; n < B_SIZE; n++) {
-              *out++ = bootstrap_timeshift[j][n + (BOOTSTRAP_FFT_SIZE - B_SIZE)];
+              *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - B_SIZE)] * std::exp(gr_complex(0.0, 2 * GR_M_PI * float(n + C_SIZE) / 2048.0));;
             }
           }
           else {
             for (int n = 0; n < B_SIZE; n++) {
-              *out++ = bootstrap_timeshift[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
+              *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)] * std::exp(gr_complex(0.0, -2 * GR_M_PI * float(n - C_SIZE) / 2048.0));
             }
             for (int n = 0; n < C_SIZE; n++) {
               *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
