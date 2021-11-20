@@ -11,6 +11,7 @@
 #include <atsc3/bootstrap_cc.h>
 #include "atsc3_defines.h"
 #include <gnuradio/fft/fft.h>
+#include <gnuradio/filter/fir_filter.h>
 
 #define BOOTSTRAP_FFT_SIZE 2048
 #define B_SIZE 504
@@ -34,11 +35,24 @@ namespace gr {
       gr_complex bootstrap_freq[BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_time[4][BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_partb[4][BOOTSTRAP_FFT_SIZE];
+      gr_complex bootstrap_symbol[(BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS];
+      gr_complex bootstrap_resample[((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8];
       void init_pseudo_noise_sequence(void);
       void init_zadoff_chu_sequence(void);
       int gray_code_cyclic_shift(int signal_bits);
       unsigned char reversebits(unsigned char b);
+      std::vector<float> design_resampler_filter_float(const unsigned interpolation, const unsigned decimation, const float fractional_bw);
+      std::vector<gr_complex> design_resampler_filter(const unsigned interpolation, const unsigned decimation, const float fractional_bw);
+      void set_taps(const std::vector<gr_complex>& taps);
+      void install_taps(const std::vector<gr_complex>& taps);
+      unsigned interpolation() const {return d_firs.size();}
+      unsigned decimation() const {return d_decimation;}
 
+      unsigned d_decimation;
+      std::vector<gr_complex> d_new_taps;
+      std::vector<gr::filter::kernel::fir_filter<gr_complex, gr_complex, gr_complex>> d_firs;
+
+      int output_mode;
       int show_levels;
       float real_positive;
       float real_negative;
@@ -56,7 +70,7 @@ namespace gr {
       fft::fft_complex_rev bootstrap_fft;
 
      public:
-      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_showlevels_t showlevels);
+      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels);
       ~bootstrap_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

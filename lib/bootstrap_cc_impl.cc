@@ -8,6 +8,8 @@
 #include <gnuradio/io_signature.h>
 #include "bootstrap_cc_impl.h"
 #include <gnuradio/math.h>
+#include <gnuradio/fft/window.h>
+#include <gnuradio/filter/firdes.h>
 
 namespace gr {
   namespace atsc3 {
@@ -15,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     bootstrap_cc::sptr
-    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_showlevels_t showlevels)
+    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels)
     {
       return gnuradio::make_block_sptr<bootstrap_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, l1bmode, showlevels);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, l1bmode, outputmode, showlevels);
     }
 
 
     /*
      * The private constructor
      */
-    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_showlevels_t showlevels)
+    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels)
       : gr::block("bootstrap_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -60,7 +62,22 @@ namespace gr {
       gr_complex* in;
       gr_complex* out;
       unsigned char bootstrap_signal[3] = {};
+      unsigned int interpolation = 9;
+      unsigned int decimation = 8;
+      unsigned int ctr;
+      float fractional_bw = 0.4;
+      std::vector<gr_complex> staps;
 
+      staps = design_resampler_filter(interpolation, decimation, fractional_bw);
+      d_decimation = decimation;
+      d_firs.reserve(interpolation);
+      for (unsigned i = 0; i < interpolation; i++) {
+        d_firs.emplace_back(std::vector<gr_complex>());
+      }
+      set_taps(staps);
+      install_taps(d_new_taps);
+
+      output_mode = outputmode;
       symbols = numpreamblesyms + numpayloadsyms;
       bootstrap_signal[0] = (frameinterval << 2) | SYSTEM_BANDWIDTH_6MHZ;
       bootstrap_signal[1] = BSR_COEFFICIENT;
@@ -1152,8 +1169,62 @@ namespace gr {
           }
         }
       }
+
+      out = &bootstrap_symbol[0];
+      for (int j = 0; j < NUM_BOOTSTRAP_SYMBOLS; j++) {
+        if (j == 0) {
+          for (int n = 0; n < C_SIZE; n++) {
+            *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
+          }
+          for (int n = 0; n < BOOTSTRAP_FFT_SIZE; n++) {
+            *out++ = bootstrap_time[j][n];
+          }
+          for (int n = 0; n < B_SIZE; n++) {
+            *out++ = bootstrap_partb[j][n];
+          }
+        }
+        else {
+          for (int n = 0; n < B_SIZE; n++) {
+            *out++ = bootstrap_partb[j][n];
+          }
+          for (int n = 0; n < C_SIZE; n++) {
+            *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
+          }
+          for (int n = 0; n < BOOTSTRAP_FFT_SIZE; n++) {
+            *out++ = bootstrap_time[j][n];
+          }
+        }
+      }
+
+      printf("interpolation = %d\n", this->interpolation());
+      printf("decimation = %d\n", this->decimation());
+      ctr = 0;
+      unsigned int index;
+      in = &bootstrap_symbol[0];
+      out = &bootstrap_resample[0];
+      for (index = 0; index < (((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * interpolation) / decimation); index++) {
+        out[index++] = d_firs[ctr].filter(in);
+        ctr += this->decimation();
+        while (ctr >= this->interpolation()) {
+          ctr -= this->interpolation();
+          in++;
+        }
+      }
+      printf("index = %d\n", index);
+      printf("in delta = %ld\n", in - &bootstrap_symbol[0]);
+
+      out = &bootstrap_resample[0];
+      for (int n = 0; n < 16; n++) {
+        printf("%f, %f\n", out[n].real(), out[n].imag());
+      }
+
       frame_items = (symbols * symbol_size) + (symbols * guard_interval);
-      insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + guard_interval) * 4);
+      if (outputmode) {
+        insertion_items = ((frame_items + ((BOOTSTRAP_FFT_SIZE + guard_interval) * NUM_BOOTSTRAP_SYMBOLS) * interpolation) / decimation);
+      }
+      else {
+        insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + guard_interval) * NUM_BOOTSTRAP_SYMBOLS);
+      }
       set_output_multiple(insertion_items);
     }
 
@@ -1225,13 +1296,91 @@ namespace gr {
       return sum;
     }
 
-   unsigned char
-   bootstrap_cc_impl::reversebits(unsigned char b) {
-     b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-     b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-     b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-     return b;
-   }
+    unsigned char
+    bootstrap_cc_impl::reversebits(unsigned char b)
+    {
+      b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+      b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+      b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+      return b;
+    }
+
+
+    std::vector<float>
+    bootstrap_cc_impl::design_resampler_filter_float(const unsigned interpolation, const unsigned decimation, const float fractional_bw)
+    {
+      // These are default values used to generate the filter when no taps are known
+      float beta = 7.0;
+      float halfband = 0.5;
+      float rate = float(interpolation) / float(decimation);
+      float trans_width, mid_transition_band;
+
+      if (rate >= 1.0) {
+        trans_width = halfband - fractional_bw;
+        mid_transition_band = halfband - trans_width / 2.0;
+      } else {
+        trans_width = rate * (halfband - fractional_bw);
+        mid_transition_band = rate * halfband - trans_width / 2.0;
+      }
+
+      return gr::filter::firdes::low_pass(interpolation,       /* gain */
+                                          interpolation,       /* Fs */
+                                          mid_transition_band, /* trans mid point */
+                                          trans_width,         /* transition width */
+                                          gr::fft::window::WIN_KAISER,
+                                          beta); /* beta*/
+    }
+
+    std::vector<gr_complex>
+    bootstrap_cc_impl::design_resampler_filter(const unsigned interpolation, const unsigned decimation, const float fractional_bw)
+    {
+      auto real_taps = design_resampler_filter_float(interpolation, decimation, fractional_bw);
+
+      std::vector<gr_complex> cplx_taps(real_taps.size());
+      for (size_t i = 0; i < real_taps.size(); i++) {
+        cplx_taps[i] = real_taps[i];
+      }
+
+      return cplx_taps;
+    }
+
+    void
+    bootstrap_cc_impl::set_taps(const std::vector<gr_complex>& taps)
+    {
+      d_new_taps = taps;
+      // round up length to a multiple of the interpolation factor
+      int n = taps.size() % this->interpolation();
+      if (n > 0) {
+        n = this->interpolation() - n;
+        while (n-- > 0) {
+          d_new_taps.insert(d_new_taps.end(), 0);
+        }
+      }
+      assert(d_new_taps.size() % this->interpolation() == 0);
+    }
+
+    void
+    bootstrap_cc_impl::install_taps(const std::vector<gr_complex>& taps)
+    {
+      int nfilters = this->interpolation();
+      int nt = taps.size() / nfilters;
+
+      assert(nt * nfilters == (int)taps.size());
+
+      std::vector<std::vector<gr_complex>> xtaps(nfilters);
+
+      for (int n = 0; n < nfilters; n++)
+        xtaps[n].resize(nt);
+
+      for (int i = 0; i < (int)taps.size(); i++)
+        xtaps[i % nfilters][i / nfilters] = taps[i];
+
+      for (int n = 0; n < nfilters; n++)
+        d_firs[n].set_taps(xtaps[n]);
+
+//      set_history(nt);
+      printf("nt = %d\n", nt);
+    }
 
     int
     bootstrap_cc_impl::general_work (int noutput_items,
@@ -1245,29 +1394,13 @@ namespace gr {
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
         level = out;
-        for (int j = 0; j < NUM_BOOTSTRAP_SYMBOLS; j++) {
-          if (j == 0) {
-            for (int n = 0; n < C_SIZE; n++) {
-              *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
-            }
-            for (int n = 0; n < BOOTSTRAP_FFT_SIZE; n++) {
-              *out++ = bootstrap_time[j][n];
-            }
-            for (int n = 0; n < B_SIZE; n++) {
-              *out++ = bootstrap_partb[j][n];
-            }
-          }
-          else {
-            for (int n = 0; n < B_SIZE; n++) {
-              *out++ = bootstrap_partb[j][n];
-            }
-            for (int n = 0; n < C_SIZE; n++) {
-              *out++ = bootstrap_time[j][n + (BOOTSTRAP_FFT_SIZE - C_SIZE)];
-            }
-            for (int n = 0; n < BOOTSTRAP_FFT_SIZE; n++) {
-              *out++ = bootstrap_time[j][n];
-            }
-          }
+        if (output_mode) {
+          memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8);
+          out += ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8;
+        }
+        else {
+          memcpy(out, &bootstrap_symbol[0], sizeof(gr_complex) * (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
+          out += (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS;
         }
         memcpy(out, in, sizeof(gr_complex) * frame_items);
         if (show_levels == SHOWLEVELS_ON) {

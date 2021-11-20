@@ -794,12 +794,12 @@ namespace gr {
       }
       if (l1basicinit->first_sub_sbs_first == TRUE) {
         frame_symbols[numpreamblesyms] = sbs_cells;
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = data_cells;
         }
       }
       else {
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 1; n++) {
           frame_symbols[n + numpreamblesyms] = data_cells;
         }
       }
@@ -812,6 +812,13 @@ namespace gr {
       }
       total_cells = totalcells;
       l1detailinit->sbs_null_cells = sbsnullcells = sbs_cells - sbs_data_cells;
+      printf("total cells = %d\n", totalcells);
+      if (firstsbs) {
+        printf("PLP size = %d\n", totalcells - l1cells - (2 * sbsnullcells));
+      }
+      else {
+        printf("PLP size = %d\n", totalcells - l1cells - sbsnullcells);
+      }
       set_output_multiple(totalcells);
     }
 
@@ -1261,6 +1268,7 @@ namespace gr {
       offset_bits += add_crc32_bits(l1basic, offset_bits);
 
 #if 0
+      printf("L1Basic\n");
       for (int i = 0; i < offset_bits; i += 8) {
         bits = index = 0;
         for (int j = 7; j >= 0; j--) {
@@ -1534,6 +1542,7 @@ namespace gr {
       offset_bits += add_crc32_bits(l1detail, offset_bits);
 
 #if 0
+      printf("L1Detail\n");
       for (int i = 0; i < offset_bits; i += 8) {
         bits = index = 0;
         for (int j = 7; j >= 0; j--) {

@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(23d4381009ad8c0041054ef181b8261e)                     */
+/* BINDTOOL_HEADER_FILE_HASH(9da099c2be0850992ab63df211a4c56b)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -268,6 +268,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_min_time_to_next_t>();
+    py::enum_<::gr::atsc3::atsc3_bootstrap_mode_t>(m,"atsc3_bootstrap_mode_t")
+        .value("BOOTSTRAP_VALIDATION", ::gr::atsc3::BOOTSTRAP_VALIDATION) // 0
+        .value("BOOTSTRAP_INTERPOLATION", ::gr::atsc3::BOOTSTRAP_INTERPOLATION) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_bootstrap_mode_t>();
 
 
 

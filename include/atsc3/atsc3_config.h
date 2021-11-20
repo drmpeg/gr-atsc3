@@ -207,6 +207,11 @@ namespace gr {
       MTTN_5300,
     };
 
+    enum atsc3_bootstrap_mode_t {
+      BOOTSTRAP_VALIDATION = 0,
+      BOOTSTRAP_INTERPOLATION,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -231,5 +236,6 @@ typedef gr::atsc3::atsc3_l1_select_t atsc3_l1_select_t;
 typedef gr::atsc3::atsc3_frequency_interleaver_t atsc3_frequency_interleaver_t;
 typedef gr::atsc3::atsc3_showlevels_t atsc3_showlevels_t;
 typedef gr::atsc3::atsc3_min_time_to_next_t atsc3_min_time_to_next_t;
+typedef gr::atsc3::atsc3_bootstrap_mode_t atsc3_bootstrap_mode_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

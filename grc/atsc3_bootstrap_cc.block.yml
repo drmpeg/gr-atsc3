@@ -4,7 +4,7 @@ category: '[ATSC3.0]'
 
 templates:
   imports: import atsc3
-  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${pilotpattern.val}, ${frameinterval.val}, ${l1bmode.val}, ${showlevels.val})
+  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${pilotpattern.val}, ${frameinterval.val}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val})
 
 parameters:
 -   id: fftsize
@@ -51,6 +51,14 @@ parameters:
     option_labels: [Mode 1, Mode 2, Mode 3, Mode 4, Mode 5]
     option_attributes:
         val: [atsc3.L1_FEC_MODE_1, atsc3.L1_FEC_MODE_2, atsc3.L1_FEC_MODE_3, atsc3.L1_FEC_MODE_4, atsc3.L1_FEC_MODE_5]
+-   id: outputmode
+    label: Output Mode
+    dtype: enum
+    options: [BOOTSTRAP_VALIDATION, BOOTSTRAP_INTERPOLATION]
+    option_labels: ['Validation', 'Interpolation']
+    option_attributes:
+        val: [atsc3.BOOTSTRAP_VALIDATION, atsc3.BOOTSTRAP_INTERPOLATION]
+
 -   id: showlevels
     label: Show Peak IQ Levels
     dtype: enum
