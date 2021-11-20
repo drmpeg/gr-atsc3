@@ -1203,7 +1203,7 @@ namespace gr {
       in = &bootstrap_symbol[0];
       out = &bootstrap_resample[0];
       for (index = 0; index < (((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * interpolation) / decimation); index++) {
-        out[index++] = d_firs[ctr].filter(in);
+        out[index] = d_firs[ctr].filter(in);
         ctr += this->decimation();
         while (ctr >= this->interpolation()) {
           ctr -= this->interpolation();
