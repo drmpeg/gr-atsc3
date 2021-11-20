@@ -20,5 +20,6 @@ install(FILES
     framemapper_cc.h
     pilotgenerator_cc.h
     freqinterleaver_cc.h
-    bootstrap_cc.h DESTINATION include/atsc3
+    bootstrap_cc.h
+    alpbbheader_bb.h DESTINATION include/atsc3
 )
