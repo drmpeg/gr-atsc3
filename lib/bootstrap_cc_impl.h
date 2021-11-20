@@ -21,6 +21,7 @@
 #define VALID_SIGNALLING_BITS 8
 #define SYSTEM_BANDWIDTH_6MHZ 0
 #define BSR_COEFFICIENT 2
+#define PADDING_SAMPLES 16 // TODO: calculate this from the length of the input filter in set_taps
 
 namespace gr {
   namespace atsc3 {
@@ -35,7 +36,7 @@ namespace gr {
       gr_complex bootstrap_freq[BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_time[4][BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_partb[4][BOOTSTRAP_FFT_SIZE];
-      gr_complex bootstrap_symbol[(BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS];
+      gr_complex bootstrap_symbol[(BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS + (PADDING_SAMPLES * 2)];
       gr_complex bootstrap_resample[((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8];
       void init_pseudo_noise_sequence(void);
       void init_zadoff_chu_sequence(void);
