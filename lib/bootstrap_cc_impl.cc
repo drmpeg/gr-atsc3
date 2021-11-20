@@ -1170,7 +1170,7 @@ namespace gr {
         }
       }
 
-      out = &bootstrap_symbol[0];
+      out = &bootstrap_symbol[PADDING_SAMPLES];
       for (int j = 0; j < NUM_BOOTSTRAP_SYMBOLS; j++) {
         if (j == 0) {
           for (int n = 0; n < C_SIZE; n++) {
@@ -1198,7 +1198,7 @@ namespace gr {
 
       printf("interpolation = %d\n", this->interpolation());
       printf("decimation = %d\n", this->decimation());
-      ctr = 0;
+      ctr = 3; // TODO: calculate this from the length of the input filter in set_taps
       unsigned int index;
       in = &bootstrap_symbol[0];
       out = &bootstrap_resample[0];
