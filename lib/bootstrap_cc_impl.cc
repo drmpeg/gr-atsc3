@@ -1170,7 +1170,12 @@ namespace gr {
         }
       }
 
-      out = &bootstrap_symbol[PADDING_SAMPLES];
+      if (output_mode) {
+        out = &bootstrap_symbol[PADDING_SAMPLES];
+      }
+      else {
+        out = &bootstrap_symbol[0];
+      }
       for (int j = 0; j < NUM_BOOTSTRAP_SYMBOLS; j++) {
         if (j == 0) {
           for (int n = 0; n < C_SIZE; n++) {
@@ -1196,8 +1201,6 @@ namespace gr {
         }
       }
 
-      printf("interpolation = %d\n", this->interpolation());
-      printf("decimation = %d\n", this->decimation());
       ctr = 3; // TODO: calculate this from the length of the input filter in set_taps
       unsigned int index;
       in = &bootstrap_symbol[0];
@@ -1209,13 +1212,6 @@ namespace gr {
           ctr -= this->interpolation();
           in++;
         }
-      }
-      printf("index = %d\n", index);
-      printf("in delta = %ld\n", in - &bootstrap_symbol[0]);
-
-      out = &bootstrap_resample[0];
-      for (int n = 0; n < 16; n++) {
-        printf("%f, %f\n", out[n].real(), out[n].imag());
       }
 
       frame_items = (symbols * symbol_size) + (symbols * guard_interval);
@@ -1377,9 +1373,6 @@ namespace gr {
 
       for (int n = 0; n < nfilters; n++)
         d_firs[n].set_taps(xtaps[n]);
-
-//      set_history(nt);
-      printf("nt = %d\n", nt);
     }
 
     int
