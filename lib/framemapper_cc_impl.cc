@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, plpsize, guardinterval, pilotpattern, pilotboost, firstsbs, cred, pcred, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, cred, pcred, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, int plpsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -46,7 +46,6 @@ namespace gr {
       l1b_mode = l1bmode;
       l1d_mode = l1dmode;
       first_sbs = firstsbs;
-      plp_size = plpsize;
       symbols = numpreamblesyms + numpayloadsyms;
       preamble_syms = numpreamblesyms;
       init_fm_randomizer();
@@ -186,7 +185,6 @@ namespace gr {
       l1detailinit->plp_lls_flag = FALSE;
       l1detailinit->plp_layer = 0;
       l1detailinit->plp_start = 0;
-      l1detailinit->plp_size = plpsize;
       l1detailinit->plp_scrambler_type = 0;
       if (framesize == FECFRAME_SHORT) {
         switch (constellation) {
@@ -814,11 +812,15 @@ namespace gr {
       l1detailinit->sbs_null_cells = sbsnullcells = sbs_cells - sbs_data_cells;
       printf("total cells = %d\n", totalcells);
       if (firstsbs) {
-        printf("PLP size = %d\n", totalcells - l1cells - (2 * sbsnullcells));
+        plp_size = totalcells - l1cells - (2 * sbsnullcells);
+        printf("PLP size = %d\n", plp_size);
+
       }
       else {
-        printf("PLP size = %d\n", totalcells - l1cells - sbsnullcells);
+        plp_size = totalcells - l1cells - sbsnullcells;
+        printf("PLP size = %d\n", plp_size);
       }
+      l1detailinit->plp_size = plp_size;
       set_output_multiple(totalcells);
     }
 

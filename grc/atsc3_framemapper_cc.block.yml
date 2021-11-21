@@ -12,7 +12,6 @@ templates:
           ${fftsize.val},
           ${numpayloadsyms},
           ${numpreamblesyms},
-          ${plpsize},
           ${guardinterval.val},
           ${pilotpattern.val},
           % if str(pilotpattern) == 'PILOT_SP3_2':
@@ -91,10 +90,6 @@ parameters:
     label: Number of Preamble Symbols
     dtype: int
     default: '2'
--   id: plpsize
-    label: PLP Size
-    dtype: int
-    default: '450029'
 -   id: guardinterval
     label: Guard Interval samples
     dtype: enum
