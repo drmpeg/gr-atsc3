@@ -132,6 +132,14 @@ namespace gr {
       ninput_items_required[0] = noutput_items / 8;
     }
 
+    void
+    alpbbheader_bb_impl::sendbits(unsigned char b, unsigned char *out)
+    {
+      for (int n = 7; n >= 0; n--) {
+        *out++ = b & (1 << n) ? 1 : 0;
+      }
+    }
+
     int
     alpbbheader_bb_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
@@ -141,9 +149,8 @@ namespace gr {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       int consumed = 0;
-      int offset = 0;
       int pointer;
-      unsigned char b;
+      unsigned char bits;
 
       for (int i = 0; i < noutput_items; i += kbch) {
         for (int j = 0; j < (int)((kbch - 16) / 8); j++) {
@@ -155,30 +162,27 @@ namespace gr {
             else {
              pointer = 188 - count;
             }
-            b = (pointer & 0x7f) | 0x80;
-            for (int n = 7; n >= 0; n--) {
-              out[offset++] = b & (1 << n) ? 1 : 0;
-            }
-            b = (pointer >> 5) & 0xfc;
-            for (int n = 7; n >= 0; n--) {
-              out[offset++] = b & (1 << n) ? 1 : 0;
-            }
+            bits = (pointer & 0x7f) | 0x80;
+            sendbits(bits, out);
+            out += 8;
+            bits = (pointer >> 5) & 0xfc;
+            sendbits(bits, out);
+            out += 8;
           }
           if (count == 0) {
             if (*in != 0x47) {
               GR_LOG_WARN(d_logger, "Transport Stream sync error!");
             }
-            b = 0xe2; /* one TS packet per ALP packet */
+            bits = 0xe2; /* one TS packet per ALP packet */
             in++;
           }
           else {
-            b = *in++;
+            bits = *in++;
           }
           count = (count + 1) % 188;
           consumed++;
-          for (int n = 7; n >= 0; n--) {
-            out[offset++] = b & (1 << n) ? 1 : 0;
-          }
+          sendbits(bits, out);
+          out += 8;
         }
       }
 

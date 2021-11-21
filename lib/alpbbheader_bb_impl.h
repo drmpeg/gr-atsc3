@@ -19,6 +19,7 @@ namespace gr {
      private:
       int kbch;
       int count;
+      void sendbits(unsigned char b, unsigned char *out);
 
      public:
       alpbbheader_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
