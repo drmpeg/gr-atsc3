@@ -31,7 +31,20 @@ https://muygs2x2vhb2pjk6g160f1s8-wpengine.netdna-ssl.com/wp-content/uploads/2021
 
 https://muygs2x2vhb2pjk6g160f1s8-wpengine.netdna-ssl.com/wp-content/uploads/2021/04/A321-2016-System-Discovery-and-Signaling.pdf
 
-This project is currently a work in progress.
+The baseline implementation has been verified against the ATSC 3.0
+validation and verification suite. The current implementation does
+not include a time interleaver and the frequency interleaver has
+only been tested in preamble only mode.
+
+A test flow graph is available in examples/vv031.grc. The parameters
+match the ~15 dB S/N of ATSC 1.0 at 21.343539 Mbps. The test stream is
+available here:
+
+https://www.w6rz.net/advatsc3.ts
+
+I'd like to thank Clayton Smith VE3IRR https://github.com/argilo for
+his invaluable help with debugging, interpreting the specification and
+calibration of the bootstrap resampler.
 
 Build instructions:
 
