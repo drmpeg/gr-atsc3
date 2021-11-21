@@ -148,7 +148,6 @@ namespace gr {
       for (int i = 0; i < noutput_items; i += kbch) {
         for (int j = 0; j < (int)((kbch - 16) / 8); j++) {
           if (j == 0) {
-            printf("count = %d\n", count);
             pointer = count;
             if (pointer == 0) {
              pointer = count;
