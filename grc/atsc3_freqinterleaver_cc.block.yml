@@ -12,9 +12,9 @@ templates:
           ${guardinterval.val},
           ${pilotpattern.val},
           ${firstsbs.val},
+          ${mode.val},
           ${cred.val},
-          ${pcred.val},
-          ${mode.val})
+          ${pcred.val})
 
 parameters:
 -   id: fftsize
@@ -46,13 +46,6 @@ parameters:
     option_labels: [SP3_2, SP3_4, SP4_2, SP4_4, SP6_2, SP6_4, SP8_2, SP8_4, SP12_2, SP12_4, SP16_2, SP16_4, SP24_2, SP24_4, SP32_2, SP32_4]
     option_attributes:
         val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
--   id: mode
-    label: Interleave Mode
-    dtype: enum
-    options: [FREQ_PREAMBLE_ONLY, FREQ_ALL_SYMBOLS]
-    option_labels: [Preamble Only, All Symbols]
-    option_attributes:
-        val: [atsc3.FREQ_PREAMBLE_ONLY, atsc3.FREQ_ALL_SYMBOLS]
 -   id: firstsbs
     label: First SBS insertion
     dtype: enum
@@ -60,6 +53,13 @@ parameters:
     option_labels: [Disabled, Enabled]
     option_attributes:
         val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+-   id: mode
+    label: Interleave Mode
+    dtype: enum
+    options: [FREQ_PREAMBLE_ONLY, FREQ_ALL_SYMBOLS]
+    option_labels: [Preamble Only, All Symbols]
+    option_attributes:
+        val: [atsc3.FREQ_PREAMBLE_ONLY, atsc3.FREQ_ALL_SYMBOLS]
 -   id: cred
     label: Reduced Carriers
     dtype: enum

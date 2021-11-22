@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(freqinterleaver_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(031600b1b8ef00e281ef33e9b2231b71)                     */
+/* BINDTOOL_HEADER_FILE_HASH(703910f5dd0af6e3a649cc7b84f054d9)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -43,9 +43,9 @@ void bind_freqinterleaver_cc(py::module& m)
            py::arg("guardinterval"),
            py::arg("pilotpattern"),
            py::arg("firstsbs"),
+           py::arg("mode"),
            py::arg("cred"),
            py::arg("pcred"),
-           py::arg("mode"),
            D(freqinterleaver_cc,make)
         )
         

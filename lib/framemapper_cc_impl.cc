@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t freqinterleaver, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, cred, pcred, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, freqinterleaver, cred, pcred, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t freqinterleaver, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -174,12 +174,12 @@ namespace gr {
       l1basicinit->first_sub_scattered_pilot_pattern = pilotpattern;
       l1basicinit->first_sub_scattered_pilot_boost = pilotboost;
       l1basicinit->first_sub_sbs_first = firstsbs;
-      l1basicinit->first_sub_sbs_last = TRUE;
+      l1basicinit->first_sub_sbs_last = SBS_ON;
       l1basicinit->reserved = 0xffffffffffff;
 
       l1detailinit->version = 0;
       l1detailinit->num_rf = 0;
-      l1detailinit->frequency_interleaver = FALSE;
+      l1detailinit->frequency_interleaver = freqinterleaver;
       l1detailinit->num_plp = 0;
       l1detailinit->plp_id = 0;
       l1detailinit->plp_lls_flag = FALSE;
@@ -790,7 +790,7 @@ namespace gr {
         frame_symbols[n] = preamble_cells;
         total_preamble_cells += preamble_cells;
       }
-      if (l1basicinit->first_sub_sbs_first == TRUE) {
+      if (l1basicinit->first_sub_sbs_first == SBS_ON) {
         frame_symbols[numpreamblesyms] = sbs_cells;
         for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = data_cells;
@@ -1180,7 +1180,7 @@ namespace gr {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->frame_length_mode;
-      if (l1basicinit->frame_length_mode == FALSE) {
+      if (l1basicinit->frame_length_mode == FLM_TIME_ALIGNED) {
         bits = l1basicinit->frame_length;
         for (int n = 9; n >= 0; n--) {
           l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
