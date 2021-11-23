@@ -231,7 +231,6 @@ namespace gr {
       l1detailinit->plp_mod = constellation;
       l1detailinit->plp_cod = rate;
       l1detailinit->plp_TI_mode = timode;
-      l1detailinit->plp_fec_block_start = 0;
       l1detailinit->plp_type = 0;
       if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
         if (tidepth == TI_DEPTH_1254) {
@@ -864,12 +863,19 @@ namespace gr {
           depth = 512;
           break;
       }
-#if 0
+
+      ti_mode = timode;
+      ti_depth = depth;
+      commutator = 0;
       delay_line.reserve(depth);
       for (int i = 0; i < depth; i++) {
-        delay_line.emplace_back(depth * i, 0);
+        delay_line.emplace_back(i, 0);
       }
-#endif
+      time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size);
+      if (time_interleaver == NULL) {
+        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
+        throw std::bad_alloc();
+      }
 
       set_output_multiple(totalcells);
     }
@@ -879,6 +885,7 @@ namespace gr {
      */
     framemapper_cc_impl::~framemapper_cc_impl()
     {
+      free(time_interleaver);
     }
 
     void
@@ -1901,8 +1908,19 @@ namespace gr {
       int left_nulls = sbsnullcells / 2;
       int right_nulls = left_nulls;
       int l1detailcells, l1totalcells;
+      gr_complex *outtimeint = &time_interleaver[0];
 
       for (int i = 0; i < noutput_items; i += noutput_items) {
+        if (ti_mode == TI_MODE_CONVOLUTIONAL) {
+          for (int n = 0; n < plp_size; n++) {
+            delay_line[commutator].push_front(in[indexin++]);
+            outtimeint[indexout++] = delay_line[commutator].back();
+            delay_line[commutator].pop_back();
+            commutator = (commutator + 1) % ti_depth;
+          }
+          in = &time_interleaver[0];
+          indexin = indexout = 0;
+        }
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
         indexout += add_l1basic(&out[0], time_offset);
         fec_block_start = cells % fec_cells;

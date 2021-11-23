@@ -173,6 +173,10 @@ namespace gr {
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
+      int ti_mode;
+      int ti_depth;
+      int commutator;
+      gr_complex *time_interleaver;
       std::vector<std::deque<gr_complex>> delay_line;
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
