@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(9da099c2be0850992ab63df211a4c56b)                     */
+/* BINDTOOL_HEADER_FILE_HASH(95aa74659347e18fe5affa68d8ed68fb)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -275,6 +275,26 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_bootstrap_mode_t>();
+    py::enum_<::gr::atsc3::atsc3_time_interleaver_mode_t>(m,"atsc3_time_interleaver_mode_t")
+        .value("TI_MODE_OFF", ::gr::atsc3::TI_MODE_OFF) // 0
+        .value("TI_MODE_CONVOLUTIONAL", ::gr::atsc3::TI_MODE_CONVOLUTIONAL) // 1
+        .value("TI_MODE_HYBRID", ::gr::atsc3::TI_MODE_HYBRID) // 2
+        .value("TI_MODE_RESERVED", ::gr::atsc3::TI_MODE_RESERVED) // 3
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_time_interleaver_mode_t>();
+    py::enum_<::gr::atsc3::atsc3_time_interleaver_depth_t>(m,"atsc3_time_interleaver_depth_t")
+        .value("TI_DEPTH_512", ::gr::atsc3::TI_DEPTH_512) // 0
+        .value("TI_DEPTH_724", ::gr::atsc3::TI_DEPTH_724) // 1
+        .value("TI_DEPTH_887", ::gr::atsc3::TI_DEPTH_887) // 2
+        .value("TI_DEPTH_1024", ::gr::atsc3::TI_DEPTH_1024) // 3
+        .value("TI_DEPTH_1254", ::gr::atsc3::TI_DEPTH_1254) // 4
+        .value("TI_DEPTH_1448", ::gr::atsc3::TI_DEPTH_1448) // 5
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_time_interleaver_depth_t>();
 
 
 

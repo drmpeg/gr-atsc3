@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t freqinterleaver, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, freqinterleaver, cred, pcred, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, cred, pcred, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t freqinterleaver, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -40,6 +40,7 @@ namespace gr {
       int data_cells;
       int sbs_cells;
       int sbs_data_cells;
+      int depth;
 
       samples = 0;
       cells = 0;
@@ -179,7 +180,7 @@ namespace gr {
 
       l1detailinit->version = 0;
       l1detailinit->num_rf = 0;
-      l1detailinit->frequency_interleaver = freqinterleaver;
+      l1detailinit->frequency_interleaver = fimode;
       l1detailinit->num_plp = 0;
       l1detailinit->plp_id = 0;
       l1detailinit->plp_lls_flag = FALSE;
@@ -229,10 +230,28 @@ namespace gr {
       }
       l1detailinit->plp_mod = constellation;
       l1detailinit->plp_cod = rate;
-      l1detailinit->plp_TI_mode = 0;
+      l1detailinit->plp_TI_mode = timode;
       l1detailinit->plp_fec_block_start = 0;
       l1detailinit->plp_type = 0;
-      l1detailinit->reserved = 0xfffffffffffff;
+      if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+        if (tidepth == TI_DEPTH_1254) {
+          l1detailinit->plp_TI_extended_interleaving = TRUE;
+          tidepth = TI_DEPTH_887;
+        }
+        else if (tidepth == TI_DEPTH_1448) {
+          l1detailinit->plp_TI_extended_interleaving = TRUE;
+          tidepth = TI_DEPTH_1024;
+        }
+        else {
+          l1detailinit->plp_TI_extended_interleaving = FALSE;
+        }
+        l1detailinit->plp_CTI_depth = tidepth;
+        l1detailinit->plp_CTI_start_row = 0;
+        l1detailinit->reserved = 0x3fffffff;
+      }
+      else {
+        l1detailinit->reserved = 0xfffffffffffff;
+      }
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0);
       l1cells += add_l1basic(&l1_dummy[0], 0);
       switch (fftsize) {
@@ -821,6 +840,37 @@ namespace gr {
         printf("PLP size = %d\n", plp_size);
       }
       l1detailinit->plp_size = plp_size;
+
+      switch(tidepth) {
+        case TI_DEPTH_512:
+          depth = 512;
+          break;
+        case TI_DEPTH_724:
+          depth = 724;
+          break;
+        case TI_DEPTH_887:
+          depth = 887;
+          break;
+        case TI_DEPTH_1024:
+          depth = 1024;
+          break;
+        case TI_DEPTH_1254:
+          depth = 1254;
+          break;
+        case TI_DEPTH_1448:
+          depth = 1448;
+          break;
+        default:
+          depth = 512;
+          break;
+      }
+#if 0
+      delay_line.reserve(depth);
+      for (int i = 0; i < depth; i++) {
+        delay_line.emplace_back(depth * i, 0);
+      }
+#endif
+
       set_output_multiple(totalcells);
     }
 
@@ -1532,14 +1582,36 @@ namespace gr {
       for (int n = 1; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = block_start;
-      for (int n = 14; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+        bits = 0;
+        for (int n = 21; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        l1detail[offset_bits++] = l1detailinit->plp_type;
+        l1detail[offset_bits++] = l1detailinit->plp_TI_extended_interleaving;
+        bits = l1detailinit->plp_CTI_depth;
+        for (int n = 2; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit->plp_CTI_start_row;
+        for (int n = 10; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bitslong = l1detailinit->reserved;
+        for (int n = 29; n >= 0; n--) {
+          l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+        }
       }
-      l1detail[offset_bits++] = l1detailinit->plp_type;
-      bitslong = l1detailinit->reserved;
-      for (int n = 51; n >= 0; n--) {
-        l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+      else {
+        bits = block_start;
+        for (int n = 14; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        l1detail[offset_bits++] = l1detailinit->plp_type;
+        bitslong = l1detailinit->reserved;
+        for (int n = 51; n >= 0; n--) {
+          l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+        }
       }
       offset_bits += add_crc32_bits(l1detail, offset_bits);
 

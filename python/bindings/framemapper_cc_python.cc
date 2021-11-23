@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(framemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(405e9552457adc847b0cad0cbcbfa8ae)                     */
+/* BINDTOOL_HEADER_FILE_HASH(ed53ba2f9721680401a8e7fbcac143dd)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -47,7 +47,9 @@ void bind_framemapper_cc(py::module& m)
            py::arg("pilotpattern"),
            py::arg("pilotboost"),
            py::arg("firstsbs"),
-           py::arg("freqinterleaver"),
+           py::arg("fimode"),
+           py::arg("timode"),
+           py::arg("tidepth"),
            py::arg("cred"),
            py::arg("pcred"),
            py::arg("l1bmode"),

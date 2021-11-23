@@ -11,6 +11,8 @@
 #include <atsc3/framemapper_cc.h>
 #include "atsc3_defines.h"
 #include <bitset>
+#include <deque>
+#include <vector>
 
 #define NBCH_3_15 3240
 #define NBCH_6_15 6480
@@ -171,6 +173,8 @@ namespace gr {
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
+      std::vector<std::deque<gr_complex>> delay_line;
+
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
 
@@ -312,7 +316,7 @@ namespace gr {
       const static int sbs_data_cells_table_32K[16][5][5];
 
      public:
-      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t freqinterleaver, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~framemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

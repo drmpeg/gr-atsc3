@@ -212,6 +212,22 @@ namespace gr {
       BOOTSTRAP_INTERPOLATION,
     };
 
+    enum atsc3_time_interleaver_mode_t {
+      TI_MODE_OFF = 0,
+      TI_MODE_CONVOLUTIONAL,
+      TI_MODE_HYBRID,
+      TI_MODE_RESERVED,
+    };
+
+    enum atsc3_time_interleaver_depth_t {
+      TI_DEPTH_512 = 0,
+      TI_DEPTH_724,
+      TI_DEPTH_887,
+      TI_DEPTH_1024,
+      TI_DEPTH_1254,
+      TI_DEPTH_1448,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -237,5 +253,7 @@ typedef gr::atsc3::atsc3_frequency_interleaver_t atsc3_frequency_interleaver_t;
 typedef gr::atsc3::atsc3_showlevels_t atsc3_showlevels_t;
 typedef gr::atsc3::atsc3_min_time_to_next_t atsc3_min_time_to_next_t;
 typedef gr::atsc3::atsc3_bootstrap_mode_t atsc3_bootstrap_mode_t;
+typedef gr::atsc3::atsc3_time_interleaver_mode_t atsc3_time_interleaver_mode_t;
+typedef gr::atsc3::atsc3_time_interleaver_depth_t atsc3_time_interleaver_depth_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */
