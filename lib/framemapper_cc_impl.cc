@@ -870,13 +870,18 @@ namespace gr {
       commutator = 0;
       delay_line.reserve(depth);
       for (int i = 0; i < depth; i++) {
-#if 0
+        delay_line.emplace_back(i, 0);
+      }
+      for (int i = 0; i < depth; i++) {
         switch (constellation) {
           case MOD_QPSK:
-            for (int j = i; j <= 0; j--) {
+            for (int j = 0; j < i; j++) {
               randombits = ti_randomize[randomindex] << 1;
               randombits |= ti_randomize[randomindex + 1];
-              delay_line.insert(j, m_qpsk[randombits]);
+              if (i != 0) {
+                delay_line[i].push_back(m_qpsk[randombits]);
+                delay_line[i].pop_front();
+              }
               randomindex += 2;
             }
             break;
@@ -889,9 +894,6 @@ namespace gr {
           default:
             break;
         }
-#else
-        delay_line.emplace_back(i, 0);
-#endif
       }
       time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size);
       if (time_interleaver == NULL) {
@@ -949,6 +951,27 @@ namespace gr {
         fm_randomize[i] = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
                           ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
                           ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        b = sr & 1;
+        sr >>= 1;
+        if (b) {
+          sr ^= POLYNOMIAL;
+        }
+      }
+    }
+
+    void
+    framemapper_cc_impl::init_ti_randomizer(void)
+    {
+      int sr = 0x18f;
+      int b, packed;
+
+      for (int i = 0; i < (MAX_INTERLEAVER_DEPTH * MAX_INTERLEAVER_DEPTH) / 2;) {
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        for (int n = 7; n >= 0; n--) {
+          ti_randomize[i++] = packed & (1 << n) ? 1 : 0;
+        }
         b = sr & 1;
         sr >>= 1;
         if (b) {
@@ -1910,27 +1933,6 @@ namespace gr {
       rows = numbits / mod;
       block_interleaver(&l1detail[0], &l1temp[0], out, l1d_mode, rows, L1_DETAIL);
       return (rows);
-    }
-
-    void
-    framemapper_cc_impl::init_ti_randomizer(void)
-    {
-      int sr = 0x18f;
-      int b, packed;
-
-      for (int i = 0; i < (1448 * 1448) / 2;) {
-        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
-                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
-                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
-        for (int n = 7; n >= 0; n--) {
-          ti_randomize[i++] = packed & (1 << n) ? 1 : 0;
-        }
-        b = sr & 1;
-        sr >>= 1;
-        if (b) {
-          sr ^= POLYNOMIAL;
-        }
-      }
     }
 
     const gr_complex zero = gr_complex(0.0, 0.0);
