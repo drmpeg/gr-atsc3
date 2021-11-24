@@ -136,12 +136,13 @@ namespace gr {
       int preamble_syms;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
-      int add_l1detail(gr_complex*, int);
+      int add_l1detail(gr_complex*, int, int);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
       void calculate_crc_table();
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
+      void init_ti_randomizer(void);
       void block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows, int l1select);
       unsigned char l1_temp[FRAME_SIZE_SHORT];
       unsigned char l1_basic[FRAME_SIZE_SHORT];
@@ -175,6 +176,7 @@ namespace gr {
 
       int ti_mode;
       int ti_depth;
+      int ti_randomize[(1448 * 1448) * 4];
       int commutator;
       gr_complex *time_interleaver;
       std::vector<std::deque<gr_complex>> delay_line;

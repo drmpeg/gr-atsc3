@@ -41,6 +41,7 @@ namespace gr {
       int sbs_cells;
       int sbs_data_cells;
       int depth;
+      int randombits, randomindex;
 
       samples = 0;
       cells = 0;
@@ -226,7 +227,6 @@ namespace gr {
             break;
         }
         l1detailinit->plp_fec_type = FEC_TYPE_BCH_64K;
-
       }
       l1detailinit->plp_mod = constellation;
       l1detailinit->plp_cod = rate;
@@ -245,13 +245,12 @@ namespace gr {
           l1detailinit->plp_TI_extended_interleaving = FALSE;
         }
         l1detailinit->plp_CTI_depth = tidepth;
-        l1detailinit->plp_CTI_start_row = 0;
         l1detailinit->reserved = 0x3fffffff;
       }
       else {
         l1detailinit->reserved = 0xfffffffffffff;
       }
-      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0);
+      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0);
       l1cells += add_l1basic(&l1_dummy[0], 0);
       switch (fftsize) {
         case FFTSIZE_8K:
@@ -864,12 +863,35 @@ namespace gr {
           break;
       }
 
+      init_ti_randomizer();
+      randomindex = 0;
       ti_mode = timode;
       ti_depth = depth;
       commutator = 0;
       delay_line.reserve(depth);
       for (int i = 0; i < depth; i++) {
+#if 0
+        switch (constellation) {
+          case MOD_QPSK:
+            for (int j = i; j <= 0; j--) {
+              randombits = ti_randomize[randomindex] << 1;
+              randombits |= ti_randomize[randomindex + 1];
+              delay_line.insert(j, m_qpsk[randombits]);
+              randomindex += 2;
+            }
+            break;
+          case MOD_16QAM:
+            break;
+          case MOD_64QAM:
+            break;
+          case MOD_256QAM:
+            break;
+          default:
+            break;
+        }
+#else
         delay_line.emplace_back(i, 0);
+#endif
       }
       time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size);
       if (time_interleaver == NULL) {
@@ -1515,7 +1537,7 @@ namespace gr {
     }
 
     int
-    framemapper_cc_impl::add_l1detail(gr_complex *out, int block_start)
+    framemapper_cc_impl::add_l1detail(gr_complex *out, int block_start, int start_row)
     {
       int bits, index, offset_bits = 0;
       int npad, padbits, count, nrepeat, table;
@@ -1590,7 +1612,7 @@ namespace gr {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        bits = 0;
+        bits = block_start;
         for (int n = 21; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
@@ -1600,7 +1622,7 @@ namespace gr {
         for (int n = 2; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        bits = l1detailinit->plp_CTI_start_row;
+        bits = start_row;
         for (int n = 10; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
@@ -1890,6 +1912,27 @@ namespace gr {
       return (rows);
     }
 
+    void
+    framemapper_cc_impl::init_ti_randomizer(void)
+    {
+      int sr = 0x18f;
+      int b, packed;
+
+      for (int i = 0; i < (1448 * 1448) / 2;) {
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        for (int n = 7; n >= 0; n--) {
+          ti_randomize[i++] = packed & (1 << n) ? 1 : 0;
+        }
+        b = sr & 1;
+        sr >>= 1;
+        if (b) {
+          sr ^= POLYNOMIAL;
+        }
+      }
+    }
+
     const gr_complex zero = gr_complex(0.0, 0.0);
 
     int
@@ -1908,10 +1951,12 @@ namespace gr {
       int left_nulls = sbsnullcells / 2;
       int right_nulls = left_nulls;
       int l1detailcells, l1totalcells;
+      int commutator_start = 0;
       gr_complex *outtimeint = &time_interleaver[0];
 
       for (int i = 0; i < noutput_items; i += noutput_items) {
         if (ti_mode == TI_MODE_CONVOLUTIONAL) {
+          commutator_start = commutator;
           for (int n = 0; n < plp_size; n++) {
             delay_line[commutator].push_front(in[indexin++]);
             outtimeint[indexout++] = delay_line[commutator].back();
@@ -1928,7 +1973,10 @@ namespace gr {
           fec_block_start = fec_cells - (cells % fec_cells);
         }
 
-        l1detailcells = add_l1detail(&l1_dummy[0], fec_block_start);
+        if (ti_mode == TI_MODE_CONVOLUTIONAL) {
+          fec_block_start = fec_block_start + ti_depth * ((commutator_start + fec_block_start) % ti_depth);
+        }
+        l1detailcells = add_l1detail(&l1_dummy[0], fec_block_start, commutator_start);
         rows = l1detailcells / preamblesyms;
         for (int i = 0; i < preamblesyms; i++) {
           for (int j = 0; j < rows; j++) {
