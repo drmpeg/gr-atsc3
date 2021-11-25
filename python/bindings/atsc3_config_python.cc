@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(95aa74659347e18fe5affa68d8ed68fb)                     */
+/* BINDTOOL_HEADER_FILE_HASH(6ebe81821c5e0bcca8ed6db901b6aef0)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -295,6 +295,14 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_time_interleaver_depth_t>();
+    py::enum_<::gr::atsc3::atsc3_plp_fec_mode_t>(m,"atsc3_plp_fec_mode_t")
+        .value("PLP_FEC_NONE", ::gr::atsc3::PLP_FEC_NONE) // 0
+        .value("PLP_FEC_CRC32", ::gr::atsc3::PLP_FEC_CRC32) // 1
+        .value("PLP_FEC_BCH", ::gr::atsc3::PLP_FEC_BCH) // 2
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_plp_fec_mode_t>();
 
 
 

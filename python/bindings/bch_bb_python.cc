@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(bch_bb.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(059766eebc1aca2f9db0f4e699b80554)                     */
+/* BINDTOOL_HEADER_FILE_HASH(ce55e7be835f09acdc575943b9adc1ad)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -39,6 +39,7 @@ void bind_bch_bb(py::module& m)
         .def(py::init(&bch_bb::make),
            py::arg("framesize"),
            py::arg("rate"),
+           py::arg("fecmode"),
            D(bch_bb,make)
         )
         

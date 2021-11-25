@@ -21,6 +21,9 @@ namespace gr {
       int kbch;
       int nbch;
       int frame_size;
+      int plp_fec_mode;
+      int num_fec_bits;
+      unsigned int crc32_table[256];
 
       std::bitset<MAX_BCH_PARITY_BITS> crc_table[256];
       unsigned int num_parity_bits;
@@ -29,9 +32,10 @@ namespace gr {
       void calculate_crc_table();
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
+      void crc32_init(void);
 
      public:
-      bch_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
+      bch_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode);
       ~bch_bb_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

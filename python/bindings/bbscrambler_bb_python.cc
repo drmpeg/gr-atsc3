@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(bbscrambler_bb.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(4e8ce8f5c766c1e39f64a2ecd52d8571)                     */
+/* BINDTOOL_HEADER_FILE_HASH(24f8adf88609ef400b6f2b9ed67dd7b6)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -39,6 +39,7 @@ void bind_bbscrambler_bb(py::module& m)
         .def(py::init(&bbscrambler_bb::make),
            py::arg("framesize"),
            py::arg("rate"),
+           py::arg("fecmode"),
            D(bbscrambler_bb,make)
         )
         

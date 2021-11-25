@@ -51,6 +51,7 @@ templates:
           ${fimode.val},
           ${timode.val},
           ${tidepth.val},
+          ${fecmode.val},
           ${cred.val},
           ${pcred.val},
           ${l1bmode.val},
@@ -279,6 +280,14 @@ parameters:
     option_labels: [512, 724, 887, 1024, 1254, 1448]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+-   id: fecmode
+    label: PLP FEC mode
+    dtype: enum
+    default: 'PLP_FEC_BCH'
+    options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
+    option_labels: [LDPC only, CRC32, BCH]
+    option_attributes:
+        val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
 -   id: cred
     label: Reduced Carriers
     dtype: enum

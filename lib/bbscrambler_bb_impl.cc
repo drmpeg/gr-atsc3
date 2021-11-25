@@ -14,107 +14,130 @@ namespace gr {
     using input_type = unsigned char;
     using output_type = unsigned char;
     bbscrambler_bb::sptr
-    bbscrambler_bb::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate)
+    bbscrambler_bb::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode)
     {
       return gnuradio::make_block_sptr<bbscrambler_bb_impl>(
-        framesize, rate);
+        framesize, rate, fecmode);
     }
 
 
     /*
      * The private constructor
      */
-    bbscrambler_bb_impl::bbscrambler_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate)
+    bbscrambler_bb_impl::bbscrambler_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode)
       : gr::sync_block("bbscrambler_bb",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
+      int nbch = 0;
+      int num_fec_bits = 0;
+
+      switch (fecmode) {
+        case PLP_FEC_NONE:
+          num_fec_bits = 0;
+          break;
+        case PLP_FEC_CRC32:
+          num_fec_bits = 32;
+          break;
+        case PLP_FEC_BCH:
+          if (framesize == FECFRAME_NORMAL) {
+            num_fec_bits = 192;
+          }
+          else if (framesize == FECFRAME_SHORT) {
+            num_fec_bits = 168;
+          }
+          break;
+        default:
+          num_fec_bits = 0;
+          break;
+      }
       if (framesize == FECFRAME_NORMAL) {
         switch (rate) {
           case C2_15:
-            kbch = 8448;
+            nbch = 8640;
             break;
           case C3_15:
-            kbch = 12768;
+            nbch = 12960;
             break;
           case C4_15:
-            kbch = 17088;
+            nbch = 17280;
             break;
           case C5_15:
-            kbch = 21408;
+            nbch = 21600;
             break;
           case C6_15:
-            kbch = 25728;
+            nbch = 25920;
             break;
           case C7_15:
-            kbch = 30048;
+            nbch = 30240;
             break;
           case C8_15:
-            kbch = 34368;
+            nbch = 34560;
             break;
           case C9_15:
-            kbch = 38688;
+            nbch = 38880;
             break;
           case C10_15:
-            kbch = 43008;
+            nbch = 43200;
             break;
           case C11_15:
-            kbch = 47328;
+            nbch = 47520;
             break;
           case C12_15:
-            kbch = 51648;
+            nbch = 51840;
             break;
           case C13_15:
-            kbch = 55968;
+            nbch = 56160;
             break;
           default:
-            kbch = 0;
+            nbch = 0;
             break;
         }
       }
       else if (framesize == FECFRAME_SHORT) {
         switch (rate) {
           case C2_15:
-            kbch = 1992;
+            nbch = 2160;
             break;
           case C3_15:
-            kbch = 3072;
+            nbch = 3240;
             break;
           case C4_15:
-            kbch = 4152;
+            nbch = 4320;
             break;
           case C5_15:
-            kbch = 5232;
+            nbch = 5400;
             break;
           case C6_15:
-            kbch = 6312;
+            nbch = 6480;
             break;
           case C7_15:
-            kbch = 7392;
+            nbch = 7560;
             break;
           case C8_15:
-            kbch = 8472;
+            nbch = 8640;
             break;
           case C9_15:
-            kbch = 9552;
+            nbch = 9720;
             break;
           case C10_15:
-            kbch = 10632;
+            nbch = 10800;
             break;
           case C11_15:
-            kbch = 11712;
+            nbch = 11880;
             break;
           case C12_15:
-            kbch = 12792;
+            nbch = 12960;
             break;
           case C13_15:
-            kbch = 13872;
+            nbch = 14040;
             break;
           default:
-            kbch = 0;
+            nbch = 0;
             break;
         }
       }
+      kbch = nbch - num_fec_bits;
       init_bb_randomizer();
       set_output_multiple(kbch);
     }

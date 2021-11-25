@@ -23,7 +23,7 @@ namespace gr {
       void init_bb_randomizer(void);
 
      public:
-      bbscrambler_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
+      bbscrambler_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode);
       ~bbscrambler_bb_impl();
 
       int work(

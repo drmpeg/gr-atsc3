@@ -228,6 +228,12 @@ namespace gr {
       TI_DEPTH_1448,
     };
 
+    enum atsc3_plp_fec_mode_t {
+      PLP_FEC_NONE = 0,
+      PLP_FEC_CRC32,
+      PLP_FEC_BCH,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -255,5 +261,6 @@ typedef gr::atsc3::atsc3_min_time_to_next_t atsc3_min_time_to_next_t;
 typedef gr::atsc3::atsc3_bootstrap_mode_t atsc3_bootstrap_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_mode_t atsc3_time_interleaver_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_depth_t atsc3_time_interleaver_depth_t;
+typedef gr::atsc3::atsc3_plp_fec_mode_t atsc3_plp_fec_mode_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

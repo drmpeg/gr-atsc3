@@ -14,74 +14,80 @@ namespace gr {
     using input_type = unsigned char;
     using output_type = unsigned char;
     bch_bb::sptr
-    bch_bb::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate)
+    bch_bb::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode)
     {
       return gnuradio::make_block_sptr<bch_bb_impl>(
-        framesize, rate);
+        framesize, rate, fecmode);
     }
 
 
     /*
      * The private constructor
      */
-    bch_bb_impl::bch_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate)
+    bch_bb_impl::bch_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode)
       : gr::block("bch_bb",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
+      switch (fecmode) {
+        case PLP_FEC_NONE:
+          num_fec_bits = 0;
+          break;
+        case PLP_FEC_CRC32:
+          num_fec_bits = 32;
+          break;
+        case PLP_FEC_BCH:
+          if (framesize == FECFRAME_NORMAL) {
+            num_fec_bits = 192;
+          }
+          else if (framesize == FECFRAME_SHORT) {
+            num_fec_bits = 168;
+          }
+          break;
+        default:
+          num_fec_bits = 0;
+          break;
+      }
       if (framesize == FECFRAME_NORMAL) {
         num_parity_bits = 192;
         switch (rate) {
           case C2_15:
-            kbch = 8448;
             nbch = 8640;
             break;
           case C3_15:
-            kbch = 12768;
             nbch = 12960;
             break;
           case C4_15:
-            kbch = 17088;
             nbch = 17280;
             break;
           case C5_15:
-            kbch = 21408;
             nbch = 21600;
             break;
           case C6_15:
-            kbch = 25728;
             nbch = 25920;
             break;
           case C7_15:
-            kbch = 30048;
             nbch = 30240;
             break;
           case C8_15:
-            kbch = 34368;
             nbch = 34560;
             break;
           case C9_15:
-            kbch = 38688;
             nbch = 38880;
             break;
           case C10_15:
-            kbch = 43008;
             nbch = 43200;
             break;
           case C11_15:
-            kbch = 47328;
             nbch = 47520;
             break;
           case C12_15:
-            kbch = 51648;
             nbch = 51840;
             break;
           case C13_15:
-            kbch = 55968;
             nbch = 56160;
             break;
           default:
-            kbch = 0;
             nbch = 0;
             break;
         }
@@ -90,61 +96,51 @@ namespace gr {
         num_parity_bits = 168;
         switch (rate) {
           case C2_15:
-            kbch = 1992;
             nbch = 2160;
             break;
           case C3_15:
-            kbch = 3072;
             nbch = 3240;
             break;
           case C4_15:
-            kbch = 4152;
             nbch = 4320;
             break;
           case C5_15:
-            kbch = 5232;
             nbch = 5400;
             break;
           case C6_15:
-            kbch = 6312;
             nbch = 6480;
             break;
           case C7_15:
-            kbch = 7392;
             nbch = 7560;
             break;
           case C8_15:
-            kbch = 8472;
             nbch = 8640;
             break;
           case C9_15:
-            kbch = 9552;
             nbch = 9720;
             break;
           case C10_15:
-            kbch = 10632;
             nbch = 10800;
             break;
           case C11_15:
-            kbch = 11712;
             nbch = 11880;
             break;
           case C12_15:
-            kbch = 12792;
             nbch = 12960;
             break;
           case C13_15:
-            kbch = 13872;
             nbch = 14040;
             break;
           default:
-            kbch = 0;
             nbch = 0;
             break;
         }
       }
+      kbch = nbch - num_fec_bits;
       frame_size = framesize;
+      plp_fec_mode = fecmode;
       bch_poly_build_tables();
+      crc32_init();
       set_output_multiple(nbch);
     }
 
@@ -283,6 +279,20 @@ namespace gr {
       calculate_crc_table();
     }
 
+    void
+    bch_bb_impl::crc32_init(void)
+    {
+      unsigned int i, j, k;
+
+      for (i = 0; i < 256; i++) {
+        k = 0;
+        for (j = (i << 24) | 0x800000; j != 0x80000000; j <<= 1) {
+          k = (k << 1) ^ (((k ^ j) & 0x80000000) ? 0x00210801 : 0);
+        }
+        crc32_table[i] = k;
+      }
+    }
+
     int
     bch_bb_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
@@ -292,6 +302,7 @@ namespace gr {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       unsigned char b, temp, msb;
+      unsigned int crc32;
 
       // We can use a 192 bits long bitset, all higher bits not used by the bch will just be
       // ignored
@@ -301,35 +312,59 @@ namespace gr {
       for (int i = 0; i < noutput_items; i += nbch) {
         memcpy(out, in, sizeof(unsigned char) * kbch);
         out += kbch;
-        for (int j = 0; j < kbch / 8; j++) {
-          b = 0;
+        switch (plp_fec_mode) {
+          case PLP_FEC_NONE:
+            consumed += kbch;
+            break;
+          case PLP_FEC_CRC32:
+            crc32 = 0xffffffff;
+            for (int j = 0; j < kbch / 8; j++) {
+              b = 0;
+              for (int e = 0; e < 8; e++) {
+                temp = *in++;
+                consumed++;
+                b |= temp << (7 - e);
+              }
+              crc32 = (crc32 << 8) ^ crc32_table[((crc32 >> 24) ^ b) & 0xff];
+            }
+            for (int n = 0; n < num_fec_bits; n++) {
+              *out++ = (char)(crc32 >> (31 - n)) & 0x1;
+            }
+            break;
+          case PLP_FEC_BCH:
+            for (int j = 0; j < kbch / 8; j++) {
+              b = 0;
 
-          // calculate the crc using the lookup table, cf.
-          // http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
-          for (int e = 0; e < 8; e++) {
-            temp = *in++;
-            consumed++;
+              // calculate the crc using the lookup table, cf.
+              // http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
+              for (int e = 0; e < 8; e++) {
+                temp = *in++;
+                consumed++;
 
-            b |= temp << (7 - e);
-          }
+                b |= temp << (7 - e);
+              }
 
-          msb = 0;
-          for (int n = 1; n <= 8; n++) {
-            temp = parity_bits[num_parity_bits - n];
-            msb |= temp << (8 - n);
-          }
-          /* XOR-in next input byte into MSB of crc and get this MSB, that's our new
-           * intermediate divident */
-          unsigned char pos = (msb ^ b);
-          /* Shift out the MSB used for division per lookuptable and XOR with the
-           * remainder */
-          parity_bits = (parity_bits << 8) ^ crc_table[pos];
-        }
+              msb = 0;
+              for (int n = 1; n <= 8; n++) {
+                temp = parity_bits[num_parity_bits - n];
+                msb |= temp << (8 - n);
+              }
+              /* XOR-in next input byte into MSB of crc and get this MSB, that's our new
+               * intermediate divident */
+              unsigned char pos = (msb ^ b);
+              /* Shift out the MSB used for division per lookuptable and XOR with the
+               * remainder */
+              parity_bits = (parity_bits << 8) ^ crc_table[pos];
+            }
 
-        // Now add the parity bits to the output
-        for (unsigned int n = 0; n < num_parity_bits; n++) {
-          *out++ = (char)parity_bits[num_parity_bits - 1];
-          parity_bits <<= 1;
+            // Now add the parity bits to the output
+            for (unsigned int n = 0; n < num_parity_bits; n++) {
+              *out++ = (char)parity_bits[num_parity_bits - 1];
+              parity_bits <<= 1;
+            }
+            break;
+          default:
+            break;
         }
       }
       // Tell runtime system how many input items we consumed on
