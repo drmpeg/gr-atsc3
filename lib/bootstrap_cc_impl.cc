@@ -1216,10 +1216,10 @@ namespace gr {
 
       frame_items = (symbols * symbol_size) + (symbols * guard_interval);
       if (outputmode) {
-        insertion_items = frame_items + ((((BOOTSTRAP_FFT_SIZE + guard_interval) * NUM_BOOTSTRAP_SYMBOLS) * interpolation) / decimation);
+        insertion_items = frame_items + ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation) / decimation);
       }
       else {
-        insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + guard_interval) * NUM_BOOTSTRAP_SYMBOLS);
+        insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
       }
       set_output_multiple(insertion_items);
     }
