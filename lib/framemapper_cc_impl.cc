@@ -121,7 +121,7 @@ namespace gr {
         }
       }
       if (l1dmode == L1_FEC_MODE_6) {
-        rateindex = 0;
+        rateindex = 7;
         for (i = 0, j = 0; i < 64; i++, j++) {
           m_l1d_256qam[i] = mod_table_256QAM[rateindex][j];
         }
@@ -136,7 +136,7 @@ namespace gr {
         }
       }
       else {
-        rateindex = 1;
+        rateindex = 11;
         for (i = 0, j = 0; i < 64; i++, j++) {
           m_l1d_256qam[i] = mod_table_256QAM[rateindex][j];
         }
