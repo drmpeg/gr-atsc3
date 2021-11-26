@@ -441,14 +441,14 @@ namespace gr {
                 preamble_cells = preamble_cells_table[26][pcred];
                 preamble_dx = preamble_dx_table[26];
                 preamble_power = preamble_power_table[26];
-              preamble_ifft_power = preamble_ifft_power_table[26][pcred];
+                preamble_ifft_power = preamble_ifft_power_table[26][pcred];
               }
               else {
                 first_preamble_cells = preamble_cells_table[27][4];
                 preamble_cells = preamble_cells_table[27][pcred];
                 preamble_dx = preamble_dx_table[27];
                 preamble_power = preamble_power_table[27];
-              preamble_ifft_power = preamble_ifft_power_table[27][pcred];
+                preamble_ifft_power = preamble_ifft_power_table[27][pcred];
               }
               break;
             case GI_10_3648:
@@ -457,14 +457,14 @@ namespace gr {
                 preamble_cells = preamble_cells_table[28][pcred];
                 preamble_dx = preamble_dx_table[28];
                 preamble_power = preamble_power_table[28];
-              preamble_ifft_power = preamble_ifft_power_table[28][pcred];
+                preamble_ifft_power = preamble_ifft_power_table[28][pcred];
               }
               else {
                 first_preamble_cells = preamble_cells_table[29][4];
                 preamble_cells = preamble_cells_table[29][pcred];
                 preamble_dx = preamble_dx_table[29];
                 preamble_power = preamble_power_table[29];
-              preamble_ifft_power = preamble_ifft_power_table[29][pcred];
+                preamble_ifft_power = preamble_ifft_power_table[29][pcred];
               }
               break;
             case GI_11_4096:
@@ -857,7 +857,7 @@ namespace gr {
       input_cells = totalcells;
       printf("input cells = %d\n", input_cells);
       /* -1.98 is a tweak factor to match verification files */
-      first_preamble_normalization = 1.0 / std::sqrt((preamble_ifft_power * ((double)preamble_carriers / (double)carriers) - 1.98));
+      first_preamble_normalization = 1.0 / std::sqrt((preamble_ifft_power * ((double)preamble_carriers / (double)max_carriers) - 1.98));
       preamble_normalization = 1.0 / std::sqrt(preamble_ifft_power);
       data_normalization = 1.0 / std::sqrt(data_ifft_power);
       set_output_multiple(symbols);
@@ -927,11 +927,12 @@ namespace gr {
               }
             }
             else if (frame_symbols[symbol] == SBS_SYMBOL) {
-              index = shift = 0;
+              index = 0;
+              shift = (max_carriers - carriers) / 2;
               for (int i = 0; i < max_carriers; i++) {
                 if (continual_pilot_table_8K[index] == i) {
                   if (continual_pilot_table_8K[index] > shift) {
-                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
                   }
                   index++;
                 }
@@ -943,11 +944,12 @@ namespace gr {
               }
             }
             else {
-              index = shift = 0;
+              index = 0;
+              shift = (max_carriers - carriers) / 2;
               for (int i = 0; i < max_carriers; i++) {
                 if (continual_pilot_table_8K[index] == i) {
                   if (continual_pilot_table_8K[index] > shift) {
-                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
                   }
                   index++;
                 }
@@ -1009,8 +1011,10 @@ namespace gr {
                   break;
                 case PILOT_SP16_4:
                   data_carrier_map[1744 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[2912 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5744 - shift] = SCATTERED_CARRIER;
+                  if ((cred_coeff & 0x1) == 0) {
+                    data_carrier_map[2912 - shift] = SCATTERED_CARRIER;
+                    data_carrier_map[5744 - shift] = SCATTERED_CARRIER;
+                  }
                   break;
                 case PILOT_SP24_2:
                   break;
@@ -1075,11 +1079,12 @@ namespace gr {
               }
             }
             else if (frame_symbols[symbol] == SBS_SYMBOL) {
-              index = shift = 0;
+              index = 0;
+              shift = (max_carriers - carriers) / 2;
               for (int i = 0; i < max_carriers; i++) {
                 if (continual_pilot_table_16K[index] == i) {
                   if (continual_pilot_table_16K[index] > shift) {
-                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
                   }
                   index++;
                 }
@@ -1091,11 +1096,12 @@ namespace gr {
               }
             }
             else {
-              index = shift = 0;
+              index = 0;
+              shift = (max_carriers - carriers) / 2;
               for (int i = 0; i < max_carriers; i++) {
                 if (continual_pilot_table_16K[index] == i) {
                   if (continual_pilot_table_16K[index] > shift) {
-                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
                   }
                   index++;
                 }
@@ -1207,11 +1213,12 @@ namespace gr {
               }
             }
             else if (frame_symbols[symbol] == SBS_SYMBOL) {
-              index = shift = 0;
+              index = 0;
+              shift = (max_carriers - carriers) / 2;
               for (int i = 0; i < max_carriers; i++) {
                 if (continual_pilot_table_32K[index] == i) {
                   if (continual_pilot_table_32K[index] > shift) {
-                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
                   }
                   index++;
                 }
@@ -1223,11 +1230,12 @@ namespace gr {
               }
             }
             else {
-              index = shift = 0;
+              index = 0;
+              shift = (max_carriers - carriers) / 2;
               for (int i = 0; i < max_carriers; i++) {
                 if (continual_pilot_table_32K[index] == i) {
                   if (continual_pilot_table_32K[index] > shift) {
-                    data_carrier_map[i] = CONTINUAL_CARRIER;
+                    data_carrier_map[i - shift] = CONTINUAL_CARRIER;
                   }
                   index++;
                 }
