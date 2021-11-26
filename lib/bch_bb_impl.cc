@@ -314,6 +314,7 @@ namespace gr {
         out += kbch;
         switch (plp_fec_mode) {
           case PLP_FEC_NONE:
+            in += kbch;
             consumed += kbch;
             break;
           case PLP_FEC_CRC32:
@@ -328,7 +329,7 @@ namespace gr {
               crc32 = (crc32 << 8) ^ crc32_table[((crc32 >> 24) ^ b) & 0xff];
             }
             for (int n = 0; n < num_fec_bits; n++) {
-              *out++ = (char)(crc32 >> (31 - n)) & 0x1;
+              *out++ = (char)(crc32 >> ((num_fec_bits - 1) - n)) & 0x1;
             }
             break;
           case PLP_FEC_BCH:
