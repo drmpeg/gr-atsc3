@@ -53,7 +53,6 @@ templates:
           ${tidepth.val},
           ${fecmode.val},
           ${cred.val},
-          ${pcred.val},
           ${l1bmode.val},
           ${l1dmode.val})
 
@@ -290,13 +289,6 @@ parameters:
         val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
 -   id: cred
     label: Reduced Carriers
-    dtype: enum
-    options: [CRED_0, CRED_1, CRED_2, CRED_3, CRED_4]
-    option_labels: [5.83 MHz, 5.75 MHz, 5.67 MHz, 5.59 MHz, 5.51 MHz]
-    option_attributes:
-        val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
--   id: pcred
-    label: Preamble Reduced Carriers
     dtype: enum
     options: [CRED_0, CRED_1, CRED_2, CRED_3, CRED_4]
     option_labels: [5.83 MHz, 5.75 MHz, 5.67 MHz, 5.59 MHz, 5.51 MHz]

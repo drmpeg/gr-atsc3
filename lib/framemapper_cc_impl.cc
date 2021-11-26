@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, fecmode, cred, pcred, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, fecmode, cred, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_reduced_carriers_t cred, atsc3_reduced_carriers_t pcred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -162,7 +162,12 @@ namespace gr {
       l1basicinit->additional_samples = 0; /* always 0 */
       l1basicinit->num_subframes = 0;
       l1basicinit->preamble_num_symbols = numpreamblesyms - 1;
-      l1basicinit->preamble_reduced_carriers = pcred;
+      if (numpreamblesyms == 1) {
+        l1basicinit->preamble_reduced_carriers = 0;
+      }
+      else {
+        l1basicinit->preamble_reduced_carriers = cred;
+      }
       l1basicinit->L1_Detail_content_tag = 0;
       l1basicinit->L1_Detail_size_bytes = 25;
       l1basicinit->L1_Detail_fec_type = l1dmode;
@@ -290,42 +295,42 @@ namespace gr {
             case GI_1_192:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[0][4];
-              preamble_cells = preamble_cells_table[0][pcred];
+              preamble_cells = preamble_cells_table[0][cred];
               break;
             case GI_2_384:
               gisamples = 384;
               first_preamble_cells = preamble_cells_table[1][4];
-              preamble_cells = preamble_cells_table[1][pcred];
+              preamble_cells = preamble_cells_table[1][cred];
               break;
             case GI_3_512:
               gisamples = 512;
               first_preamble_cells = preamble_cells_table[2][4];
-              preamble_cells = preamble_cells_table[2][pcred];
+              preamble_cells = preamble_cells_table[2][cred];
               break;
             case GI_4_768:
               gisamples = 768;
               first_preamble_cells = preamble_cells_table[3][4];
-              preamble_cells = preamble_cells_table[3][pcred];
+              preamble_cells = preamble_cells_table[3][cred];
               break;
             case GI_5_1024:
               gisamples = 1024;
               first_preamble_cells = preamble_cells_table[4][4];
-              preamble_cells = preamble_cells_table[4][pcred];
+              preamble_cells = preamble_cells_table[4][cred];
               break;
             case GI_6_1536:
               gisamples = 1536;
               first_preamble_cells = preamble_cells_table[5][4];
-              preamble_cells = preamble_cells_table[5][pcred];
+              preamble_cells = preamble_cells_table[5][cred];
               break;
             case GI_7_2048:
               gisamples = 2048;
               first_preamble_cells = preamble_cells_table[6][4];
-              preamble_cells = preamble_cells_table[6][pcred];
+              preamble_cells = preamble_cells_table[6][cred];
               break;
             default:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[0][4];
-              preamble_cells = preamble_cells_table[0][pcred];
+              preamble_cells = preamble_cells_table[0][cred];
               break;
           }
           switch (pilotpattern) {
@@ -422,62 +427,62 @@ namespace gr {
             case GI_1_192:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[7][4];
-              preamble_cells = preamble_cells_table[7][pcred];
+              preamble_cells = preamble_cells_table[7][cred];
               break;
             case GI_2_384:
               gisamples = 384;
               first_preamble_cells = preamble_cells_table[8][4];
-              preamble_cells = preamble_cells_table[8][pcred];
+              preamble_cells = preamble_cells_table[8][cred];
               break;
             case GI_3_512:
               gisamples = 512;
               first_preamble_cells = preamble_cells_table[9][4];
-              preamble_cells = preamble_cells_table[9][pcred];
+              preamble_cells = preamble_cells_table[9][cred];
               break;
             case GI_4_768:
               gisamples = 768;
               first_preamble_cells = preamble_cells_table[10][4];
-              preamble_cells = preamble_cells_table[10][pcred];
+              preamble_cells = preamble_cells_table[10][cred];
               break;
             case GI_5_1024:
               gisamples = 1024;
               first_preamble_cells = preamble_cells_table[11][4];
-              preamble_cells = preamble_cells_table[11][pcred];
+              preamble_cells = preamble_cells_table[11][cred];
               break;
             case GI_6_1536:
               gisamples = 1536;
               first_preamble_cells = preamble_cells_table[12][4];
-              preamble_cells = preamble_cells_table[12][pcred];
+              preamble_cells = preamble_cells_table[12][cred];
               break;
             case GI_7_2048:
               gisamples = 2048;
               first_preamble_cells = preamble_cells_table[13][4];
-              preamble_cells = preamble_cells_table[13][pcred];
+              preamble_cells = preamble_cells_table[13][cred];
               break;
             case GI_8_2432:
               gisamples = 2432;
               first_preamble_cells = preamble_cells_table[14][4];
-              preamble_cells = preamble_cells_table[14][pcred];
+              preamble_cells = preamble_cells_table[14][cred];
               break;
             case GI_9_3072:
               gisamples = 3072;
               first_preamble_cells = preamble_cells_table[15][4];
-              preamble_cells = preamble_cells_table[15][pcred];
+              preamble_cells = preamble_cells_table[15][cred];
               break;
             case GI_10_3648:
               gisamples = 3648;
               first_preamble_cells = preamble_cells_table[16][4];
-              preamble_cells = preamble_cells_table[16][pcred];
+              preamble_cells = preamble_cells_table[16][cred];
               break;
             case GI_11_4096:
               gisamples = 4096;
               first_preamble_cells = preamble_cells_table[17][4];
-              preamble_cells = preamble_cells_table[17][pcred];
+              preamble_cells = preamble_cells_table[17][cred];
               break;
             default:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[7][4];
-              preamble_cells = preamble_cells_table[7][pcred];
+              preamble_cells = preamble_cells_table[7][cred];
               break;
           }
           switch (pilotpattern) {
@@ -574,79 +579,79 @@ namespace gr {
             case GI_1_192:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[18][4];
-              preamble_cells = preamble_cells_table[18][pcred];
+              preamble_cells = preamble_cells_table[18][cred];
               break;
             case GI_2_384:
               gisamples = 384;
               first_preamble_cells = preamble_cells_table[19][4];
-              preamble_cells = preamble_cells_table[19][pcred];
+              preamble_cells = preamble_cells_table[19][cred];
               break;
             case GI_3_512:
               gisamples = 512;
               first_preamble_cells = preamble_cells_table[20][4];
-              preamble_cells = preamble_cells_table[20][pcred];
+              preamble_cells = preamble_cells_table[20][cred];
               break;
             case GI_4_768:
               gisamples = 768;
               first_preamble_cells = preamble_cells_table[21][4];
-              preamble_cells = preamble_cells_table[21][pcred];
+              preamble_cells = preamble_cells_table[21][cred];
               break;
             case GI_5_1024:
               gisamples = 1024;
               first_preamble_cells = preamble_cells_table[22][4];
-              preamble_cells = preamble_cells_table[22][pcred];
+              preamble_cells = preamble_cells_table[22][cred];
               break;
             case GI_6_1536:
               gisamples = 1536;
               first_preamble_cells = preamble_cells_table[23][4];
-              preamble_cells = preamble_cells_table[23][pcred];
+              preamble_cells = preamble_cells_table[23][cred];
               break;
             case GI_7_2048:
               gisamples = 2048;
               first_preamble_cells = preamble_cells_table[24][4];
-              preamble_cells = preamble_cells_table[24][pcred];
+              preamble_cells = preamble_cells_table[24][cred];
               break;
             case GI_8_2432:
               gisamples = 2432;
               first_preamble_cells = preamble_cells_table[25][4];
-              preamble_cells = preamble_cells_table[25][pcred];
+              preamble_cells = preamble_cells_table[25][cred];
               break;
             case GI_9_3072:
               gisamples = 3072;
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
                 first_preamble_cells = preamble_cells_table[26][4];
-                preamble_cells = preamble_cells_table[26][pcred];
+                preamble_cells = preamble_cells_table[26][cred];
               }
               else {
                 first_preamble_cells = preamble_cells_table[27][4];
-                preamble_cells = preamble_cells_table[27][pcred];
+                preamble_cells = preamble_cells_table[27][cred];
               }
               break;
             case GI_10_3648:
               gisamples = 3648;
               if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
                 first_preamble_cells = preamble_cells_table[28][4];
-                preamble_cells = preamble_cells_table[28][pcred];
+                preamble_cells = preamble_cells_table[28][cred];
               }
               else {
                 first_preamble_cells = preamble_cells_table[29][4];
-                preamble_cells = preamble_cells_table[29][pcred];
+                preamble_cells = preamble_cells_table[29][cred];
               }
               break;
             case GI_11_4096:
               gisamples = 4096;
               first_preamble_cells = preamble_cells_table[30][4];
-              preamble_cells = preamble_cells_table[30][pcred];
+              preamble_cells = preamble_cells_table[30][cred];
               break;
             case GI_12_4864:
               gisamples = 4864;
               first_preamble_cells = preamble_cells_table[31][4];
-              preamble_cells = preamble_cells_table[31][pcred];
+              preamble_cells = preamble_cells_table[31][cred];
               break;
             default:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[18][4];
-              preamble_cells = preamble_cells_table[18][pcred];
+              preamble_cells = preamble_cells_table[18][cred];
               break;
           }
           switch (pilotpattern) {
@@ -743,42 +748,42 @@ namespace gr {
             case GI_1_192:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[0][4];
-              preamble_cells = preamble_cells_table[0][pcred];
+              preamble_cells = preamble_cells_table[0][cred];
               break;
             case GI_2_384:
               gisamples = 384;
               first_preamble_cells = preamble_cells_table[1][4];
-              preamble_cells = preamble_cells_table[1][pcred];
+              preamble_cells = preamble_cells_table[1][cred];
               break;
             case GI_3_512:
               gisamples = 512;
               first_preamble_cells = preamble_cells_table[2][4];
-              preamble_cells = preamble_cells_table[2][pcred];
+              preamble_cells = preamble_cells_table[2][cred];
               break;
             case GI_4_768:
               gisamples = 768;
               first_preamble_cells = preamble_cells_table[3][4];
-              preamble_cells = preamble_cells_table[3][pcred];
+              preamble_cells = preamble_cells_table[3][cred];
               break;
             case GI_5_1024:
               gisamples = 1024;
               first_preamble_cells = preamble_cells_table[4][4];
-              preamble_cells = preamble_cells_table[4][pcred];
+              preamble_cells = preamble_cells_table[4][cred];
               break;
             case GI_6_1536:
               gisamples = 1536;
               first_preamble_cells = preamble_cells_table[5][4];
-              preamble_cells = preamble_cells_table[5][pcred];
+              preamble_cells = preamble_cells_table[5][cred];
               break;
             case GI_7_2048:
               gisamples = 2048;
               first_preamble_cells = preamble_cells_table[6][4];
-              preamble_cells = preamble_cells_table[6][pcred];
+              preamble_cells = preamble_cells_table[6][cred];
               break;
             default:
               gisamples = 192;
               first_preamble_cells = preamble_cells_table[0][4];
-              preamble_cells = preamble_cells_table[0][pcred];
+              preamble_cells = preamble_cells_table[0][cred];
               break;
           }
           switch (pilotpattern) {

@@ -100,6 +100,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
+    fecmode: PLP_FEC_BCH
     framesize: FECFRAME_NORMAL
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -108,7 +109,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [832, 36.0]
+    coordinate: [832, 28.0]
     rotation: 0
     state: true
 - name: atsc3_bch_bb_0
@@ -117,6 +118,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
+    fecmode: PLP_FEC_BCH
     framesize: FECFRAME_NORMAL
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -125,7 +127,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1096, 36.0]
+    coordinate: [1096, 28.0]
     rotation: 0
     state: true
 - name: atsc3_bootstrap_cc_0
@@ -160,7 +162,9 @@ blocks:
     comment: ''
     constellation: MOD_256QAM
     cred: CRED_0
+    fecmode: PLP_FEC_BCH
     fftsize: FFTSIZE_8K
+    fimode: FREQ_PREAMBLE_ONLY
     firstsbs: SBS_OFF
     framesize: FECFRAME_NORMAL
     guardinterval: GI_5_1024
@@ -170,7 +174,6 @@ blocks:
     minoutbuf: '0'
     numpayloadsyms: '72'
     numpreamblesyms: '2'
-    pcred: CRED_0
     pilotboost1: SPB_0
     pilotboost10: SPB_0
     pilotboost11: SPB_0
@@ -189,11 +192,13 @@ blocks:
     pilotboost9: SPB_0
     pilotpattern: PILOT_SP3_4
     rate: C9_15
+    tidepth: TI_DEPTH_512
+    timode: TI_MODE_OFF
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 140.0]
+    coordinate: [304, 124.0]
     rotation: 180
     state: true
 - name: atsc3_freqinterleaver_cc_0
@@ -211,13 +216,12 @@ blocks:
     mode: FREQ_PREAMBLE_ONLY
     numpayloadsyms: '72'
     numpreamblesyms: '2'
-    pcred: CRED_0
     pilotpattern: PILOT_SP3_4
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [64, 412.0]
+    coordinate: [64, 428.0]
     rotation: 0
     state: enabled
 - name: atsc3_interleaver_bb_0
@@ -287,7 +291,6 @@ blocks:
     minoutbuf: '0'
     numpayloadsyms: '72'
     numpreamblesyms: '2'
-    pcred: CRED_0
     pilotboost1: SPB_0
     pilotboost10: SPB_0
     pilotboost11: SPB_0
@@ -309,7 +312,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [368, 412.0]
+    coordinate: [368, 428.0]
     rotation: 0
     state: true
 - name: blocks_file_source_0
@@ -368,7 +371,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [680, 460.0]
+    coordinate: [680, 468.0]
     rotation: 0
     state: true
 - name: uhd_usrp_sink_0_0
@@ -658,7 +661,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [64, 244.0]
+    coordinate: [64, 252.0]
     rotation: 180
     state: true
 - name: virtual_source_0
