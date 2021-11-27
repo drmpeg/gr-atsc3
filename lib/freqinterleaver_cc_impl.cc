@@ -684,7 +684,7 @@ namespace gr {
         q_odd = 0;
         if ((i % 2) == 0) {
           if (i == 0) {
-            lfsr2 = 0x1fff;
+            lfsr2 = (pn_mask << 1) | 0x1;
           }
           else {
             result = 0;
@@ -751,15 +751,25 @@ namespace gr {
           }
         }
         if (fft_size == FFTSIZE_32K) {
-          for (int n = 0; n < q_odd; n++) {
+          for (int n = 0; n < q_oddFP; n++) {
             int a;
-            a = Hodd[n];
-            Heven[a] = n;
+            a = HoddFP[n];
+            HevenFP[a] = n;
           }
           for (int n = 0; n < q_oddP; n++) {
             int a;
             a = HoddP[n];
             HevenP[a] = n;
+          }
+          for (int n = 0; n < q_oddSBS; n++) {
+            int a;
+            a = HoddSBS[n];
+            HevenSBS[a] = n;
+          }
+          for (int n = 0; n < q_odd; n++) {
+            int a;
+            a = Hodd[n];
+            Heven[a] = n;
           }
         }
       }
