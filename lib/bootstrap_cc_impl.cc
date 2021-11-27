@@ -1170,6 +1170,7 @@ namespace gr {
         }
       }
 
+      std::fill_n(&bootstrap_symbol[0], (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS + (PADDING_SAMPLES * 2), 0);
       if (output_mode) {
         out = &bootstrap_symbol[PADDING_SAMPLES];
       }
