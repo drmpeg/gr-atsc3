@@ -8,7 +8,11 @@ templates:
       atsc3.framemapper_cc(
           ${framesize.val},
           ${rate.val},
-          ${constellation.val},
+          % if str(framesize) == 'FECFRAME_NORMAL':
+          ${constellation1.val},
+          % else:
+          ${constellation2.val},
+          % endif
           ${fftsize.val},
           ${numpayloadsyms},
           ${numpreamblesyms},
@@ -63,6 +67,8 @@ parameters:
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
     option_attributes:
+        hide_constellation1: [none, all]
+        hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
 -   id: rate
     label: Code rate
@@ -71,13 +77,22 @@ parameters:
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
--   id: constellation
+-   id: constellation1
+    label: Constellation
+    dtype: enum
+    options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM, MOD_1024QAM, MOD_4096QAM]
+    option_labels: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM, 4096QAM]
+    option_attributes:
+        val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM, atsc3.MOD_1024QAM, atsc3.MOD_4096QAM]
+    hide: ${ framesize.hide_constellation1 }
+-   id: constellation2
     label: Constellation
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
+    hide: ${ framesize.hide_constellation2 }
 -   id: fftsize
     label: FFT Size
     dtype: enum

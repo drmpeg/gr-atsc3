@@ -240,6 +240,12 @@ namespace gr {
           case MOD_256QAM:
             fec_cells = 8100;
             break;
+          case MOD_1024QAM:
+            fec_cells = 6480;
+            break;
+          case MOD_4096QAM:
+            fec_cells = 5400;
+            break;
           default:
             fec_cells = 0;
             break;

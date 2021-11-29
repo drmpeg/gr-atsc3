@@ -138,6 +138,32 @@ namespace gr {
       const static int group_tab_12_15S_256QAM[45];
       const static int group_tab_13_15S_256QAM[45];
 
+      const static int group_tab_2_15N_1024QAM[180];
+      const static int group_tab_3_15N_1024QAM[180];
+      const static int group_tab_4_15N_1024QAM[180];
+      const static int group_tab_5_15N_1024QAM[180];
+      const static int group_tab_6_15N_1024QAM[180];
+      const static int group_tab_7_15N_1024QAM[180];
+      const static int group_tab_8_15N_1024QAM[180];
+      const static int group_tab_9_15N_1024QAM[180];
+      const static int group_tab_10_15N_1024QAM[180];
+      const static int group_tab_11_15N_1024QAM[180];
+      const static int group_tab_12_15N_1024QAM[180];
+      const static int group_tab_13_15N_1024QAM[180];
+
+      const static int group_tab_2_15N_4096QAM[180];
+      const static int group_tab_3_15N_4096QAM[180];
+      const static int group_tab_4_15N_4096QAM[180];
+      const static int group_tab_5_15N_4096QAM[180];
+      const static int group_tab_6_15N_4096QAM[180];
+      const static int group_tab_7_15N_4096QAM[180];
+      const static int group_tab_8_15N_4096QAM[180];
+      const static int group_tab_9_15N_4096QAM[180];
+      const static int group_tab_10_15N_4096QAM[180];
+      const static int group_tab_11_15N_4096QAM[180];
+      const static int group_tab_12_15N_4096QAM[180];
+      const static int group_tab_13_15N_4096QAM[180];
+
      public:
       interleaver_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation);
       ~interleaver_bb_impl();
