@@ -160,7 +160,8 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    constellation: MOD_256QAM
+    constellation1: MOD_256QAM
+    constellation2: MOD_QPSK
     cred: CRED_0
     fecmode: PLP_FEC_BCH
     fftsize: FFTSIZE_8K
@@ -230,7 +231,8 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    constellation: MOD_256QAM
+    constellation1: MOD_256QAM
+    constellation2: MOD_QPSK
     framesize: FECFRAME_NORMAL
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -265,7 +267,8 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    constellation: MOD_256QAM
+    constellation1: MOD_256QAM
+    constellation2: MOD_QPSK
     framesize: FECFRAME_NORMAL
     maxoutbuf: '0'
     minoutbuf: '0'
