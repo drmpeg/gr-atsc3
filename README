@@ -33,7 +33,7 @@ https://muygs2x2vhb2pjk6g160f1s8-wpengine.netdna-ssl.com/wp-content/uploads/2021
 
 The baseline implementation has been verified against the ATSC 3.0
 validation and verification suite. The current implementation only
-supports the convolutional time interleaver and Tranport Stream
+supports the convolutional time interleaver and Transport Stream
 input.
 
 A test flow graph is available in examples/vv031.grc. The parameters
@@ -59,11 +59,12 @@ Features not implemented:
 4) Multiple subframes per frame
 5) Time-aligned frames
 6) Channel bonding
-7) MISO
-8) MIMO
-9) PAPR reduction
-10) Transmitter Identification (TxID)
-11) IP packet input
+7) Time information
+8) MISO
+9) MIMO
+10) PAPR reduction
+12) Transmitter Identification (TxID)
+12) IP packet input
 
 Build instructions:
 
