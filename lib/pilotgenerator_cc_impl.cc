@@ -15,17 +15,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     pilotgenerator_cc::sptr
-    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, unsigned int vlength)
+    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<pilotgenerator_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, cred, vlength);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, paprmode, cred, vlength);
     }
 
 
     /*
      * The private constructor
      */
-    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, unsigned int vlength)
+    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, unsigned int vlength)
       : gr::block("pilotgenerator_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type) * vlength)),
@@ -40,14 +40,17 @@ namespace gr {
       int preamble_cells;
       int data_cells;
       int sbs_cells;
+      int papr_cells;
 
       fft_size = fftsize;
       pilot_pattern = pilotpattern;
+      papr_mode = paprmode;
       cred_coeff = cred;
       symbols = numpreamblesyms + numpayloadsyms;
       preamble_symbols = numpreamblesyms;
       switch (fftsize) {
         case FFTSIZE_8K:
+          papr_cells = 72;
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
@@ -206,6 +209,7 @@ namespace gr {
           }
           break;
         case FFTSIZE_16K:
+          papr_cells = 144;
           carriers = carriers_table[FFTSIZE_16K][cred];
           max_carriers = carriers_table[FFTSIZE_16K][0];
           preamble_carriers = carriers_table[FFTSIZE_16K][4];
@@ -396,6 +400,7 @@ namespace gr {
           }
           break;
         case FFTSIZE_32K:
+          papr_cells = 288;
           carriers = carriers_table[FFTSIZE_32K][cred];
           max_carriers = carriers_table[FFTSIZE_32K][0];
           preamble_carriers = carriers_table[FFTSIZE_32K][4];
@@ -614,6 +619,7 @@ namespace gr {
           }
           break;
         default:
+          papr_cells = 72;
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
@@ -869,11 +875,14 @@ namespace gr {
       cp_bpsk[0] = gr_complex(power, 0.0);
       cp_bpsk[1] = gr_complex(-(power), 0.0);
       init_prbs();
+      if (paprmode != PAPR_TR) {
+        papr_cells = 0;
+      }
       frame_symbols[0] = PREAMBLE_SYMBOL;
       total_preamble_cells = 0;
       for (int n = 1; n < numpreamblesyms; n++) {
         frame_symbols[n] = PREAMBLE_SYMBOL;
-        total_preamble_cells += preamble_cells;
+        total_preamble_cells += (preamble_cells - papr_cells);
       }
       if (firstsbs == TRUE) {
         frame_symbols[numpreamblesyms] = SBS_SYMBOL;
@@ -893,10 +902,10 @@ namespace gr {
       }
       init_pilots();
       if (firstsbs) {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * data_cells) + (sbs_cells * 2);
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
       }
       input_cells = totalcells;
       printf("input cells = %d\n", input_cells);
@@ -939,11 +948,12 @@ namespace gr {
     pilotgenerator_cc_impl::init_pilots()
     {
       for (int symbol = 0; symbol < symbols; ++symbol) {
-        int remainder, shift, index, preamblecarriers;
+        int remainder, shift, index, preamblecarriers, trshift;
         std::vector<int>& data_carrier_map = this->data_carrier_map[symbol];
         for (int i = 0; i < carriers; i++) {
           data_carrier_map[i] = DATA_CARRIER;
         }
+        trshift = dx * ((symbol - 1) % dy);
         switch (fft_size) {
           case FFTSIZE_8K:
             if (frame_symbols[symbol] == PREAMBLE_SYMBOL) {
@@ -969,6 +979,25 @@ namespace gr {
                   data_carrier_map[i] = PREAMBLE_CARRIER;
                 }
               }
+              if (symbol != 0 && papr_mode == PAPR_TR) {
+                index = 0;
+                if (dx == 3 || dx == 4 || dx == 8) {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_alt_table_8K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+                else {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_table_8K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+              }
             }
             else if (frame_symbols[symbol] == SBS_SYMBOL) {
               index = 0;
@@ -984,6 +1013,25 @@ namespace gr {
               for (int i = 0; i < carriers; i++) {
                 if ((i % dx) == 0) {
                   data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+              if (papr_mode == PAPR_TR) {
+                index = 0;
+                if (dx == 3 || dx == 4 || dx == 8) {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_alt_table_8K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+                else {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_table_8K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
                 }
               }
             }
@@ -1002,6 +1050,15 @@ namespace gr {
                 remainder = i % (dx * dy);
                 if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
                   data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+              if (papr_mode == PAPR_TR) {
+                index = 0;
+                for (int i = 0; i < max_carriers; i++) {
+                  if ((trpapr_table_8K[index] + trshift) == i) {
+                    data_carrier_map[i] = TRPAPR_CARRIER;
+                    index++;
+                  }
                 }
               }
             }
@@ -1121,6 +1178,25 @@ namespace gr {
                   data_carrier_map[i] = PREAMBLE_CARRIER;
                 }
               }
+              if (symbol != 0 && papr_mode == PAPR_TR) {
+                index = 0;
+                if (dx == 3 || dx == 4 || dx == 8) {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_alt_table_16K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+                else {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_table_16K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+              }
             }
             else if (frame_symbols[symbol] == SBS_SYMBOL) {
               index = 0;
@@ -1136,6 +1212,25 @@ namespace gr {
               for (int i = 0; i < carriers; i++) {
                 if ((i % dx) == 0) {
                   data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+              if (papr_mode == PAPR_TR) {
+                index = 0;
+                if (dx == 3 || dx == 4 || dx == 8) {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_alt_table_16K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+                else {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_table_16K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
                 }
               }
             }
@@ -1154,6 +1249,15 @@ namespace gr {
                 remainder = i % (dx * dy);
                 if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
                   data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+              if (papr_mode == PAPR_TR) {
+                index = 0;
+                for (int i = 0; i < max_carriers; i++) {
+                  if ((trpapr_table_16K[index] + trshift) == i) {
+                    data_carrier_map[i] = TRPAPR_CARRIER;
+                    index++;
+                  }
                 }
               }
             }
@@ -1255,6 +1359,25 @@ namespace gr {
                   data_carrier_map[i] = PREAMBLE_CARRIER;
                 }
               }
+              if (symbol != 0 && papr_mode == PAPR_TR) {
+                index = 0;
+                if (dx == 3 || dx == 4 || dx == 8) {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_alt_table_32K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+                else {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_table_32K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+              }
             }
             else if (frame_symbols[symbol] == SBS_SYMBOL) {
               index = 0;
@@ -1270,6 +1393,25 @@ namespace gr {
               for (int i = 0; i < carriers; i++) {
                 if ((i % dx) == 0) {
                   data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+              if (papr_mode == PAPR_TR) {
+                index = 0;
+                if (dx == 3 || dx == 4 || dx == 8) {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_alt_table_32K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
+                }
+                else {
+                  for (int i = 0; i < max_carriers; i++) {
+                    if ((trpapr_table_32K[index] + trshift) == i) {
+                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      index++;
+                    }
+                  }
                 }
               }
             }
@@ -1288,6 +1430,15 @@ namespace gr {
                 remainder = i % (dx * dy);
                 if (remainder == (dx * ((symbol - preamble_symbols) % dy))) {
                   data_carrier_map[i] = SCATTERED_CARRIER;
+                }
+              }
+              if (papr_mode == PAPR_TR) {
+                index = 0;
+                for (int i = 0; i < max_carriers; i++) {
+                  if ((trpapr_table_32K[index] + trshift) == i) {
+                    data_carrier_map[i] = TRPAPR_CARRIER;
+                    index++;
+                  }
                 }
               }
             }
@@ -1383,6 +1534,9 @@ namespace gr {
               else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
                 *out++ = cp_bpsk[prbs[n]];
               }
+              else if (data_carrier_map[j][n] == TRPAPR_CARRIER) {
+                *out++ = zero;
+              }
               else {
                 *out++ = in[indexin++];
               }
@@ -1404,6 +1558,9 @@ namespace gr {
               }
               else if (data_carrier_map[j][n] == CONTINUAL_CARRIER) {
                 *out++ = cp_bpsk[prbs[n]];
+              }
+              else if (data_carrier_map[j][n] == TRPAPR_CARRIER) {
+                *out++ = zero;
               }
               else {
                 *out++ = in[indexin++];
@@ -1577,8 +1734,9 @@ namespace gr {
       2318, 2566, 2666, 2750, 2894, 3010, 3214, 3250, 3622, 3686, 3886, 3962, 4082, 4166, 4394, 4558,
       4646, 4718, 5038, 5170, 5210, 5342, 5534, 5614, 5926, 5942, 6058, 6134, 6350, 6410, 6650, 6782,
       6934, 7154, 7330, 7438, 7666, 7742, 7802, 7894, 8146, 8258, 8470, 8494, 8650, 8722, 9022, 9118,
-      9254, 9422, 9650, 9670, 9814, 9902, 10102, 10166, 10454, 10598, 10778, 10822, 11062, 11138, 11254, 11318,
-      11666, 11758, 11810, 11974, 12106, 12242, 12394, 12502, 12706, 12866, 13126, 13190, 13274, 13466, 13618, 13666
+      9254, 9422, 9650, 9670, 9814, 9902, 10102, 10166, 10454, 10598, 10778, 10822, 11062, 11138,
+      11254, 11318, 11666, 11758, 11810, 11974, 12106, 12242, 12394, 12502, 12706, 12866, 13126, 13190,
+      13274, 13466, 13618, 13666
     };
 
     const int pilotgenerator_cc_impl::continual_pilot_table_32K[192] = {
@@ -1586,14 +1744,104 @@ namespace gr {
       2548, 2644, 2716, 2860, 3004, 3164, 3236, 3436, 3460, 3700, 3836, 4028, 4124, 4132, 4156, 4316,
       4636, 5012, 5132, 5140, 5332, 5372, 5500, 5524, 5788, 6004, 6020, 6092, 6428, 6452, 6500, 6740,
       7244, 7316, 7372, 7444, 7772, 7844, 7924, 8020, 8164, 8308, 8332, 8348, 8788, 8804, 9116, 9140,
-      9292, 9412, 9436, 9604, 10076, 10204, 10340, 10348, 10420, 10660, 10684, 10708, 11068, 11132, 11228, 11356,
-      11852, 11860, 11884, 12044, 12116, 12164, 12268, 12316, 12700, 12772, 12820, 12988, 13300, 13340, 13564, 13780,
-      13868, 14084, 14308, 14348, 14660, 14828, 14876, 14948, 15332, 15380, 15484, 15532, 15604, 15764, 15788, 15796,
-      16292, 16420, 16516, 16580, 16940, 16964, 16988, 17228, 17300, 17308, 17444, 17572, 18044, 18212, 18236, 18356,
-      18508, 18532, 18844, 18860, 19300, 19316, 19340, 19484, 19628, 19724, 19804, 19876, 20204, 20276, 20332, 20404,
-      20908, 21148, 21196, 21220, 21556, 21628, 21644, 21860, 22124, 22148, 22276, 22316, 22508, 22516, 22636, 23012,
-      23332, 23492, 23516, 23524, 23620, 23812, 23948, 24188, 24212, 24412, 24484, 24644, 24788, 24932, 25004, 25100,
-      25412, 25508, 25732, 25772, 26252, 26308, 26380, 26420, 26548, 26780, 26932, 26980, 27236, 27292, 27332, 27412
+      9292, 9412, 9436, 9604, 10076, 10204, 10340, 10348, 10420, 10660, 10684, 10708, 11068, 11132,
+      11228, 11356, 11852, 11860, 11884, 12044, 12116, 12164, 12268, 12316, 12700, 12772, 12820, 12988,
+      13300, 13340, 13564, 13780, 13868, 14084, 14308, 14348, 14660, 14828, 14876, 14948, 15332, 15380,
+      15484, 15532, 15604, 15764, 15788, 15796, 16292, 16420, 16516, 16580, 16940, 16964, 16988, 17228,
+      17300, 17308, 17444, 17572, 18044, 18212, 18236, 18356, 18508, 18532, 18844, 18860, 19300, 19316,
+      19340, 19484, 19628, 19724, 19804, 19876, 20204, 20276, 20332, 20404, 20908, 21148, 21196, 21220,
+      21556, 21628, 21644, 21860, 22124, 22148, 22276, 22316, 22508, 22516, 22636, 23012, 23332, 23492,
+      23516, 23524, 23620, 23812, 23948, 24188, 24212, 24412, 24484, 24644, 24788, 24932, 25004, 25100,
+      25412, 25508, 25732, 25772, 26252, 26308, 26380, 26420, 26548, 26780, 26932, 26980, 27236, 27292,
+      27332, 27412
+    };
+
+    const int pilotgenerator_cc_impl::trpapr_table_8K[72] = {
+      250, 386, 407, 550, 591, 717, 763, 787, 797, 839, 950, 1090, 1105, 1199, 1738, 1867,
+      1903, 1997, 2114, 2260, 2356, 2427, 2428, 2444, 2452, 2475, 2564, 2649, 2663, 2678, 2740, 2777,
+      2819, 2986, 3097, 3134, 3253, 3284, 3323, 3442, 3596, 3694, 3719, 3751, 3763, 3836, 4154, 4257,
+      4355, 4580, 4587, 4678, 4805, 5084, 5126, 5161, 5229, 5321, 5445, 5649, 5741, 5746, 5885, 5918,
+      6075, 6093, 6319, 6421, 6463, 6511, 6517, 6577
+    };
+
+    const int pilotgenerator_cc_impl::trpapr_table_16K[144] = {
+      421, 548, 589, 621, 644, 727, 770, 813, 857, 862, 1113, 1187, 1201, 1220, 1393, 1517,
+      1821, 1899, 1924, 2003, 2023, 2143, 2146, 2290, 2474, 2482, 2597, 2644, 2749, 2818, 2951, 3014,
+      3212, 3237, 3363, 3430, 3515, 3517, 3745, 3758, 4049, 4165, 4354, 4399, 4575, 4763, 4789, 4802,
+      4834, 4970, 5260, 5386, 5395, 5402, 5579, 5716, 5734, 5884, 5895, 6073, 6123, 6158, 6212, 6243,
+      6521, 6593, 6604, 6607, 6772, 6842, 6908, 6986, 7220, 7331, 7396, 7407, 7588, 7635, 7665, 7893,
+      7925, 7949, 8019, 8038, 8167, 8289, 8295, 8338, 8549, 8555, 8660, 8857, 8925, 9007, 9057, 9121,
+      9364, 9375, 9423, 9446, 9479, 9502, 9527, 9860, 9919, 9938, 10138, 10189, 10191, 10275, 10333,
+      10377, 10988, 11109, 11261, 11266, 11362, 11390, 11534, 11623, 11893, 11989, 12037, 12101, 12119,
+      12185, 12254, 12369, 12371, 12380, 12401, 12586, 12597, 12638, 12913, 12974, 13001, 13045, 13052,
+      13111, 13143, 13150, 13151, 13300
+    };
+
+    const int pilotgenerator_cc_impl::trpapr_table_32K[288] = {
+      803, 805, 811, 901, 1001, 1027, 1245, 1258, 1318, 1478, 1507, 1509, 1556, 1577, 1655, 1742,
+      1978, 2001, 2056, 2110, 2164, 2227, 2305, 2356, 2408, 2522, 2563, 2780, 2805, 2879, 3010, 3019,
+      3128, 3389, 3649, 3730, 3873, 4027, 4066, 4087, 4181, 4246, 4259, 4364, 4406, 4515, 4690, 4773,
+      4893, 4916, 4941, 4951, 4965, 5165, 5222, 5416, 5638, 5687, 5729, 5930, 5997, 6005, 6161, 6218,
+      6292, 6344, 6370, 6386, 6505, 6974, 7079, 7114, 7275, 7334, 7665, 7765, 7868, 7917, 7966, 8023,
+      8055, 8089, 8091, 8191, 8374, 8495, 8651, 8690, 8755, 8821, 9139, 9189, 9274, 9561, 9611, 9692,
+      9711, 9782, 9873, 9964, 10011, 10209, 10575, 10601, 10623, 10690, 10967, 11045, 11083, 11084,
+      11090, 11128, 11153, 11530, 11737, 11829, 11903, 11907, 11930, 11942, 12356, 12429, 12484, 12547,
+      12562, 12605, 12767, 12863, 13019, 13052, 13053, 13167, 13210, 13244, 13259, 13342, 13370, 13384,
+      13447, 13694, 13918, 14002, 14077, 14111, 14216, 14243, 14270, 14450, 14451, 14456, 14479, 14653,
+      14692, 14827, 14865, 14871, 14908, 15215, 15227, 15284, 15313, 15333, 15537, 15643, 15754, 15789,
+      16065, 16209, 16213, 16217, 16259, 16367, 16369, 16646, 16780, 16906, 16946, 17012, 17167, 17192,
+      17325, 17414, 17629, 17687, 17746, 17788, 17833, 17885, 17913, 18067, 18089, 18316, 18337, 18370,
+      18376, 18440, 18550, 18680, 18910, 18937, 19047, 19052, 19117, 19383, 19396, 19496, 19601, 19778,
+      19797, 20038, 20357, 20379, 20455, 20669, 20707, 20708, 20751, 20846, 20853, 20906, 21051, 21079,
+      21213, 21267, 21308, 21355, 21523, 21574, 21815, 21893, 21973, 22084, 22172, 22271, 22713, 22905,
+      23039, 23195, 23303, 23635, 23732, 23749, 23799, 23885, 23944, 24149, 24311, 24379, 24471, 24553,
+      24585, 24611, 24616, 24621, 24761, 24789, 24844, 24847, 24977, 25015, 25160, 25207, 25283, 25351,
+      25363, 25394, 25540, 25603, 25647, 25747, 25768, 25915, 25928, 26071, 26092, 26139, 26180, 26209,
+      26270, 26273, 26278, 26326, 26341, 26392, 26559, 26642, 26776, 26842
+    };
+
+    const int pilotgenerator_cc_impl::trpapr_alt_table_8K[72] = {
+      295, 329, 347, 365, 463, 473, 481, 553, 578, 602, 742, 749, 829, 922, 941, 1115,
+      1123, 1174, 1363, 1394, 1402, 1615, 1657, 1702, 1898, 1910, 1997, 2399, 2506, 2522, 2687, 2735,
+      3043, 3295, 3389, 3454, 3557, 3647, 3719, 3793, 3794, 3874, 3898, 3970, 4054, 4450, 4609, 4666,
+      4829, 4855, 4879, 4961, 4969, 5171, 5182, 5242, 5393, 5545, 5567, 5618, 5630, 5734, 5861, 5897,
+      5987, 5989, 6002, 6062, 6074, 6205, 6334, 6497
+    };
+
+    const int pilotgenerator_cc_impl::trpapr_alt_table_16K[144] = {
+      509, 739, 770, 890, 970, 989, 1031, 1033, 1121, 1223, 1231, 1285, 1526, 1559, 1603, 1615,
+      1690, 1771, 1903, 1910, 1958, 2033, 2146, 2225, 2302, 2306, 2345, 2447, 2477, 2561, 2578, 2597,
+      2635, 2654, 2687, 2891, 2938, 3029, 3271, 3479, 3667, 3713, 3791, 3977, 4067, 4150, 4217, 4387,
+      4501, 4541, 4657, 4733, 4742, 4963, 5011, 5149, 5311, 5362, 5491, 5531, 5609, 5722, 5747, 5798,
+      5842, 5881, 5959, 5983, 6059, 6166, 6178, 6214, 6230, 6382, 6557, 6625, 6811, 6881, 6994, 7261,
+      7535, 7546, 7711, 7897, 7898, 7918, 7997, 8125, 8398, 8483, 8530, 8686, 8731, 8855, 9001, 9026,
+      9110, 9206, 9223, 9325, 9466, 9493, 9890, 9893, 10537, 10570, 10691, 10835, 10837, 11098, 11126,
+      11146, 11198, 11270, 11393, 11629, 11657, 11795, 11867, 11909, 11983, 12046, 12107, 12119, 12353,
+      12482, 12569, 12575, 12662, 12691, 12739, 12787, 12902, 12917, 12985, 13010, 13022, 13073, 13102,
+      13141, 13159, 13225, 13255, 13303
+    };
+
+    const int pilotgenerator_cc_impl::trpapr_alt_table_32K[288] = {
+      793, 884, 899, 914, 1004, 1183, 1198, 1276, 1300, 1339, 1348, 1444, 1487, 1490, 1766, 1870,
+      1903, 1909, 1961, 2053, 2092, 2099, 2431, 2572, 2578, 2618, 2719, 2725, 2746, 2777, 2798, 2891,
+      2966, 2972, 3023, 3037, 3076, 3257, 3284, 3326, 3389, 3425, 3454, 3523, 3602, 3826, 3838, 3875,
+      3955, 4094, 4126, 4261, 4349, 4357, 4451, 4646, 4655, 4913, 5075, 5083, 5306, 5317, 5587, 5821,
+      6038, 6053, 6062, 6137, 6268, 6286, 6490, 6517, 6529, 6554, 6593, 6671, 6751, 6827, 6845, 7043,
+      7111, 7147, 7196, 7393, 7451, 7475, 7517, 7750, 7769, 7780, 8023, 8081, 8263, 8290, 8425, 8492,
+      8939, 8986, 9113, 9271, 9298, 9343, 9455, 9476, 9637, 9821, 9829, 9913, 9953, 9988, 10001, 10007,
+      10018, 10082, 10172, 10421, 10553, 10582, 10622, 10678, 10843, 10885, 10901, 11404, 11674, 11959,
+      12007, 12199, 12227, 12290, 12301, 12629, 12631, 12658, 12739, 12866, 12977, 13121, 13294, 13843,
+      13849, 13852, 13933, 14134, 14317, 14335, 14342, 14407, 14651, 14758, 14815, 14833, 14999, 15046,
+      15097, 15158, 15383, 15503, 15727, 15881, 16139, 16238, 16277, 16331, 16444, 16490, 16747, 16870,
+      16981, 17641, 17710, 17714, 17845, 18011, 18046, 18086, 18097, 18283, 18334, 18364, 18431, 18497,
+      18527, 18604, 18686, 18709, 18731, 18740, 18749, 18772, 18893, 19045, 19075, 19087, 19091, 19099,
+      19127, 19169, 19259, 19427, 19433, 19450, 19517, 19526, 19610, 19807, 19843, 19891, 20062, 20159,
+      20246, 20420, 20516, 20530, 20686, 20801, 20870, 20974, 21131, 21158, 21565, 21635, 21785, 21820,
+      21914, 21926, 22046, 22375, 22406, 22601, 22679, 22699, 22772, 22819, 22847, 22900, 22982, 22987,
+      23063, 23254, 23335, 23357, 23561, 23590, 23711, 23753, 23902, 24037, 24085, 24101, 24115, 24167,
+      24182, 24361, 24374, 24421, 24427, 24458, 24463, 24706, 24748, 24941, 25079, 25127, 25195, 25285,
+      25444, 25492, 25505, 25667, 25682, 25729, 25741, 25765, 25973, 26171, 26180, 26227, 26353, 26381,
+      26542, 26603, 26651, 26671, 26759, 26804, 26807, 26827
     };
 
     const int pilotgenerator_cc_impl::preamble_cells_table[32][5] = {

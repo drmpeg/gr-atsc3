@@ -13,6 +13,7 @@ templates:
           ${pilotpattern.val},
           ${firstsbs.val},
           ${mode.val},
+          ${paprmode.val},
           ${cred.val})
 
 parameters:
@@ -59,6 +60,13 @@ parameters:
     option_labels: [Preamble Only, All Symbols]
     option_attributes:
         val: [atsc3.FREQ_PREAMBLE_ONLY, atsc3.FREQ_ALL_SYMBOLS]
+-   id: paprmode
+    label: PAPR mode
+    dtype: enum
+    options: [PAPR_OFF, PAPR_TR]
+    option_labels: [Disabled, Tone Reservation]
+    option_attributes:
+        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 -   id: cred
     label: Reduced Carriers
     dtype: enum

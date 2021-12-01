@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     freqinterleaver_cc::sptr
-    freqinterleaver_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred)
+    freqinterleaver_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred)
     {
       return gnuradio::make_block_sptr<freqinterleaver_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, firstsbs, mode, cred);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, firstsbs, mode, paprmode, cred);
     }
 
 
     /*
      * The private constructor
      */
-    freqinterleaver_cc_impl::freqinterleaver_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred)
+    freqinterleaver_cc_impl::freqinterleaver_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred)
       : gr::sync_block("freqinterleaver_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -34,6 +34,7 @@ namespace gr {
       int preamble_cells;
       int data_cells;
       int sbs_cells;
+      int papr_cells;
       int maxstates;
 
       fft_size = fftsize;
@@ -42,6 +43,7 @@ namespace gr {
       switch (fftsize) {
         case FFTSIZE_8K:
           maxstates = 8192;
+          papr_cells = 72;
           switch (guardinterval) {
             case GI_1_192:
               first_preamble_cells = preamble_cells_table[0][4];
@@ -149,6 +151,7 @@ namespace gr {
           break;
         case FFTSIZE_16K:
           maxstates = 16384;
+          papr_cells = 144;
           switch (guardinterval) {
             case GI_1_192:
               first_preamble_cells = preamble_cells_table[7][4];
@@ -272,6 +275,7 @@ namespace gr {
           break;
         case FFTSIZE_32K:
           maxstates = 32768;
+          papr_cells = 288;
           switch (guardinterval) {
             case GI_1_192:
               first_preamble_cells = preamble_cells_table[18][4];
@@ -411,6 +415,7 @@ namespace gr {
           break;
         default:
           maxstates = 8192;
+          papr_cells = 72;
           switch (guardinterval) {
             case GI_1_192:
               first_preamble_cells = preamble_cells_table[0][4];
@@ -517,11 +522,12 @@ namespace gr {
           }
           break;
       }
+      if (paprmode != PAPR_TR) {
+        papr_cells = 0;
+      }
       frame_symbols[0] = PREAMBLE_SYMBOL;
-      total_preamble_cells = 0;
       for (int n = 1; n < numpreamblesyms; n++) {
         frame_symbols[n] = PREAMBLE_SYMBOL;
-        total_preamble_cells += preamble_cells;
       }
       if (firstsbs == TRUE) {
         frame_symbols[numpreamblesyms] = SBS_SYMBOL;
@@ -539,21 +545,21 @@ namespace gr {
       frame_cells[0] = first_preamble_cells;
       total_preamble_cells = 0;
       for (int n = 1; n < numpreamblesyms; n++) {
-        frame_cells[n] = preamble_cells;
-        total_preamble_cells += preamble_cells;
+        frame_cells[n] = (preamble_cells - papr_cells);
+        total_preamble_cells += (preamble_cells - papr_cells);
       }
       if (firstsbs == TRUE) {
         frame_cells[numpreamblesyms] = sbs_cells;
         for (int n = 0; n < numpayloadsyms; n++) {
-          frame_cells[n + numpreamblesyms + 1] = data_cells;
+          frame_cells[n + numpreamblesyms + 1] = (data_cells - papr_cells);
         }
       }
       else {
         for (int n = 0; n < numpayloadsyms; n++) {
-          frame_cells[n + numpreamblesyms] = data_cells;
+          frame_cells[n + numpreamblesyms] = (data_cells - papr_cells);
         }
       }
-      frame_cells[numpreamblesyms + numpayloadsyms - 1] = sbs_cells;
+      frame_cells[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
 
       HevenFP.resize(symbols);
       HoddFP.resize(symbols);
@@ -573,13 +579,13 @@ namespace gr {
         Heven[i].resize(maxstates);
         Hodd[i].resize(maxstates);
       }
-      init_address(first_preamble_cells, preamble_cells, sbs_cells, data_cells);
+      init_address(first_preamble_cells, preamble_cells - papr_cells, sbs_cells - papr_cells, data_cells - papr_cells);
 
       if (firstsbs) {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * data_cells) + (sbs_cells * 2);
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
       }
       output_cells = totalcells;
       printf("output cells = %d\n", totalcells);

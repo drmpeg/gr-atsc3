@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, fecmode, cred, l1bmode, l1dmode);
+        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, fecmode, paprmode, cred, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -40,6 +40,7 @@ namespace gr {
       int data_cells;
       int sbs_cells;
       int sbs_data_cells;
+      int papr_cells;
       int depth;
       int randombits, randomindex;
 
@@ -156,7 +157,7 @@ namespace gr {
       l1basicinit->lls_flag = FALSE;
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
-      l1basicinit->papr_reduction = PAPR_OFF;
+      l1basicinit->papr_reduction = paprmode;
       l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0; /* always 0 */
@@ -297,6 +298,7 @@ namespace gr {
       switch (fftsize) {
         case FFTSIZE_8K:
           fftsamples = 8192;
+          papr_cells = 72;
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -429,6 +431,7 @@ namespace gr {
           break;
         case FFTSIZE_16K:
           fftsamples = 16384;
+          papr_cells = 144;
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -581,6 +584,7 @@ namespace gr {
           break;
         case FFTSIZE_32K:
           fftsamples = 32768;
+          papr_cells = 288;
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -750,6 +754,7 @@ namespace gr {
           break;
         default:
           fftsamples = 8192;
+          papr_cells = 72;
           switch (guardinterval) {
             case GI_1_192:
               gisamples = 192;
@@ -881,33 +886,36 @@ namespace gr {
           }
           break;
       }
+      if (paprmode != PAPR_TR) {
+        papr_cells = 0;
+      }
       frame_samples = ((fftsamples + gisamples) * (numpayloadsyms + numpreamblesyms)) + BOOTSTRAP_SAMPLES;
       frame_symbols[0] = first_preamble_cells;
       total_preamble_cells = 0;
       for (int n = 1; n < numpreamblesyms; n++) {
-        frame_symbols[n] = preamble_cells;
-        total_preamble_cells += preamble_cells;
+        frame_symbols[n] = (preamble_cells - papr_cells);
+        total_preamble_cells += (preamble_cells - papr_cells);
       }
       if (l1basicinit->first_sub_sbs_first == SBS_ON) {
-        frame_symbols[numpreamblesyms] = sbs_cells;
+        frame_symbols[numpreamblesyms] = (sbs_cells - papr_cells);
         for (int n = 0; n < numpayloadsyms - 2; n++) {
-          frame_symbols[n + numpreamblesyms + 1] = data_cells;
+          frame_symbols[n + numpreamblesyms + 1] = (data_cells - papr_cells);
         }
       }
       else {
         for (int n = 0; n < numpayloadsyms - 1; n++) {
-          frame_symbols[n + numpreamblesyms] = data_cells;
+          frame_symbols[n + numpreamblesyms] = (data_cells - papr_cells);
         }
       }
-      frame_symbols[numpreamblesyms + numpayloadsyms - 1] = sbs_cells;
+      frame_symbols[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
       if (firstsbs) {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * data_cells) + (sbs_cells * 2);
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * data_cells) + sbs_cells;
+        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
       }
       total_cells = totalcells;
-      l1detailinit->sbs_null_cells = sbsnullcells = sbs_cells - sbs_data_cells;
+      l1detailinit->sbs_null_cells = sbsnullcells = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("total cells = %d\n", totalcells);
       printf("SBS null cells = %d\n", sbsnullcells);
       if (firstsbs) {

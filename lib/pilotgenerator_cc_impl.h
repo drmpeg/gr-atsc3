@@ -19,7 +19,8 @@ enum atsc3_carrier_type_t {
     DATA_CARRIER = 1,
     PREAMBLE_CARRIER,
     SCATTERED_CARRIER,
-    CONTINUAL_CARRIER
+    CONTINUAL_CARRIER,
+    TRPAPR_CARRIER
 };
 
 enum atsc3_symbol_type_t {
@@ -36,6 +37,7 @@ namespace gr {
      private:
       int fft_size;
       int pilot_pattern;
+      int papr_mode;
       int cred_coeff;
       int symbols;
       int carriers;
@@ -72,6 +74,12 @@ namespace gr {
       const static int continual_pilot_table_8K[48];
       const static int continual_pilot_table_16K[96];
       const static int continual_pilot_table_32K[192];
+      const static int trpapr_table_8K[72];
+      const static int trpapr_table_16K[144];
+      const static int trpapr_table_32K[288];
+      const static int trpapr_alt_table_8K[72];
+      const static int trpapr_alt_table_16K[144];
+      const static int trpapr_alt_table_32K[288];
       const static int preamble_cells_table[32][5];
       const static int data_cells_table_8K[16][5];
       const static int data_cells_table_16K[16][5];
@@ -81,7 +89,7 @@ namespace gr {
       const static int sbs_cells_table_32K[16][5];
 
      public:
-      pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, unsigned int vlength);
+      pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, unsigned int vlength);
       ~pilotgenerator_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
