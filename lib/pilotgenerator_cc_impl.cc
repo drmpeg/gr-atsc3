@@ -953,7 +953,10 @@ namespace gr {
         for (int i = 0; i < carriers; i++) {
           data_carrier_map[i] = DATA_CARRIER;
         }
-        trshift = dx * ((symbol - 1) % dy);
+        trshift = dx * ((symbol - (preamble_symbols - 2)) % dy);
+        if (frame_symbols[symbol] == SBS_SYMBOL || frame_symbols[symbol] == PREAMBLE_SYMBOL) {
+          trshift = 0;
+        }
         switch (fft_size) {
           case FFTSIZE_8K:
             if (frame_symbols[symbol] == PREAMBLE_SYMBOL) {
@@ -984,7 +987,9 @@ namespace gr {
                 if (dx == 3 || dx == 4 || dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_8K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_alt_table_8K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -992,7 +997,9 @@ namespace gr {
                 else {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_table_8K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_table_8K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1020,7 +1027,9 @@ namespace gr {
                 if (dx == 3 || dx == 4 || dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_8K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_alt_table_8K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1028,7 +1037,9 @@ namespace gr {
                 else {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_table_8K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_table_8K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1056,7 +1067,9 @@ namespace gr {
                 index = 0;
                 for (int i = 0; i < max_carriers; i++) {
                   if ((trpapr_table_8K[index] + trshift) == i) {
-                    data_carrier_map[i] = TRPAPR_CARRIER;
+                    if ((trpapr_table_8K[index] + trshift) > shift) {
+                      data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                    }
                     index++;
                   }
                 }
@@ -1183,7 +1196,9 @@ namespace gr {
                 if (dx == 3 || dx == 4 || dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_16K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_alt_table_16K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1191,7 +1206,9 @@ namespace gr {
                 else {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_table_16K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_table_16K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1219,7 +1236,9 @@ namespace gr {
                 if (dx == 3 || dx == 4 || dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_16K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_alt_table_16K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1227,7 +1246,9 @@ namespace gr {
                 else {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_table_16K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_table_16K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1255,7 +1276,9 @@ namespace gr {
                 index = 0;
                 for (int i = 0; i < max_carriers; i++) {
                   if ((trpapr_table_16K[index] + trshift) == i) {
-                    data_carrier_map[i] = TRPAPR_CARRIER;
+                    if ((trpapr_table_16K[index] + trshift) > shift) {
+                      data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                    }
                     index++;
                   }
                 }
@@ -1364,7 +1387,9 @@ namespace gr {
                 if (dx == 3 || dx == 4 || dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_32K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_alt_table_32K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1372,7 +1397,9 @@ namespace gr {
                 else {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_table_32K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_table_32K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1400,7 +1427,9 @@ namespace gr {
                 if (dx == 3 || dx == 4 || dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_32K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_alt_table_32K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1408,7 +1437,9 @@ namespace gr {
                 else {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_table_32K[index] + trshift) == i) {
-                      data_carrier_map[i] = TRPAPR_CARRIER;
+                      if ((trpapr_table_32K[index] + trshift) > shift) {
+                        data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                      }
                       index++;
                     }
                   }
@@ -1436,7 +1467,9 @@ namespace gr {
                 index = 0;
                 for (int i = 0; i < max_carriers; i++) {
                   if ((trpapr_table_32K[index] + trshift) == i) {
-                    data_carrier_map[i] = TRPAPR_CARRIER;
+                    if ((trpapr_table_32K[index] + trshift) > shift) {
+                      data_carrier_map[i - shift] = TRPAPR_CARRIER;
+                    }
                     index++;
                   }
                 }
