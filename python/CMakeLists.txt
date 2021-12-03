@@ -41,3 +41,4 @@ GR_ADD_TEST(qa_pilotgenerator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR
 GR_ADD_TEST(qa_freqinterleaver_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_freqinterleaver_cc.py)
 GR_ADD_TEST(qa_bootstrap_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_bootstrap_cc.py)
 GR_ADD_TEST(qa_alpbbheader_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_alpbbheader_bb.py)
+GR_ADD_TEST(qa_paprtr_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_paprtr_cc.py)

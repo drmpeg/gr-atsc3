@@ -21,5 +21,6 @@ install(FILES
     pilotgenerator_cc.h
     freqinterleaver_cc.h
     bootstrap_cc.h
-    alpbbheader_bb.h DESTINATION include/atsc3
+    alpbbheader_bb.h
+    paprtr_cc.h DESTINATION include/atsc3
 )

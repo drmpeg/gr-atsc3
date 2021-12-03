@@ -1,0 +1,84 @@
+id: atsc3_paprtr_cc
+label: ATSC3.0 Tone Reservation PAPR
+category: '[ATSC3.0]'
+
+templates:
+  imports: import atsc3
+  make: |-
+      atsc3.paprtr_cc(
+          ${fftsize.val},
+          ${numpayloadsyms},
+          ${numpreamblesyms},
+          ${pilotpattern.val},
+          ${firstsbs.val},
+          ${paprmode.val},
+          ${cred.val},
+          ${vclip},
+          ${iterations},
+          ${fftsize.vlength})
+
+parameters:
+-   id: fftsize
+    label: FFT Size
+    dtype: enum
+    options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
+    option_labels: [8K, 16K, 32K]
+    option_attributes:
+        val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
+        vlength: [8192, 16384, 32768]
+-   id: numpayloadsyms
+    label: Number of Payload Symbols
+    dtype: int
+    default: '72'
+-   id: numpreamblesyms
+    label: Number of Preamble Symbols
+    dtype: int
+    default: '2'
+-   id: pilotpattern
+    label: Pilot Pattern
+    dtype: enum
+    options: [PILOT_SP3_2, PILOT_SP3_4, PILOT_SP4_2, PILOT_SP4_4, PILOT_SP6_2, PILOT_SP6_4, PILOT_SP8_2, PILOT_SP8_4, PILOT_SP12_2, PILOT_SP12_4, PILOT_SP16_2, PILOT_SP16_4, PILOT_SP24_2, PILOT_SP24_4, PILOT_SP32_2, PILOT_SP32_4]
+    option_labels: [SP3_2, SP3_4, SP4_2, SP4_4, SP6_2, SP6_4, SP8_2, SP8_4, SP12_2, SP12_4, SP16_2, SP16_4, SP24_2, SP24_4, SP32_2, SP32_4]
+    option_attributes:
+        val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
+-   id: firstsbs
+    label: First SBS insertion
+    dtype: enum
+    options: [SBS_OFF]
+    option_labels: [Disabled]
+    option_attributes:
+        val: [atsc3.SBS_OFF]
+-   id: paprmode
+    label: PAPR mode
+    dtype: enum
+    options: [PAPR_OFF, PAPR_TR]
+    option_labels: [Disabled, Tone Reservation]
+    option_attributes:
+        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
+-   id: cred
+    label: Reduced Carriers
+    dtype: enum
+    options: [CRED_0, CRED_1, CRED_2, CRED_3, CRED_4]
+    option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
+    option_attributes:
+        val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: vclip
+    label: Vclip
+    dtype: float
+    default: '3.3'
+-   id: iterations
+    label: Iterations
+    dtype: int
+    default: '10'
+
+inputs:
+-   domain: stream
+    dtype: complex
+    vlen: ${fftsize.vlength}
+
+outputs:
+-   domain: stream
+    dtype: complex
+    vlen: ${fftsize.vlength}
+
+file_format: 1

@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(bootstrap_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(6b5593a660af3675e69d8574929d2e71)                     */
+/* BINDTOOL_HEADER_FILE(paprtr_cc.h)                                        */
+/* BINDTOOL_HEADER_FILE_HASH(030f7f489d443fa0dbf3a82c06cc7499)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -23,31 +23,31 @@
 
 namespace py = pybind11;
 
-#include <atsc3/bootstrap_cc.h>
+#include <atsc3/paprtr_cc.h>
 // pydoc.h is automatically generated in the build directory
-#include <bootstrap_cc_pydoc.h>
+#include <paprtr_cc_pydoc.h>
 
-void bind_bootstrap_cc(py::module& m)
+void bind_paprtr_cc(py::module& m)
 {
 
-    using bootstrap_cc    = ::gr::atsc3::bootstrap_cc;
+    using paprtr_cc    = ::gr::atsc3::paprtr_cc;
 
 
-    py::class_<bootstrap_cc, gr::block, gr::basic_block,
-        std::shared_ptr<bootstrap_cc>>(m, "bootstrap_cc", D(bootstrap_cc))
+    py::class_<paprtr_cc, gr::sync_block, gr::block, gr::basic_block,
+        std::shared_ptr<paprtr_cc>>(m, "paprtr_cc", D(paprtr_cc))
 
-        .def(py::init(&bootstrap_cc::make),
+        .def(py::init(&paprtr_cc::make),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),
-           py::arg("guardinterval"),
            py::arg("pilotpattern"),
-           py::arg("frameinterval"),
-           py::arg("l1bmode"),
-           py::arg("outputmode"),
-           py::arg("showlevels"),
+           py::arg("firstsbs"),
+           py::arg("paprmode"),
+           py::arg("cred"),
            py::arg("vclip"),
-           D(bootstrap_cc,make)
+           py::arg("iterations"),
+           py::arg("vlength"),
+           D(paprtr_cc,make)
         )
         
 

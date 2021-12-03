@@ -4,7 +4,7 @@ category: '[ATSC3.0]'
 
 templates:
   imports: import atsc3
-  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${pilotpattern.val}, ${frameinterval.val}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val})
+  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${pilotpattern.val}, ${frameinterval.val}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val}, ${vclip})
 
 parameters:
 -   id: fftsize
@@ -58,14 +58,19 @@ parameters:
     option_labels: ['Validation', 'Interpolation']
     option_attributes:
         val: [atsc3.BOOTSTRAP_VALIDATION, atsc3.BOOTSTRAP_INTERPOLATION]
-
 -   id: showlevels
     label: Show Peak IQ Levels
     dtype: enum
     options: [SHOWLEVELS_OFF, SHOWLEVELS_ON]
     option_labels: ['Off', 'On']
     option_attributes:
+        hide_vclip: [all, none]
         val: [atsc3.SHOWLEVELS_OFF, atsc3.SHOWLEVELS_ON]
+-   id: vclip
+    label: Vclip
+    dtype: float
+    default: '3.3'
+    hide: ${ showlevels.hide_vclip }
 
 inputs:
 -   domain: stream

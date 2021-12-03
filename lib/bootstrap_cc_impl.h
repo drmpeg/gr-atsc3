@@ -29,6 +29,8 @@ namespace gr {
     class bootstrap_cc_impl : public bootstrap_cc
     {
      private:
+      int symbol_size;
+      int guard_interval;
       int frame_items;
       int insertion_items;
       int pnseq[ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2)];
@@ -71,7 +73,7 @@ namespace gr {
       fft::fft_complex_rev bootstrap_fft;
 
      public:
-      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels);
+      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip);
       ~bootstrap_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

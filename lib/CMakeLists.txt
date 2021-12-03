@@ -22,6 +22,7 @@ list(APPEND atsc3_sources
     freqinterleaver_cc_impl.cc
     bootstrap_cc_impl.cc
     alpbbheader_bb_impl.cc
+    paprtr_cc_impl.cc
 )
 
 set(atsc3_sources "${atsc3_sources}" PARENT_SCOPE)

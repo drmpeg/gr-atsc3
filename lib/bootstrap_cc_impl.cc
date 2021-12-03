@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     bootstrap_cc::sptr
-    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels)
+    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
     {
       return gnuradio::make_block_sptr<bootstrap_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, l1bmode, outputmode, showlevels);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, l1bmode, outputmode, showlevels, vclip);
     }
 
 
     /*
      * The private constructor
      */
-    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels)
+    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
       : gr::block("bootstrap_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -36,10 +36,10 @@ namespace gr {
         real_negative(0.0),
         imag_positive(0.0),
         imag_negative(0.0),
-        real_positive_threshold(1.0),
-        real_negative_threshold(-1.0),
-        imag_positive_threshold(1.0),
-        imag_negative_threshold(-1.0),
+        real_positive_threshold(vclip),
+        real_negative_threshold(-vclip),
+        imag_positive_threshold(vclip),
+        imag_negative_threshold(-vclip),
         real_positive_threshold_count(0),
         real_negative_threshold_count(0),
         imag_positive_threshold_count(0),
@@ -47,8 +47,6 @@ namespace gr {
         bootstrap_fft(BOOTSTRAP_FFT_SIZE, 1)
     {
       int symbols;
-      int symbol_size;
-      int guard_interval;
       int bootstrap_fft_size = BOOTSTRAP_FFT_SIZE;
       int zcindex, pnindex;
       int reverse;
@@ -1385,6 +1383,7 @@ namespace gr {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       gr_complex* level;
+      int skipped_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation()) / decimation()) + (symbol_size + guard_interval);
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
         level = out;
@@ -1398,7 +1397,7 @@ namespace gr {
         }
         memcpy(out, in, sizeof(gr_complex) * frame_items);
         if (show_levels == SHOWLEVELS_ON) {
-          for (int j = 0; j < insertion_items; j++) {
+          for (int j = skipped_items; j < insertion_items; j++) {
             if (level[j].real() > real_positive) {
               real_positive = level[j].real();
             }

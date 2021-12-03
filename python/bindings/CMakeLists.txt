@@ -39,7 +39,8 @@ list(APPEND atsc3_python_files
     pilotgenerator_cc_python.cc
     freqinterleaver_cc_python.cc
     bootstrap_cc_python.cc
-    alpbbheader_bb_python.cc python_bindings.cc)
+    alpbbheader_bb_python.cc
+    paprtr_cc_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(atsc3
    ../..

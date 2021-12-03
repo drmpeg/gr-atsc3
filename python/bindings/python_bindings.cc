@@ -32,6 +32,7 @@ namespace py = pybind11;
     void bind_freqinterleaver_cc(py::module& m);
     void bind_bootstrap_cc(py::module& m);
     void bind_alpbbheader_bb(py::module& m);
+    void bind_paprtr_cc(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -71,5 +72,6 @@ PYBIND11_MODULE(atsc3_python, m)
     bind_freqinterleaver_cc(m);
     bind_bootstrap_cc(m);
     bind_alpbbheader_bb(m);
+    bind_paprtr_cc(m);
     // ) END BINDING_FUNCTION_CALLS
 }
