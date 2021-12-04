@@ -1078,56 +1078,55 @@ namespace gr {
             if ((frame_symbols[symbol] == SBS_SYMBOL) || (frame_symbols[symbol] == DATA_SYMBOL)) {
               data_carrier_map[0] = SCATTERED_CARRIER;
               data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
-              shift = 0;
               switch (pilot_pattern) {
                 case PILOT_SP3_2:
-                  data_carrier_map[1731 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1731] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP3_4:
-                  data_carrier_map[1731 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[2886 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5733 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1731] = SCATTERED_CARRIER;
+                  data_carrier_map[2886] = SCATTERED_CARRIER;
+                  data_carrier_map[5733] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP4_2:
-                  data_carrier_map[1732 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1732] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP4_4:
-                  data_carrier_map[1732 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[2888 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5724 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1732] = SCATTERED_CARRIER;
+                  data_carrier_map[2888] = SCATTERED_CARRIER;
+                  data_carrier_map[5724] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP6_2:
-                  data_carrier_map[1734 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1734] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP6_4:
-                  data_carrier_map[1734 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[2892 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5730 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1734] = SCATTERED_CARRIER;
+                  data_carrier_map[2892] = SCATTERED_CARRIER;
+                  data_carrier_map[5730] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP8_2:
-                  data_carrier_map[1736 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1736] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP8_4:
-                  data_carrier_map[1736 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[2896 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5720 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1736] = SCATTERED_CARRIER;
+                  data_carrier_map[2896] = SCATTERED_CARRIER;
+                  data_carrier_map[5720] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP12_2:
-                  data_carrier_map[1740 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1740] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP12_4:
-                  data_carrier_map[1740 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[2904 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5748 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1740] = SCATTERED_CARRIER;
+                  data_carrier_map[2904] = SCATTERED_CARRIER;
+                  data_carrier_map[5748] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP16_2:
-                  data_carrier_map[1744 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1744] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP16_4:
-                  data_carrier_map[1744 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1744] = SCATTERED_CARRIER;
                   if ((cred_coeff & 0x1) == 0) {
-                    data_carrier_map[2912 - shift] = SCATTERED_CARRIER;
-                    data_carrier_map[5744 - shift] = SCATTERED_CARRIER;
+                    data_carrier_map[2912] = SCATTERED_CARRIER;
+                    data_carrier_map[5744] = SCATTERED_CARRIER;
                   }
                   break;
                 case PILOT_SP24_2:
@@ -1135,28 +1134,28 @@ namespace gr {
                 case PILOT_SP24_4:
                   break;
                 case PILOT_SP32_2:
-                  data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[1696] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP32_4:
                   switch (cred_coeff) {
                     case CRED_0:
-                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
-                      data_carrier_map[2880 - shift] = SCATTERED_CARRIER;
-                      data_carrier_map[5728 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[1696] = SCATTERED_CARRIER;
+                      data_carrier_map[2880] = SCATTERED_CARRIER;
+                      data_carrier_map[5728] = SCATTERED_CARRIER;
                       break;
                     case CRED_1:
                       break;
                     case CRED_2:
-                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[1696] = SCATTERED_CARRIER;
                       break;
                     case CRED_3:
-                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
-                      data_carrier_map[2880 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[1696] = SCATTERED_CARRIER;
+                      data_carrier_map[2880] = SCATTERED_CARRIER;
                       break;
                     case CRED_4:
-                      data_carrier_map[1696 - shift] = SCATTERED_CARRIER;
-                      data_carrier_map[2880 - shift] = SCATTERED_CARRIER;
-                      data_carrier_map[5728 - shift] = SCATTERED_CARRIER;
+                      data_carrier_map[1696] = SCATTERED_CARRIER;
+                      data_carrier_map[2880] = SCATTERED_CARRIER;
+                      data_carrier_map[5728] = SCATTERED_CARRIER;
                       break;
                     default:
                       break;
@@ -1287,71 +1286,70 @@ namespace gr {
             if ((frame_symbols[symbol] == SBS_SYMBOL) || (frame_symbols[symbol] == DATA_SYMBOL)) {
               data_carrier_map[0] = SCATTERED_CARRIER;
               data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
-              shift = 0;
               switch (pilot_pattern) {
                 case PILOT_SP3_2:
-                  data_carrier_map[3471 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3471] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP3_4:
-                  data_carrier_map[3471 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5778 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11469 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3471] = SCATTERED_CARRIER;
+                  data_carrier_map[5778] = SCATTERED_CARRIER;
+                  data_carrier_map[11469] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP4_2:
-                  data_carrier_map[3460 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3460] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP4_4:
-                  data_carrier_map[3460 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5768 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11452 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3460] = SCATTERED_CARRIER;
+                  data_carrier_map[5768] = SCATTERED_CARRIER;
+                  data_carrier_map[11452] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP6_2:
-                  data_carrier_map[3462 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3462] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP6_4:
-                  data_carrier_map[3462 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5772 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11466 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3462] = SCATTERED_CARRIER;
+                  data_carrier_map[5772] = SCATTERED_CARRIER;
+                  data_carrier_map[11466] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP8_2:
-                  data_carrier_map[3464 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3464] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP8_4:
-                  data_carrier_map[3464 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5776 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11448 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3464] = SCATTERED_CARRIER;
+                  data_carrier_map[5776] = SCATTERED_CARRIER;
+                  data_carrier_map[11448] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP12_2:
-                  data_carrier_map[3468 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3468] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP12_4:
-                  data_carrier_map[3468 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5784 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11460 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3468] = SCATTERED_CARRIER;
+                  data_carrier_map[5784] = SCATTERED_CARRIER;
+                  data_carrier_map[11460] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP16_2:
-                  data_carrier_map[3472 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3472] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP16_4:
-                  data_carrier_map[3472 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5792 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11440 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3472] = SCATTERED_CARRIER;
+                  data_carrier_map[5792] = SCATTERED_CARRIER;
+                  data_carrier_map[11440] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP24_2:
-                  data_carrier_map[3480 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3480] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP24_4:
-                  data_carrier_map[3480 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5808 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11496 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3480] = SCATTERED_CARRIER;
+                  data_carrier_map[5808] = SCATTERED_CARRIER;
+                  data_carrier_map[11496] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP32_2:
-                  data_carrier_map[3488 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3488] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP32_4:
-                  data_carrier_map[3488 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[5824 - shift] = SCATTERED_CARRIER;
-                  data_carrier_map[11488 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[3488] = SCATTERED_CARRIER;
+                  data_carrier_map[5824] = SCATTERED_CARRIER;
+                  data_carrier_map[11488] = SCATTERED_CARRIER;
                   break;
                 default:
                   break;
@@ -1478,10 +1476,9 @@ namespace gr {
             if ((frame_symbols[symbol] == SBS_SYMBOL) || (frame_symbols[symbol] == DATA_SYMBOL)) {
               data_carrier_map[0] = SCATTERED_CARRIER;
               data_carrier_map[carriers - 1] = SCATTERED_CARRIER;
-              shift = 0;
               switch (pilot_pattern) {
                 case PILOT_SP3_2:
-                  data_carrier_map[6939 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[6939] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP3_4:
                   break;
@@ -1490,32 +1487,32 @@ namespace gr {
                 case PILOT_SP4_4:
                   break;
                 case PILOT_SP6_2:
-                  data_carrier_map[6942 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[6942] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP6_4:
                   break;
                 case PILOT_SP8_2:
-                  data_carrier_map[6920 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[6920] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP8_4:
                   break;
                 case PILOT_SP12_2:
-                  data_carrier_map[6924 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[6924] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP12_4:
                   break;
                 case PILOT_SP16_2:
-                  data_carrier_map[6928 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[6928] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP16_4:
                   break;
                 case PILOT_SP24_2:
-                  data_carrier_map[6936 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[6936] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP24_4:
                   break;
                 case PILOT_SP32_2:
-                  data_carrier_map[6944 - shift] = SCATTERED_CARRIER;
+                  data_carrier_map[6944] = SCATTERED_CARRIER;
                   break;
                 case PILOT_SP32_4:
                   break;
