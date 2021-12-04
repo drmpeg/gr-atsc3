@@ -50,6 +50,7 @@ namespace gr {
       double v_clip;
       int num_iterations;
       const int* tr_papr_map;
+      const int* tr_papr_alt_map;
       int tr_carrier_map[MAX_CARRIERS];
       volk::vector<gr_complex> ones_freq;
       volk::vector<gr_complex> ones_time;

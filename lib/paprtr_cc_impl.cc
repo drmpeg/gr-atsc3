@@ -52,6 +52,7 @@ namespace gr {
         case FFTSIZE_8K:
           N_TR = 72;
           tr_papr_map = trpapr_table_8K;
+          tr_papr_alt_map = trpapr_alt_table_8K;
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
@@ -59,6 +60,7 @@ namespace gr {
         case FFTSIZE_16K:
           N_TR = 144;
           tr_papr_map = trpapr_table_16K;
+          tr_papr_alt_map = trpapr_alt_table_16K;
           carriers = carriers_table[FFTSIZE_16K][cred];
           max_carriers = carriers_table[FFTSIZE_16K][0];
           preamble_carriers = carriers_table[FFTSIZE_16K][4];
@@ -66,6 +68,7 @@ namespace gr {
         case FFTSIZE_32K:
           N_TR = 288;
           tr_papr_map = trpapr_table_32K;
+          tr_papr_alt_map = trpapr_alt_table_32K;
           carriers = carriers_table[FFTSIZE_32K][cred];
           max_carriers = carriers_table[FFTSIZE_32K][0];
           preamble_carriers = carriers_table[FFTSIZE_32K][4];
@@ -73,6 +76,7 @@ namespace gr {
         default:
           N_TR = 72;
           tr_papr_map = trpapr_table_8K;
+          tr_papr_alt_map = trpapr_alt_table_8K;
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
@@ -182,6 +186,8 @@ namespace gr {
     void
     paprtr_cc_impl::init_pilots(int symbol)
     {
+      int reduced_carrier_shift;
+
       for (int i = 0; i < carriers; i++) {
         tr_carrier_map[i] = DATA_CARRIER;
       }
@@ -189,22 +195,46 @@ namespace gr {
       if (frame_symbols[symbol] == SBS_SYMBOL || frame_symbols[symbol] == PREAMBLE_SYMBOL) {
         shift = 0;
       }
-      switch (fft_size) {
-        case FFTSIZE_8K:
-          for (int i = 0; i < 72; i++) {
-            tr_carrier_map[trpapr_table_8K[i] + shift] = TRPAPR_CARRIER;
-          }
-          break;
-        case FFTSIZE_16K:
-          for (int i = 0; i < 144; i++) {
-            tr_carrier_map[trpapr_table_16K[i] + shift] = TRPAPR_CARRIER;
-          }
-          break;
-        case FFTSIZE_32K:
-          for (int i = 0; i < 288; i++) {
-            tr_carrier_map[trpapr_table_32K[i] + shift] = TRPAPR_CARRIER;
-          }
-          break;
+      reduced_carrier_shift = (max_carriers - carriers) / 2;
+      shift = shift - reduced_carrier_shift;
+
+      if ((dx == 3 || dx == 4 || dx == 8) && (frame_symbols[symbol] == SBS_SYMBOL || frame_symbols[symbol] == PREAMBLE_SYMBOL)) {
+        switch (fft_size) {
+          case FFTSIZE_8K:
+            for (int i = 0; i < 72; i++) {
+              tr_carrier_map[trpapr_alt_table_8K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+          case FFTSIZE_16K:
+            for (int i = 0; i < 144; i++) {
+              tr_carrier_map[trpapr_alt_table_16K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+          case FFTSIZE_32K:
+            for (int i = 0; i < 288; i++) {
+              tr_carrier_map[trpapr_alt_table_32K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+        }
+      }
+      else {
+        switch (fft_size) {
+          case FFTSIZE_8K:
+            for (int i = 0; i < 72; i++) {
+              tr_carrier_map[trpapr_table_8K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+          case FFTSIZE_16K:
+            for (int i = 0; i < 144; i++) {
+              tr_carrier_map[trpapr_table_16K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+          case FFTSIZE_32K:
+            for (int i = 0; i < 288; i++) {
+              tr_carrier_map[trpapr_table_32K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+        }
       }
     }
 
@@ -245,7 +275,12 @@ namespace gr {
                 }
               }
               std::fill_n(&ones_freq[index], right_nulls, 0);
-              papr_map = tr_papr_map;
+              if ((dx == 3 || dx == 4 || dx == 8) && (frame_symbols[j] == SBS_SYMBOL || frame_symbols[j] == PREAMBLE_SYMBOL)) {
+                papr_map = tr_papr_alt_map;
+              }
+              else {
+                papr_map = tr_papr_map;
+              }
               valid = TRUE;
             }
             if (valid == TRUE) {
@@ -318,7 +353,8 @@ namespace gr {
               volk_32f_x2_add_32f((float*)out, (float*)in, (float*)c.data(), papr_fft_size * 2);
               in = in + papr_fft_size;
               out = out + papr_fft_size;
-            } else {
+            }
+            else {
               memcpy(out, in, sizeof(gr_complex) * papr_fft_size);
               in = in + papr_fft_size;
               out = out + papr_fft_size;
