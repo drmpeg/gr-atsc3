@@ -62,7 +62,7 @@ Features not implemented:
 7) Time information
 8) MISO
 9) MIMO
-10) PAPR reduction
+10) ACE PAPR reduction
 12) Transmitter Identification (TxID)
 12) IP packet input
 
