@@ -60,11 +60,13 @@ Features not implemented:
 5) Time-aligned frames
 6) Channel bonding
 7) Time information
-8) MISO
-9) MIMO
-10) ACE PAPR reduction
-12) Transmitter Identification (TxID)
-12) IP packet input
+8) L1-Detail segmentation
+9) L1-Detail additional parity
+10) MISO
+11) MIMO
+12) ACE PAPR reduction
+13) Transmitter Identification (TxID)
+14) IP packet input
 
 Build instructions:
 
