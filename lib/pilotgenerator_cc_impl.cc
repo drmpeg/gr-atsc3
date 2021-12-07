@@ -1134,7 +1134,9 @@ namespace gr {
                 case PILOT_SP24_4:
                   break;
                 case PILOT_SP32_2:
-                  data_carrier_map[1696] = SCATTERED_CARRIER;
+                  if ((cred_coeff & 0x1) == 0) {
+                    data_carrier_map[1696] = SCATTERED_CARRIER;
+                  }
                   break;
                 case PILOT_SP32_4:
                   switch (cred_coeff) {
@@ -1348,8 +1350,10 @@ namespace gr {
                   break;
                 case PILOT_SP32_4:
                   data_carrier_map[3488] = SCATTERED_CARRIER;
-                  data_carrier_map[5824] = SCATTERED_CARRIER;
-                  data_carrier_map[11488] = SCATTERED_CARRIER;
+                  if ((cred_coeff & 0x1) == 0) {
+                    data_carrier_map[5824] = SCATTERED_CARRIER;
+                    data_carrier_map[11488] = SCATTERED_CARRIER;
+                  }
                   break;
                 default:
                   break;
