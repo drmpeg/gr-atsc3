@@ -147,6 +147,7 @@ blocks:
     outputmode: BOOTSTRAP_INTERPOLATION
     pilotpattern: PILOT_SP3_4
     showlevels: SHOWLEVELS_OFF
+    vclip: '3.3'
   states:
     bus_sink: false
     bus_source: false
@@ -175,6 +176,7 @@ blocks:
     minoutbuf: '0'
     numpayloadsyms: '72'
     numpreamblesyms: '2'
+    paprmode: PAPR_OFF
     pilotboost1: SPB_0
     pilotboost10: SPB_0
     pilotboost11: SPB_0
@@ -199,7 +201,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 124.0]
+    coordinate: [304, 116.0]
     rotation: 180
     state: true
 - name: atsc3_freqinterleaver_cc_0
@@ -217,6 +219,7 @@ blocks:
     mode: FREQ_PREAMBLE_ONLY
     numpayloadsyms: '72'
     numpreamblesyms: '2'
+    paprmode: PAPR_OFF
     pilotpattern: PILOT_SP3_4
   states:
     bus_sink: false
@@ -294,6 +297,7 @@ blocks:
     minoutbuf: '0'
     numpayloadsyms: '72'
     numpreamblesyms: '2'
+    paprmode: PAPR_OFF
     pilotboost1: SPB_0
     pilotboost10: SPB_0
     pilotboost11: SPB_0
@@ -374,7 +378,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [680, 468.0]
+    coordinate: [680, 476.0]
     rotation: 0
     state: true
 - name: uhd_usrp_sink_0_0
