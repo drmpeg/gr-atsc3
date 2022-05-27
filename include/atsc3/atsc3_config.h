@@ -234,6 +234,40 @@ namespace gr {
       PLP_FEC_BCH,
     };
 
+    enum atsc3_ldm_injection_level_t {
+      LDM_LEVEL_00DB = 0,
+      LDM_LEVEL_05DB,
+      LDM_LEVEL_10DB,
+      LDM_LEVEL_15DB,
+      LDM_LEVEL_20DB,
+      LDM_LEVEL_25DB,
+      LDM_LEVEL_30DB,
+      LDM_LEVEL_35DB,
+      LDM_LEVEL_40DB,
+      LDM_LEVEL_45DB,
+      LDM_LEVEL_50DB,
+      LDM_LEVEL_60DB,
+      LDM_LEVEL_70DB,
+      LDM_LEVEL_80DB,
+      LDM_LEVEL_90DB,
+      LDM_LEVEL_100DB,
+      LDM_LEVEL_110DB,
+      LDM_LEVEL_120DB,
+      LDM_LEVEL_130DB,
+      LDM_LEVEL_140DB,
+      LDM_LEVEL_150DB,
+      LDM_LEVEL_160DB,
+      LDM_LEVEL_170DB,
+      LDM_LEVEL_180DB,
+      LDM_LEVEL_190DB,
+      LDM_LEVEL_200DB,
+      LDM_LEVEL_210DB,
+      LDM_LEVEL_220DB,
+      LDM_LEVEL_230DB,
+      LDM_LEVEL_240DB,
+      LDM_LEVEL_250DB,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -262,5 +296,6 @@ typedef gr::atsc3::atsc3_bootstrap_mode_t atsc3_bootstrap_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_mode_t atsc3_time_interleaver_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_depth_t atsc3_time_interleaver_depth_t;
 typedef gr::atsc3::atsc3_plp_fec_mode_t atsc3_plp_fec_mode_t;
+typedef gr::atsc3::atsc3_ldm_injection_level_t atsc3_ldm_injection_level_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

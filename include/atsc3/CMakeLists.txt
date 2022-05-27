@@ -22,5 +22,6 @@ install(FILES
     freqinterleaver_cc.h
     bootstrap_cc.h
     alpbbheader_bb.h
-    paprtr_cc.h DESTINATION include/atsc3
+    paprtr_cc.h
+    ldmcombiner_cc.h DESTINATION include/atsc3
 )

@@ -1,0 +1,27 @@
+id: atsc3_ldmcombiner_cc
+label: ATSC3.0 LDM Combiner
+category: '[ATSC3.0]'
+
+templates:
+  imports: import atsc3
+  make: atsc3.ldmcombiner_cc(${level.val})
+
+parameters:
+-   id: level
+    label: LDM Injection Level
+    dtype: enum
+    options: [LDM_LEVEL_00DB, LDM_LEVEL_05DB, LDM_LEVEL_10DB, LDM_LEVEL_15DB, LDM_LEVEL_20DB, LDM_LEVEL_25DB, LDM_LEVEL_30DB, LDM_LEVEL_35DB, LDM_LEVEL_40DB, LDM_LEVEL_45DB, LDM_LEVEL_50DB, LDM_LEVEL_60DB, LDM_LEVEL_70DB, LDM_LEVEL_80DB, LDM_LEVEL_90DB, LDM_LEVEL_100DB, LDM_LEVEL_110DB, LDM_LEVEL_120DB, LDM_LEVEL_130DB, LDM_LEVEL_140DB, LDM_LEVEL_150DB, LDM_LEVEL_160DB, LDM_LEVEL_170DB, LDM_LEVEL_180DB, LDM_LEVEL_190DB, LDM_LEVEL_200DB, LDM_LEVEL_210DB, LDM_LEVEL_220DB, LDM_LEVEL_230DB, LDM_LEVEL_240DB, LDM_LEVEL_250DB]
+    option_labels: [0.0 dB, -0.5 dB, -1.0 dB, -1.5 dB, -2.0 dB, -2.5 dB, -3.0 dB, -3.5 dB, -4.0 dB, -4.5 dB, -5.0 dB, -6.0 dB, -7.0 dB, -8.0 dB, -9.0 dB, -10.0 dB, -11.0 dB, -12.0 dB, -13.0 dB, -14.0 dB, -15.0 dB, -16.0 dB, -17.0 dB, -18.0 dB, -19.0 dB, -20.0 dB, -21.0 dB, -22.0 dB, -23.0 dB, -24.0 dB, -25.0 dB]
+    option_attributes:
+        val: [atsc3.LDM_LEVEL_00DB, atsc3.LDM_LEVEL_05DB, atsc3.LDM_LEVEL_10DB, atsc3.LDM_LEVEL_15DB, atsc3.LDM_LEVEL_20DB, atsc3.LDM_LEVEL_25DB, atsc3.LDM_LEVEL_30DB, atsc3.LDM_LEVEL_35DB, atsc3.LDM_LEVEL_40DB, atsc3.LDM_LEVEL_45DB, atsc3.LDM_LEVEL_50DB, atsc3.LDM_LEVEL_60DB, atsc3.LDM_LEVEL_70DB, atsc3.LDM_LEVEL_80DB, atsc3.LDM_LEVEL_90DB, atsc3.LDM_LEVEL_100DB, atsc3.LDM_LEVEL_110DB, atsc3.LDM_LEVEL_120DB, atsc3.LDM_LEVEL_130DB, atsc3.LDM_LEVEL_140DB, atsc3.LDM_LEVEL_150DB, atsc3.LDM_LEVEL_160DB, atsc3.LDM_LEVEL_170DB, atsc3.LDM_LEVEL_180DB, atsc3.LDM_LEVEL_190DB, atsc3.LDM_LEVEL_200DB, atsc3.LDM_LEVEL_210DB, atsc3.LDM_LEVEL_220DB, atsc3.LDM_LEVEL_230DB, atsc3.LDM_LEVEL_240DB, atsc3.LDM_LEVEL_250DB]
+
+inputs:
+-   domain: stream
+    dtype: complex
+    multiplicity: '2'
+
+outputs:
+-   domain: stream
+    dtype: complex
+
+file_format: 1

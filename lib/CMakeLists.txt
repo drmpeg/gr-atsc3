@@ -23,6 +23,7 @@ list(APPEND atsc3_sources
     bootstrap_cc_impl.cc
     alpbbheader_bb_impl.cc
     paprtr_cc_impl.cc
+    ldmcombiner_cc_impl.cc
 )
 
 set(atsc3_sources "${atsc3_sources}" PARENT_SCOPE)

@@ -15,4 +15,13 @@
  */
 
 
+
+ static const char *__doc_gr_atsc3_ldmcombiner_cc = R"doc()doc";
+
+
+ static const char *__doc_gr_atsc3_ldmcombiner_cc_ldmcombiner_cc = R"doc()doc";
+
+
+ static const char *__doc_gr_atsc3_ldmcombiner_cc_make = R"doc()doc";
+
   

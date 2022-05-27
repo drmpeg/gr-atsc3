@@ -17,5 +17,6 @@ install(FILES
     atsc3_freqinterleaver_cc.block.yml
     atsc3_bootstrap_cc.block.yml
     atsc3_alpbbheader_bb.block.yml
-    atsc3_paprtr_cc.block.yml DESTINATION share/gnuradio/grc/blocks
+    atsc3_paprtr_cc.block.yml
+    atsc3_ldmcombiner_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )
