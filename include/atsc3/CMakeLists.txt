@@ -23,5 +23,6 @@ install(FILES
     bootstrap_cc.h
     alpbbheader_bb.h
     paprtr_cc.h
-    ldmcombiner_cc.h DESTINATION include/atsc3
+    ldmcombiner_cc.h
+    ldmframemapper_cc.h DESTINATION include/atsc3
 )
