@@ -1,4 +1,4 @@
-# Copyright 2021 Ron Economos
+# Copyright 2021,2022 Ron Economos
 #
 # This file is part of gr-atsc3
 #
@@ -53,20 +53,21 @@ calibration of the bootstrap resampler.
 
 Features not implemented:
 
-1) Multiple PLPs
-2) Layered Division Multiplexing (LDM)
-3) Hybrid Time Interleaver (HTI)
-4) Multiple subframes per frame
-5) Time-aligned frames
-6) Channel bonding
-7) Time information
-8) L1-Detail segmentation
-9) L1-Detail additional parity
-10) MISO
-11) MIMO
-12) ACE PAPR reduction
-13) Transmitter Identification (TxID)
-14) IP packet input
+1) Time Division Multiplexing
+2) Frequency Division Multiplexing
+3) Time and Frequency Division Multplexing
+4) Hybrid Time Interleaver (HTI)
+5) Multiple subframes per frame
+6) Time-aligned frames
+7) Channel bonding
+8) Time information
+9) L1-Detail segmentation
+10) L1-Detail additional parity
+11) MISO
+12) MIMO
+13) ACE PAPR reduction
+14) Transmitter Identification (TxID)
+15) IP packet input
 
 Build instructions:
 
