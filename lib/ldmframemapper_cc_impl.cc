@@ -346,32 +346,20 @@ namespace gr {
       l1detailinit->plp_TI_mode = timode;
       l1detailinit->plp_type = 0;
       if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        if (tidepth == TI_DEPTH_1254) {
-          l1detailinit->plp_TI_extended_interleaving = TRUE;
-          tidepth = TI_DEPTH_887;
-        }
-        else if (tidepth == TI_DEPTH_1448) {
-          l1detailinit->plp_TI_extended_interleaving = TRUE;
-          tidepth = TI_DEPTH_1024;
-        }
-        else {
-          l1detailinit->plp_TI_extended_interleaving = FALSE;
-        }
+        l1detailinit->plp_TI_extended_interleaving = FALSE;
         l1detailinit->plp_CTI_depth = tidepth;
         if (constellation_core == MOD_QPSK) {
-          l1detailinit->reserved = 0x3fffffff;
+          l1detailinit->reserved = 0x3;
         }
         else {
-          l1detailinit->reserved = 0x7fffffff;
+          l1detailinit->reserved = 0x7;
         }
       }
       else {
-        l1detailinit->reserved = 0xfffffffffffff;
+        l1detailinit->reserved = 0x7fffffff;
       }
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0);
-      printf("l1cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
-      printf("l1cells = %d\n", l1cells);
       switch (fftsize) {
         case FFTSIZE_8K:
           fftsamples = 8192;
@@ -2032,12 +2020,26 @@ namespace gr {
       for (int n = 4; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bitslong = l1detailinit->reserved;
-      for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+      if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+        if (l1detailinit->plp_mod_core == MOD_QPSK) {
+          bitslong = l1detailinit->reserved;
+          for (int n = 1; n >= 0; n--) {
+            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+          }
+        }
+        else {
+          bitslong = l1detailinit->reserved;
+          for (int n = 2; n >= 0; n--) {
+            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+          }
+        }
       }
-
-//      printf("bits = %d\n", offset_bits);
+      else {
+        bitslong = l1detailinit->reserved;
+        for (int n = 30; n >= 0; n--) {
+          l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+        }
+      }
       offset_bits += add_crc32_bits(l1detail, offset_bits);
 
 #if 0
