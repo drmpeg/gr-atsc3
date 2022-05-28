@@ -6,13 +6,23 @@ templates:
   imports: import atsc3
   make: |-
       atsc3.ldmframemapper_cc(
-          ${framesize.val},
-          ${rate.val},
-          % if str(framesize) == 'FECFRAME_NORMAL':
+          ${framesize_core.val},
+          ${rate_core.val},
+          ${fecmode_core.val},
+          % if str(framesize_core) == 'FECFRAME_NORMAL':
           ${constellation1.val},
           % else:
           ${constellation2.val},
           % endif
+          ${framesize_enh.val},
+          ${rate_enh.val},
+          ${fecmode_enh.val},
+          % if str(framesize_enh) == 'FECFRAME_NORMAL':
+          ${constellation3.val},
+          % else:
+          ${constellation4.val},
+          % endif
+          ${level.val},
           ${fftsize.val},
           ${numpayloadsyms},
           ${numpreamblesyms},
@@ -55,15 +65,14 @@ templates:
           ${fimode.val},
           ${timode.val},
           ${tidepth.val},
-          ${fecmode.val},
           ${paprmode.val},
           ${cred.val},
           ${l1bmode.val},
           ${l1dmode.val})
 
 parameters:
--   id: framesize
-    label: FECFRAME size
+-   id: framesize_core
+    label: Core FECFRAME size
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
@@ -71,29 +80,84 @@ parameters:
         hide_constellation1: [none, all]
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
--   id: rate
-    label: Code rate
+-   id: rate_core
+    label: Core Code rate
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
+-   id: fecmode_core
+    label: Core PLP FEC mode
+    dtype: enum
+    default: 'PLP_FEC_BCH'
+    options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
+    option_labels: [LDPC only, CRC32, BCH]
+    option_attributes:
+        val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
 -   id: constellation1
-    label: Constellation
+    label: Core Constellation
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM, MOD_1024QAM, MOD_4096QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM, 4096QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM, atsc3.MOD_1024QAM, atsc3.MOD_4096QAM]
-    hide: ${ framesize.hide_constellation1 }
+    hide: ${ framesize_core.hide_constellation1 }
 -   id: constellation2
-    label: Constellation
+    label: Core Constellation
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
-    hide: ${ framesize.hide_constellation2 }
+    hide: ${ framesize_core.hide_constellation2 }
+-   id: framesize_enh
+    label: Enhancement FECFRAME size
+    dtype: enum
+    options: [FECFRAME_NORMAL, FECFRAME_SHORT]
+    option_labels: [Normal, Short]
+    option_attributes:
+        hide_constellation1: [none, all]
+        hide_constellation2: [all, none]
+        val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
+-   id: rate_enh
+    label: Enhancement Code rate
+    dtype: enum
+    options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
+    option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
+    option_attributes:
+        val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
+-   id: fecmode_enh
+    label: Enhancement PLP FEC mode
+    dtype: enum
+    default: 'PLP_FEC_BCH'
+    options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
+    option_labels: [LDPC only, CRC32, BCH]
+    option_attributes:
+        val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
+-   id: constellation3
+    label: Enhancement Constellation
+    dtype: enum
+    options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM, MOD_1024QAM, MOD_4096QAM]
+    option_labels: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM, 4096QAM]
+    option_attributes:
+        val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM, atsc3.MOD_1024QAM, atsc3.MOD_4096QAM]
+    hide: ${ framesize_enh.hide_constellation1 }
+-   id: constellation4
+    label: Enhancement Constellation
+    dtype: enum
+    options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
+    option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
+    option_attributes:
+        val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
+    hide: ${ framesize_enh.hide_constellation2 }
+-   id: level
+    label: LDM Injection Level
+    dtype: enum
+    options: [LDM_LEVEL_00DB, LDM_LEVEL_05DB, LDM_LEVEL_10DB, LDM_LEVEL_15DB, LDM_LEVEL_20DB, LDM_LEVEL_25DB, LDM_LEVEL_30DB, LDM_LEVEL_35DB, LDM_LEVEL_40DB, LDM_LEVEL_45DB, LDM_LEVEL_50DB, LDM_LEVEL_60DB, LDM_LEVEL_70DB, LDM_LEVEL_80DB, LDM_LEVEL_90DB, LDM_LEVEL_100DB, LDM_LEVEL_110DB, LDM_LEVEL_120DB, LDM_LEVEL_130DB, LDM_LEVEL_140DB, LDM_LEVEL_150DB, LDM_LEVEL_160DB, LDM_LEVEL_170DB, LDM_LEVEL_180DB, LDM_LEVEL_190DB, LDM_LEVEL_200DB, LDM_LEVEL_210DB, LDM_LEVEL_220DB, LDM_LEVEL_230DB, LDM_LEVEL_240DB, LDM_LEVEL_250DB]
+    option_labels: [0.0 dB, -0.5 dB, -1.0 dB, -1.5 dB, -2.0 dB, -2.5 dB, -3.0 dB, -3.5 dB, -4.0 dB, -4.5 dB, -5.0 dB, -6.0 dB, -7.0 dB, -8.0 dB, -9.0 dB, -10.0 dB, -11.0 dB, -12.0 dB, -13.0 dB, -14.0 dB, -15.0 dB, -16.0 dB, -17.0 dB, -18.0 dB, -19.0 dB, -20.0 dB, -21.0 dB, -22.0 dB, -23.0 dB, -24.0 dB, -25.0 dB]
+    option_attributes:
+        val: [atsc3.LDM_LEVEL_00DB, atsc3.LDM_LEVEL_05DB, atsc3.LDM_LEVEL_10DB, atsc3.LDM_LEVEL_15DB, atsc3.LDM_LEVEL_20DB, atsc3.LDM_LEVEL_25DB, atsc3.LDM_LEVEL_30DB, atsc3.LDM_LEVEL_35DB, atsc3.LDM_LEVEL_40DB, atsc3.LDM_LEVEL_45DB, atsc3.LDM_LEVEL_50DB, atsc3.LDM_LEVEL_60DB, atsc3.LDM_LEVEL_70DB, atsc3.LDM_LEVEL_80DB, atsc3.LDM_LEVEL_90DB, atsc3.LDM_LEVEL_100DB, atsc3.LDM_LEVEL_110DB, atsc3.LDM_LEVEL_120DB, atsc3.LDM_LEVEL_130DB, atsc3.LDM_LEVEL_140DB, atsc3.LDM_LEVEL_150DB, atsc3.LDM_LEVEL_160DB, atsc3.LDM_LEVEL_170DB, atsc3.LDM_LEVEL_180DB, atsc3.LDM_LEVEL_190DB, atsc3.LDM_LEVEL_200DB, atsc3.LDM_LEVEL_210DB, atsc3.LDM_LEVEL_220DB, atsc3.LDM_LEVEL_230DB, atsc3.LDM_LEVEL_240DB, atsc3.LDM_LEVEL_250DB]
 -   id: fftsize
     label: FFT Size
     dtype: enum
@@ -295,14 +359,6 @@ parameters:
     option_labels: [512, 724, 887, 1024, 1254, 1448]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
--   id: fecmode
-    label: PLP FEC mode
-    dtype: enum
-    default: 'PLP_FEC_BCH'
-    options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
-    option_labels: [LDPC only, CRC32, BCH]
-    option_attributes:
-        val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
 -   id: paprmode
     label: PAPR mode
     dtype: enum

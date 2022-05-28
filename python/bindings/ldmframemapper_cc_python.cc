@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(ldmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(00ee7b7db6a77e2d721adb4ba08bb26b)                     */
+/* BINDTOOL_HEADER_FILE_HASH(15975a1b816e403cf977eee3a9ea87e0)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -37,9 +37,15 @@ void bind_ldmframemapper_cc(py::module& m)
         std::shared_ptr<ldmframemapper_cc>>(m, "ldmframemapper_cc", D(ldmframemapper_cc))
 
         .def(py::init(&ldmframemapper_cc::make),
-           py::arg("framesize"),
-           py::arg("rate"),
-           py::arg("constellation"),
+           py::arg("framesize_core"),
+           py::arg("rate_core"),
+           py::arg("fecmode_core"),
+           py::arg("constellation_core"),
+           py::arg("framesize_enh"),
+           py::arg("rate_enh"),
+           py::arg("fecmode_enh"),
+           py::arg("constellation_enh"),
+           py::arg("level"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),
@@ -50,7 +56,6 @@ void bind_ldmframemapper_cc(py::module& m)
            py::arg("fimode"),
            py::arg("timode"),
            py::arg("tidepth"),
-           py::arg("fecmode"),
            py::arg("paprmode"),
            py::arg("cred"),
            py::arg("l1bmode"),

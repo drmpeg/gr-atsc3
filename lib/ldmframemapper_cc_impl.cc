@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     ldmframemapper_cc::sptr
-    ldmframemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    ldmframemapper_cc::make(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<ldmframemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, fecmode, paprmode, cred, l1bmode, l1dmode);
+        framesize_core, rate_core, fecmode_core, constellation_core, framesize_enh, rate_enh, fecmode_enh, constellation_enh, level, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, paprmode, cred, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    ldmframemapper_cc_impl::ldmframemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    ldmframemapper_cc_impl::ldmframemapper_cc_impl(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("ldmframemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -170,7 +170,7 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      l1basicinit->L1_Detail_size_bytes = 25;
+      l1basicinit->L1_Detail_size_bytes = 34;
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
@@ -188,86 +188,161 @@ namespace gr {
       l1detailinit->version = 0;
       l1detailinit->num_rf = 0;
       l1detailinit->frequency_interleaver = fimode;
-      l1detailinit->num_plp = 0;
+      l1detailinit->num_plp = 1;
       l1detailinit->plp_id = 0;
       l1detailinit->plp_lls_flag = FALSE;
       l1detailinit->plp_layer = 0;
       l1detailinit->plp_start = 0;
       l1detailinit->plp_scrambler_type = 0;
-      if (framesize == FECFRAME_SHORT) {
-        switch (constellation) {
+      if (framesize_core == FECFRAME_SHORT) {
+        switch (constellation_core) {
           case MOD_QPSK:
-            fec_cells = 8100;
+            fec_cells_core = 8100;
             break;
           case MOD_16QAM:
-            fec_cells = 4050;
+            fec_cells_core = 4050;
             break;
           case MOD_64QAM:
-            fec_cells = 2700;
+            fec_cells_core = 2700;
             break;
           case MOD_256QAM:
-            fec_cells = 2025;
+            fec_cells_core = 2025;
             break;
           default:
-            fec_cells = 0;
+            fec_cells_core = 0;
             break;
         }
-        switch (fecmode) {
+        switch (fecmode_core) {
           case PLP_FEC_NONE:
-            l1detailinit->plp_fec_type = FEC_TYPE_ONLY_16K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_ONLY_16K;
             break;
           case PLP_FEC_CRC32:
-            l1detailinit->plp_fec_type = FEC_TYPE_CRC_16K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_CRC_16K;
             break;
           case PLP_FEC_BCH:
-            l1detailinit->plp_fec_type = FEC_TYPE_BCH_16K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_16K;
             break;
           default:
-            l1detailinit->plp_fec_type = FEC_TYPE_BCH_16K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_16K;
             break;
         }
       }
       else {
-        switch (constellation) {
+        switch (constellation_core) {
           case MOD_QPSK:
-            fec_cells = 32400;
+            fec_cells_core = 32400;
             break;
           case MOD_16QAM:
-            fec_cells = 16200;
+            fec_cells_core = 16200;
             break;
           case MOD_64QAM:
-            fec_cells = 10800;
+            fec_cells_core = 10800;
             break;
           case MOD_256QAM:
-            fec_cells = 8100;
+            fec_cells_core = 8100;
             break;
           case MOD_1024QAM:
-            fec_cells = 6480;
+            fec_cells_core = 6480;
             break;
           case MOD_4096QAM:
-            fec_cells = 5400;
+            fec_cells_core = 5400;
             break;
           default:
-            fec_cells = 0;
+            fec_cells_core = 0;
             break;
         }
-        switch (fecmode) {
+        switch (fecmode_core) {
           case PLP_FEC_NONE:
-            l1detailinit->plp_fec_type = FEC_TYPE_ONLY_64K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_ONLY_64K;
             break;
           case PLP_FEC_CRC32:
-            l1detailinit->plp_fec_type = FEC_TYPE_CRC_64K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_CRC_64K;
             break;
           case PLP_FEC_BCH:
-            l1detailinit->plp_fec_type = FEC_TYPE_BCH_64K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_64K;
             break;
           default:
-            l1detailinit->plp_fec_type = FEC_TYPE_BCH_64K;
+            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_64K;
             break;
         }
       }
-      l1detailinit->plp_mod = constellation;
-      l1detailinit->plp_cod = rate;
+      if (framesize_enh == FECFRAME_SHORT) {
+        switch (constellation_enh) {
+          case MOD_QPSK:
+            fec_cells_enh = 8100;
+            break;
+          case MOD_16QAM:
+            fec_cells_enh = 4050;
+            break;
+          case MOD_64QAM:
+            fec_cells_enh = 2700;
+            break;
+          case MOD_256QAM:
+            fec_cells_enh = 2025;
+            break;
+          default:
+            fec_cells_enh = 0;
+            break;
+        }
+        switch (fecmode_enh) {
+          case PLP_FEC_NONE:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_ONLY_16K;
+            break;
+          case PLP_FEC_CRC32:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_CRC_16K;
+            break;
+          case PLP_FEC_BCH:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_16K;
+            break;
+          default:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_16K;
+            break;
+        }
+      }
+      else {
+        switch (constellation_enh) {
+          case MOD_QPSK:
+            fec_cells_enh = 32400;
+            break;
+          case MOD_16QAM:
+            fec_cells_enh = 16200;
+            break;
+          case MOD_64QAM:
+            fec_cells_enh = 10800;
+            break;
+          case MOD_256QAM:
+            fec_cells_enh = 8100;
+            break;
+          case MOD_1024QAM:
+            fec_cells_enh = 6480;
+            break;
+          case MOD_4096QAM:
+            fec_cells_enh = 5400;
+            break;
+          default:
+            fec_cells_enh = 0;
+            break;
+        }
+        switch (fecmode_enh) {
+          case PLP_FEC_NONE:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_ONLY_64K;
+            break;
+          case PLP_FEC_CRC32:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_CRC_64K;
+            break;
+          case PLP_FEC_BCH:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_64K;
+            break;
+          default:
+            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_64K;
+            break;
+        }
+      }
+      l1detailinit->plp_mod_core = constellation_core;
+      l1detailinit->plp_cod_core = rate_core;
+      l1detailinit->plp_mod_enh = constellation_enh;
+      l1detailinit->plp_cod_enh = rate_enh;
+      l1detailinit->plp_ldm_injection_level = level;
       l1detailinit->plp_TI_mode = timode;
       l1detailinit->plp_type = 0;
       if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
@@ -283,7 +358,7 @@ namespace gr {
           l1detailinit->plp_TI_extended_interleaving = FALSE;
         }
         l1detailinit->plp_CTI_depth = tidepth;
-        if (constellation == MOD_QPSK) {
+        if (constellation_core == MOD_QPSK) {
           l1detailinit->reserved = 0x3fffffff;
         }
         else {
@@ -293,8 +368,10 @@ namespace gr {
       else {
         l1detailinit->reserved = 0xfffffffffffff;
       }
-      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0);
+      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0);
+      printf("l1cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
+      printf("l1cells = %d\n", l1cells);
       switch (fftsize) {
         case FFTSIZE_8K:
           fftsamples = 8192;
@@ -958,7 +1035,7 @@ namespace gr {
       ti_mode = timode;
       ti_depth = depth;
       commutator = 0;
-      switch (rate) {
+      switch (rate_core) {
         case C2_15:
           rateindex = 0;
           break;
@@ -999,7 +1076,7 @@ namespace gr {
           rateindex = 0;
           break;
       }
-      switch (constellation) {
+      switch (constellation_core) {
         case MOD_QPSK:
           normalization = std::sqrt(2.0);
           ti_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
@@ -1066,7 +1143,7 @@ namespace gr {
         delay_line.emplace_back(i, 0);
       }
       for (int i = 0; i < depth; i++) {
-        switch (constellation) {
+        switch (constellation_core) {
           case MOD_QPSK:
             for (int j = 0; j < i; j++) {
               randombits = ti_randomize[randomindex] << 1;
@@ -1792,7 +1869,7 @@ namespace gr {
     }
 
     int
-    ldmframemapper_cc_impl::add_l1detail(gr_complex *out, int block_start, int start_row)
+    ldmframemapper_cc_impl::add_l1detail(gr_complex *out, int block_start_core, int block_start_enh, int start_row)
     {
       int bits, index, offset_bits = 0;
       int npad, padbits, count, nrepeat, table;
@@ -1850,15 +1927,15 @@ namespace gr {
       for (int n = 1; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1detailinit->plp_fec_type;
+      bits = l1detailinit->plp_fec_type_core;
       for (int n = 3; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1detailinit->plp_mod;
+      bits = l1detailinit->plp_mod_core;
       for (int n = 3; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1detailinit->plp_cod;
+      bits = l1detailinit->plp_cod_core;
       for (int n = 3; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
@@ -1867,12 +1944,12 @@ namespace gr {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        bits = block_start;
+        bits = block_start_core;
         for (int n = 21; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
         l1detail[offset_bits++] = l1detailinit->plp_type;
-        if (l1detailinit->plp_mod == MOD_QPSK) {
+        if (l1detailinit->plp_mod_core == MOD_QPSK) {
           l1detail[offset_bits++] = l1detailinit->plp_TI_extended_interleaving;
           bits = l1detailinit->plp_CTI_depth;
           for (int n = 2; n >= 0; n--) {
@@ -1881,10 +1958,6 @@ namespace gr {
           bits = start_row;
           for (int n = 10; n >= 0; n--) {
             l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-          }
-          bitslong = l1detailinit->reserved;
-          for (int n = 29; n >= 0; n--) {
-            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
           }
         }
         else {
@@ -1896,23 +1969,75 @@ namespace gr {
           for (int n = 10; n >= 0; n--) {
             l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
           }
-          bitslong = l1detailinit->reserved;
-          for (int n = 30; n >= 0; n--) {
-            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
-          }
         }
       }
       else {
-        bits = block_start;
+        bits = block_start_core;
         for (int n = 14; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
         l1detail[offset_bits++] = l1detailinit->plp_type;
-        bitslong = l1detailinit->reserved;
-        for (int n = 51; n >= 0; n--) {
-          l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+      }
+      /* PLP 1 */
+      bits = l1detailinit->plp_id + 1;
+      for (int n = 5; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      l1detail[offset_bits++] = l1detailinit->plp_lls_flag;
+      bits = l1detailinit->plp_layer + 1;
+      for (int n = 1; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bits = l1detailinit->plp_start;
+      for (int n = 23; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bits = l1detailinit->plp_size;
+      for (int n = 23; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bits = l1detailinit->plp_scrambler_type;
+      for (int n = 1; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bits = l1detailinit->plp_fec_type_enh;
+      for (int n = 3; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bits = l1detailinit->plp_mod_enh;
+      for (int n = 3; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bits = l1detailinit->plp_cod_enh;
+      for (int n = 3; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bits = l1detailinit->plp_TI_mode;
+      for (int n = 1; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+        bits = block_start_enh;
+        for (int n = 21; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
       }
+      else {
+        bits = block_start_enh;
+        for (int n = 14; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+      }
+      bits = l1detailinit->plp_ldm_injection_level;
+      for (int n = 4; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
+      bitslong = l1detailinit->reserved;
+      for (int n = 1; n >= 0; n--) {
+        l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+      }
+
+//      printf("bits = %d\n", offset_bits);
       offset_bits += add_crc32_bits(l1detail, offset_bits);
 
 #if 0
@@ -2197,7 +2322,8 @@ namespace gr {
       int indexout = 0;
       int preamblesyms = preamble_syms;
       int rows, datacells;
-      int time_offset, fec_block_start;
+      int time_offset;
+      int fec_block_start_core, fec_block_start_enh;
       int left_nulls;
       int right_nulls;
       int l1detailcells, l1totalcells;
@@ -2226,15 +2352,23 @@ namespace gr {
         }
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
         indexout += add_l1basic(&out[0], time_offset);
-        fec_block_start = cells % fec_cells;
-        if (fec_block_start) {
-          fec_block_start = fec_cells - (cells % fec_cells);
+        fec_block_start_core = cells % fec_cells_core;
+        if (fec_block_start_core) {
+          fec_block_start_core = fec_cells_core - (cells % fec_cells_core);
         }
 
         if (ti_mode == TI_MODE_CONVOLUTIONAL) {
-          fec_block_start = fec_block_start + ti_depth * ((commutator_start + fec_block_start) % ti_depth);
+          fec_block_start_core = fec_block_start_core + ti_depth * ((commutator_start + fec_block_start_core) % ti_depth);
         }
-        l1detailcells = add_l1detail(&l1_dummy[0], fec_block_start, commutator_start);
+        fec_block_start_enh = cells % fec_cells_enh;
+        if (fec_block_start_enh) {
+          fec_block_start_enh = fec_cells_enh - (cells % fec_cells_enh);
+        }
+
+        if (ti_mode == TI_MODE_CONVOLUTIONAL) {
+          fec_block_start_enh = fec_block_start_enh + ti_depth * ((commutator_start + fec_block_start_enh) % ti_depth);
+        }
+        l1detailcells = add_l1detail(&l1_dummy[0], fec_block_start_core, fec_block_start_enh, commutator_start);
         rows = l1detailcells / preamblesyms;
         for (int i = 0; i < preamblesyms; i++) {
           for (int j = 0; j < rows; j++) {

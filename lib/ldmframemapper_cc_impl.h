@@ -81,9 +81,12 @@ typedef struct {
   int plp_start;
   int plp_size;
   int plp_scrambler_type;
-  int plp_fec_type;
-  int plp_mod;
-  int plp_cod;
+  int plp_fec_type_core;
+  int plp_mod_core;
+  int plp_cod_core;
+  int plp_fec_type_enh;
+  int plp_mod_enh;
+  int plp_cod_enh;
   int plp_TI_mode;
   int plp_fec_block_start;
   int plp_CTI_fec_block_start;
@@ -137,7 +140,7 @@ namespace gr {
       int preamble_syms;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
-      int add_l1detail(gr_complex*, int, int);
+      int add_l1detail(gr_complex*, int, int, int);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
       void init_ti_randomizer(void);
@@ -171,7 +174,8 @@ namespace gr {
       long long samples;
       int frame_samples;
       long long cells;
-      int fec_cells;
+      int fec_cells_core;
+      int fec_cells_enh;
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
@@ -327,7 +331,7 @@ namespace gr {
       const static int sbs_data_cells_table_32K[16][5][5];
 
      public:
-      ldmframemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      ldmframemapper_cc_impl(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~ldmframemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
