@@ -273,16 +273,16 @@ namespace gr {
       if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
         if (tidepth == TI_DEPTH_1254) {
           l1detailinit->plp_TI_extended_interleaving = TRUE;
-          tidepth = TI_DEPTH_887;
+          l1detailinit->plp_CTI_depth = TI_DEPTH_887;
         }
         else if (tidepth == TI_DEPTH_1448) {
           l1detailinit->plp_TI_extended_interleaving = TRUE;
-          tidepth = TI_DEPTH_1024;
+          l1detailinit->plp_CTI_depth = TI_DEPTH_1024;
         }
         else {
           l1detailinit->plp_TI_extended_interleaving = FALSE;
+          l1detailinit->plp_CTI_depth = tidepth;
         }
-        l1detailinit->plp_CTI_depth = tidepth;
         if (constellation == MOD_QPSK) {
           l1detailinit->reserved = 0x3fffffff;
         }
