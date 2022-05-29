@@ -1007,12 +1007,6 @@ namespace gr {
         case TI_DEPTH_1024:
           depth = 1024;
           break;
-        case TI_DEPTH_1254:
-          depth = 1254;
-          break;
-        case TI_DEPTH_1448:
-          depth = 1448;
-          break;
         default:
           depth = 512;
           break;
