@@ -24,5 +24,6 @@ install(FILES
     alpbbheader_bb.h
     paprtr_cc.h
     ldmcombiner_cc.h
-    ldmframemapper_cc.h DESTINATION include/atsc3
+    ldmframemapper_cc.h
+    subframemapper_cc.h DESTINATION include/atsc3
 )

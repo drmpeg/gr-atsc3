@@ -42,7 +42,8 @@ list(APPEND atsc3_python_files
     alpbbheader_bb_python.cc
     paprtr_cc_python.cc
     ldmcombiner_cc_python.cc
-    ldmframemapper_cc_python.cc python_bindings.cc)
+    ldmframemapper_cc_python.cc
+    subframemapper_cc_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(atsc3
    ../..

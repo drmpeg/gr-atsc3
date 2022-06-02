@@ -25,6 +25,7 @@ list(APPEND atsc3_sources
     paprtr_cc_impl.cc
     ldmcombiner_cc_impl.cc
     ldmframemapper_cc_impl.cc
+    subframemapper_cc_impl.cc
 )
 
 set(atsc3_sources "${atsc3_sources}" PARENT_SCOPE)
