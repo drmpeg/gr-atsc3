@@ -581,6 +581,9 @@ namespace gr {
       }
       init_address(first_preamble_cells, preamble_cells - papr_cells, sbs_cells - papr_cells, data_cells - papr_cells);
 
+      if (numpreamblesyms == 0) {
+        first_preamble_cells = 0;
+      }
       if (firstsbs) {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }

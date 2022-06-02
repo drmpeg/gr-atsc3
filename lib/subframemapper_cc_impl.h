@@ -135,6 +135,7 @@ namespace gr {
       int total_cells[2];
       int sbsnullcells[2];
       int preamble_syms[2];
+      int max_output_cells;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
       int add_l1detail(gr_complex*, int, int, int, int);

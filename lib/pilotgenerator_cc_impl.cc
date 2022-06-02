@@ -901,6 +901,9 @@ namespace gr {
         data_carrier_map[i].resize(max_carriers);
       }
       init_pilots();
+      if (numpreamblesyms == 0) {
+        first_preamble_cells = 0;
+      }
       if (firstsbs) {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }

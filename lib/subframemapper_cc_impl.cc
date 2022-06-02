@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "subframemapper_cc_impl.h"
+#include <algorithm>
 
 namespace gr {
   namespace atsc3 {
@@ -27,7 +28,7 @@ namespace gr {
     subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_fftsize_t fftsize1st, int numpayloadsyms1st, int numpreamblesyms, atsc3_guardinterval_t guardinterval1st, atsc3_pilotpattern_t pilotpattern1st, atsc3_scattered_pilot_boost_t pilotboost1st, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode1st, atsc3_time_interleaver_mode_t timode1st, atsc3_time_interleaver_depth_t tidepth1st, atsc3_papr_t paprmode1st, atsc3_reduced_carriers_t cred1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_fftsize_t fftsize2nd, int numpayloadsyms2nd, atsc3_guardinterval_t guardinterval2nd, atsc3_pilotpattern_t pilotpattern2nd, atsc3_scattered_pilot_boost_t pilotboost2nd, atsc3_frequency_interleaver_t fimode2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_time_interleaver_depth_t tidepth2nd, atsc3_papr_t paprmode2nd, atsc3_reduced_carriers_t cred2nd, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("subframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
-              gr::io_signature::make(1, 1, sizeof(output_type)))
+              gr::io_signature::make(2, 2, sizeof(output_type)))
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       L1_Detail *l1detailinit1st = &L1_Signalling[0].l1detail_data[0];
@@ -2078,7 +2079,8 @@ namespace gr {
         throw std::bad_alloc();
       }
 
-      set_output_multiple(totalcells[0] + totalcells[1]);
+      max_output_cells = std::max(totalcells[0], totalcells[1]);
+      set_output_multiple(max_output_cells);
     }
 
     /*
@@ -2093,8 +2095,8 @@ namespace gr {
     void
     subframemapper_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = plp_size[0] * (noutput_items / (total_cells[0] + total_cells[1]));
-      ninput_items_required[1] = plp_size[1] * (noutput_items / (total_cells[0] + total_cells[1]));
+      ninput_items_required[0] = plp_size[0] * (noutput_items / max_output_cells);
+      ninput_items_required[1] = plp_size[1] * (noutput_items / max_output_cells);
     }
 
 #define CRC_POLY 0x00210801
@@ -3254,9 +3256,8 @@ namespace gr {
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-      auto out = static_cast<output_type*>(output_items[0]);
-      int indexin;
-      int indexout = 0;
+      int indexin[2] = {0, 0};
+      int indexout[2] = {0, 0};
       int ti_indexin;
       int ti_indexout;
       int preamblesyms;
@@ -3274,7 +3275,7 @@ namespace gr {
       for (int i = 0; i < noutput_items; i += noutput_items) {
         for (int subframe = 0; subframe < 2; subframe++) {
           auto in = static_cast<const input_type*>(input_items[subframe]);
-          indexin = 0;
+          auto out = static_cast<output_type*>(output_items[subframe]);
           preamblesyms = preamble_syms[subframe];
           if (sbsnullcells[subframe] & 0x1) {
             left_nulls = (sbsnullcells[subframe] / 2);
@@ -3297,7 +3298,7 @@ namespace gr {
           }
           if (subframe == 0) {
             time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
-            indexout += add_l1basic(&out[0], time_offset);
+            indexout[subframe] += add_l1basic(&out[0], time_offset);
           }
           for (int k = 0; k < 2; k++) {
             fec_block_start[k] = cells[k] % fec_cells[k];
@@ -3314,51 +3315,53 @@ namespace gr {
             rows = l1detailcells / preamblesyms;
             for (int i = 0; i < preamblesyms; i++) {
               for (int j = 0; j < rows; j++) {
-                out[indexout++] = l1_dummy[j * preamblesyms + i];
+                out[indexout[subframe]++] = l1_dummy[j * preamblesyms + i];
               }
             }
             for (int i = rows * preamblesyms; i < l1detailcells; i++) {
-              out[indexout++] = l1_dummy[i];
+              out[indexout[subframe]++] = l1_dummy[i];
             }
 
-            l1totalcells = indexout;
+            l1totalcells = indexout[subframe];
             datacells = 0;
             for (int n = 0; n < preamblesyms; n++) {
               datacells += frame_symbols[subframe][n];
             }
             datacells -= l1totalcells;
-            memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * datacells);
-            indexin += datacells;
-            indexout += datacells;
+            memcpy(&out[indexout[subframe]], &in[indexin[subframe]], sizeof(gr_complex) * datacells);
+            indexin[subframe] += datacells;
+            indexout[subframe] += datacells;
           }
           if (first_sbs[subframe]) {
             for (int n = 0; n < left_nulls; n++) {
-              out[indexout++] = zero;
+              out[indexout[subframe]++] = zero;
             }
-            memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[subframe][preamblesyms] - sbsnullcells[subframe]));
-            indexout += frame_symbols[subframe][preamblesyms] - sbsnullcells[subframe];
+            memcpy(&out[indexout[subframe]], &in[indexin[subframe]], sizeof(gr_complex) * (frame_symbols[subframe][preamblesyms] - sbsnullcells[subframe]));
+            indexout[subframe] += frame_symbols[subframe][preamblesyms] - sbsnullcells[subframe];
             for (int n = 0; n < right_nulls; n++) {
-              out[indexout++] = zero;
+              out[indexout[subframe]++] = zero;
             }
-            indexin += frame_symbols[subframe][preamblesyms] - sbsnullcells[subframe];
+            indexin[subframe] += frame_symbols[subframe][preamblesyms] - sbsnullcells[subframe];
             preamblesyms++;
           }
           for (int n = preamblesyms; n < symbols[subframe] - 1; n++) {
-            memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * frame_symbols[subframe][n]);
-            indexin += frame_symbols[subframe][n];
-            indexout += frame_symbols[subframe][n];
+            memcpy(&out[indexout[subframe]], &in[indexin[subframe]], sizeof(gr_complex) * frame_symbols[subframe][n]);
+            indexin[subframe] += frame_symbols[subframe][n];
+            indexout[subframe] += frame_symbols[subframe][n];
           }
           for (int n = 0; n < left_nulls; n++) {
-            out[indexout++] = zero;
+            out[indexout[subframe]++] = zero;
           }
-          memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[subframe][symbols[subframe] - 1] - sbsnullcells[subframe]));
-          indexout += frame_symbols[subframe][symbols[subframe] - 1] - sbsnullcells[subframe];
+          memcpy(&out[indexout[subframe]], &in[indexin[subframe]], sizeof(gr_complex) * (frame_symbols[subframe][symbols[subframe] - 1] - sbsnullcells[subframe]));
+          indexout[subframe] += frame_symbols[subframe][symbols[subframe] - 1] - sbsnullcells[subframe];
+          indexin[subframe] += frame_symbols[subframe][symbols[subframe] - 1] - sbsnullcells[subframe];
           for (int n = 0; n < right_nulls; n++) {
-            out[indexout++] = zero;
+            out[indexout[subframe]++] = zero;
           }
 
           samples += frame_samples[subframe];
           cells[subframe] += plp_size[subframe];
+          produce(subframe, indexout[subframe]);
         }
       }
 
@@ -3368,7 +3371,7 @@ namespace gr {
       consume (1, plp_size[1]);
 
       // Tell runtime system how many output items we produced.
-      return noutput_items;
+      return WORK_CALLED_PRODUCE;
     }
 
     const int subframemapper_cc_impl::shortening_table[8][18] = {
