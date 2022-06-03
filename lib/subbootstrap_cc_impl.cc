@@ -1447,10 +1447,10 @@ namespace gr {
       int skipped_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation()) / decimation()) + (symbol_size[0] + guard_interval[0]);
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
-        if (ninput_items[0] != frame_items[0]) {
+        if (ninput_items[0] < frame_items[0]) {
           printf("Not enough input[0] items!\n");
         }
-        if (ninput_items[1] != frame_items[1]) {
+        if (ninput_items[1] < frame_items[1]) {
           printf("Not enough input[1] items!\n");
         }
         level = out;

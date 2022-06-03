@@ -9,6 +9,8 @@
 #include "subframemapper_cc_impl.h"
 #include <algorithm>
 
+#define L1_DETAIL_SIZE_BYTES 42
+
 namespace gr {
   namespace atsc3 {
 
@@ -176,7 +178,7 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred1st;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      l1basicinit->L1_Detail_size_bytes = 40;
+      l1basicinit->L1_Detail_size_bytes = L1_DETAIL_SIZE_BYTES;
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
@@ -398,16 +400,8 @@ namespace gr {
           l1detailinit2nd->plp_TI_extended_interleaving = FALSE;
         }
         l1detailinit2nd->plp_CTI_depth = tidepth2nd;
-        if (constellation2nd == MOD_QPSK) {
-          l1detailinit2nd->reserved = 0x3fffffff;
-        }
-        else {
-          l1detailinit2nd->reserved = 0x7fffffff;
-        }
       }
-      else {
-        l1detailinit2nd->reserved = 0xfffffffffffff;
-      }
+      l1detailinit2nd->reserved = 0x7fffffffffffffff;
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0, 0);
       l1cells += add_l1basic(&l1_dummy[0], 0);
       switch (fftsize1st) {
@@ -2552,7 +2546,7 @@ namespace gr {
       }
       offset_bits += add_crc32_bits(l1basic, offset_bits);
 
-#if 1
+#if 0
       printf("L1Basic\n");
       for (int i = 0; i < offset_bits; i += 8) {
         bits = index = 0;
@@ -2747,7 +2741,7 @@ namespace gr {
       int npad, padbits, count, nrepeat, table;
       int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
-      int Anum, Aden, B, mod, rows;
+      int Anum, Aden, B, mod, rows, temp;
       long long bitslong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
@@ -2946,10 +2940,6 @@ namespace gr {
           for (int n = 10; n >= 0; n--) {
             l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
           }
-          bitslong = l1detailinit2nd->reserved;
-          for (int n = 29; n >= 0; n--) {
-            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
-          }
         }
         else {
           bits = l1detailinit2nd->plp_CTI_depth;
@@ -2960,11 +2950,6 @@ namespace gr {
           for (int n = 10; n >= 0; n--) {
             l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
           }
-          printf("offset_bits = %d\n", offset_bits);
-          bitslong = l1detailinit2nd->reserved;
-          for (int n = 6; n >= 0; n--) {
-            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
-          }
         }
       }
       else {
@@ -2973,14 +2958,17 @@ namespace gr {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
         l1detail[offset_bits++] = l1detailinit2nd->plp_type;
+      }
+      if ((((L1_DETAIL_SIZE_BYTES * 8) - 32) - offset_bits) > 0) {
         bitslong = l1detailinit2nd->reserved;
-        for (int n = 51; n >= 0; n--) {
-//          l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
+        temp = (((L1_DETAIL_SIZE_BYTES * 8) - 32) - offset_bits) - 1;
+        for (int n = temp; n >= 0; n--) {
+          l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
         }
       }
       offset_bits += add_crc32_bits(l1detail, offset_bits);
 
-#if 1
+#if 0
       printf("L1Detail\n");
       for (int i = 0; i < offset_bits; i += 8) {
         bits = index = 0;
