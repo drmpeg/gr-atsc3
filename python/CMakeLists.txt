@@ -45,3 +45,4 @@ GR_ADD_TEST(qa_paprtr_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_pap
 GR_ADD_TEST(qa_ldmcombiner_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ldmcombiner_cc.py)
 GR_ADD_TEST(qa_ldmframemapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ldmframemapper_cc.py)
 GR_ADD_TEST(qa_subframemapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_subframemapper_cc.py)
+GR_ADD_TEST(qa_subbootstrap_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_subbootstrap_cc.py)

@@ -1,0 +1,110 @@
+id: atsc3_subbootstrap_cc
+label: ATSC3.0 Subframe Bootstrap Insertion
+category: '[ATSC3.0]'
+
+templates:
+  imports: import atsc3
+  make: atsc3.subbootstrap_cc(${fftsize1st.val}, ${numpayloadsyms1st}, ${numpreamblesyms}, ${guardinterval1st.val}, ${pilotpattern1st.val}, ${fftsize2nd.val}, ${numpayloadsyms2nd}, ${guardinterval2nd.val}, ${pilotpattern2nd.val}, ${frameinterval.val}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val}, ${vclip})
+
+parameters:
+-   id: fftsize1st
+    label: FFT Size 1st
+    dtype: enum
+    options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
+    option_labels: [8K, 16K, 32K]
+    option_attributes:
+        val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
+        vlength: [8192, 16384, 32768]
+-   id: numpayloadsyms1st
+    label: Number of Payload Symbols 1st
+    dtype: int
+    default: '72'
+-   id: numpreamblesyms
+    label: Number of Preamble Symbols
+    dtype: int
+    default: '2'
+-   id: guardinterval1st
+    label: Guard Interval samples 1st
+    dtype: enum
+    options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
+    option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
+    option_attributes:
+        val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
+-   id: pilotpattern1st
+    label: Pilot Pattern 1st
+    dtype: enum
+    options: [PILOT_SP3_2, PILOT_SP3_4, PILOT_SP4_2, PILOT_SP4_4, PILOT_SP6_2, PILOT_SP6_4, PILOT_SP8_2, PILOT_SP8_4, PILOT_SP12_2, PILOT_SP12_4, PILOT_SP16_2, PILOT_SP16_4, PILOT_SP24_2, PILOT_SP24_4, PILOT_SP32_2, PILOT_SP32_4]
+    option_labels: [SP3_2, SP3_4, SP4_2, SP4_4, SP6_2, SP6_4, SP8_2, SP8_4, SP12_2, SP12_4, SP16_2, SP16_4, SP24_2, SP24_4, SP32_2, SP32_4]
+    option_attributes:
+        val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
+-   id: fftsize2nd
+    label: FFT Size 2nd
+    dtype: enum
+    options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
+    option_labels: [8K, 16K, 32K]
+    option_attributes:
+        val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
+        vlength: [8192, 16384, 32768]
+-   id: numpayloadsyms2nd
+    label: Number of Payload Symbols 2nd
+    dtype: int
+    default: '72'
+-   id: guardinterval2nd
+    label: Guard Interval samples 2nd
+    dtype: enum
+    options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
+    option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
+    option_attributes:
+        val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
+-   id: pilotpattern2nd
+    label: Pilot Pattern 2nd
+    dtype: enum
+    options: [PILOT_SP3_2, PILOT_SP3_4, PILOT_SP4_2, PILOT_SP4_4, PILOT_SP6_2, PILOT_SP6_4, PILOT_SP8_2, PILOT_SP8_4, PILOT_SP12_2, PILOT_SP12_4, PILOT_SP16_2, PILOT_SP16_4, PILOT_SP24_2, PILOT_SP24_4, PILOT_SP32_2, PILOT_SP32_4]
+    option_labels: [SP3_2, SP3_4, SP4_2, SP4_4, SP6_2, SP6_4, SP8_2, SP8_4, SP12_2, SP12_4, SP16_2, SP16_4, SP24_2, SP24_4, SP32_2, SP32_4]
+    option_attributes:
+        val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
+-   id: frameinterval
+    label: Minimum Frame Interval
+    dtype: enum
+    options: [MTTN_50, MTTN_100, MTTN_150, MTTN_200, MTTN_250, MTTN_300, MTTN_350, MTTN_400, MTTN_500, MTTN_600, MTTN_700, MTTN_800, MTTN_900, MTTN_1000, MTTN_1100, MTTN_1200, MTTN_1300, MTTN_1500, MTTN_1700, MTTN_1900, MTTN_2100, MTTN_2300, MTTN_2500, MTTN_2700, MTTN_2900, MTTN_3300, MTTN_3700, MTTN_4100, MTTN_4500, MTTN_4900, MTTN_5300]
+    option_labels: [50 ms, 100 ms, 150 ms, 200 ms, 250 ms, 300 ms, 350 ms, 400 ms, 500 ms, 600 ms, 700 ms, 800 ms, 900 ms, 1000 ms, 1100 ms, 1200 ms, 1300 ms, 1500 ms, 1700 ms, 1900 ms, 2100 ms, 2300 ms, 2500 ms, 2700 ms, 2900 ms, 3300 ms, 3700 ms, 4100 ms, 4500 ms, 4900 ms, 5300]
+    option_attributes:
+        val: [atsc3.MTTN_50, atsc3.MTTN_100, atsc3.MTTN_150, atsc3.MTTN_200, atsc3.MTTN_250, atsc3.MTTN_300, atsc3.MTTN_350, atsc3.MTTN_400, atsc3.MTTN_500, atsc3.MTTN_600, atsc3.MTTN_700, atsc3.MTTN_800, atsc3.MTTN_900, atsc3.MTTN_1000, atsc3.MTTN_1100, atsc3.MTTN_1200, atsc3.MTTN_1300, atsc3.MTTN_1500, atsc3.MTTN_1700, atsc3.MTTN_1900, atsc3.MTTN_2100, atsc3.MTTN_2300, atsc3.MTTN_2500, atsc3.MTTN_2700, atsc3.MTTN_2900, atsc3.MTTN_3300, atsc3.MTTN_3700, atsc3.MTTN_4100, atsc3.MTTN_4500, atsc3.MTTN_4900, atsc3.MTTN_5300]
+-   id: l1bmode
+    label: L1 Basic Mode
+    dtype: enum
+    options: [L1_FEC_MODE_1, L1_FEC_MODE_2, L1_FEC_MODE_3, L1_FEC_MODE_4, L1_FEC_MODE_5]
+    option_labels: [Mode 1, Mode 2, Mode 3, Mode 4, Mode 5]
+    option_attributes:
+        val: [atsc3.L1_FEC_MODE_1, atsc3.L1_FEC_MODE_2, atsc3.L1_FEC_MODE_3, atsc3.L1_FEC_MODE_4, atsc3.L1_FEC_MODE_5]
+-   id: outputmode
+    label: Output Mode
+    dtype: enum
+    options: [BOOTSTRAP_VALIDATION, BOOTSTRAP_INTERPOLATION]
+    option_labels: ['Validation', 'Interpolation']
+    option_attributes:
+        val: [atsc3.BOOTSTRAP_VALIDATION, atsc3.BOOTSTRAP_INTERPOLATION]
+-   id: showlevels
+    label: Show Peak IQ Levels
+    dtype: enum
+    options: [SHOWLEVELS_OFF, SHOWLEVELS_ON]
+    option_labels: ['Off', 'On']
+    option_attributes:
+        hide_vclip: [all, none]
+        val: [atsc3.SHOWLEVELS_OFF, atsc3.SHOWLEVELS_ON]
+-   id: vclip
+    label: Vclip
+    dtype: float
+    default: '3.3'
+    hide: ${ showlevels.hide_vclip }
+
+inputs:
+-   domain: stream
+    dtype: complex
+    multiplicity: '2'
+
+outputs:
+-   domain: stream
+    dtype: complex
+
+file_format: 1

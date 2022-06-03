@@ -25,5 +25,6 @@ install(FILES
     paprtr_cc.h
     ldmcombiner_cc.h
     ldmframemapper_cc.h
-    subframemapper_cc.h DESTINATION include/atsc3
+    subframemapper_cc.h
+    subbootstrap_cc.h DESTINATION include/atsc3
 )
