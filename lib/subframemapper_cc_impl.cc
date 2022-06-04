@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     subframemapper_cc::sptr
-    subframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_fftsize_t fftsize1st, int numpayloadsyms1st, int numpreamblesyms, atsc3_guardinterval_t guardinterval1st, atsc3_pilotpattern_t pilotpattern1st, atsc3_scattered_pilot_boost_t pilotboost1st, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode1st, atsc3_time_interleaver_mode_t timode1st, atsc3_time_interleaver_depth_t tidepth1st, atsc3_papr_t paprmode1st, atsc3_reduced_carriers_t cred1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_fftsize_t fftsize2nd, int numpayloadsyms2nd, atsc3_guardinterval_t guardinterval2nd, atsc3_pilotpattern_t pilotpattern2nd, atsc3_scattered_pilot_boost_t pilotboost2nd, atsc3_frequency_interleaver_t fimode2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_time_interleaver_depth_t tidepth2nd, atsc3_papr_t paprmode2nd, atsc3_reduced_carriers_t cred2nd, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_fftsize_t fftsize1st, int numpayloadsyms1st, int numpreamblesyms, atsc3_guardinterval_t guardinterval1st, atsc3_pilotpattern_t pilotpattern1st, atsc3_scattered_pilot_boost_t pilotboost1st, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode1st, atsc3_time_interleaver_mode_t timode1st, atsc3_time_interleaver_depth_t tidepth1st, atsc3_reduced_carriers_t cred1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_fftsize_t fftsize2nd, int numpayloadsyms2nd, atsc3_guardinterval_t guardinterval2nd, atsc3_pilotpattern_t pilotpattern2nd, atsc3_scattered_pilot_boost_t pilotboost2nd, atsc3_frequency_interleaver_t fimode2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_time_interleaver_depth_t tidepth2nd, atsc3_reduced_carriers_t cred2nd, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<subframemapper_cc_impl>(
-        framesize1st, rate1st, fecmode1st, constellation1st, fftsize1st, numpayloadsyms1st, numpreamblesyms, guardinterval1st, pilotpattern1st, pilotboost1st, firstsbs, fimode1st, timode1st, tidepth1st, paprmode1st, cred1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, fftsize2nd, numpayloadsyms2nd, guardinterval2nd, pilotpattern2nd, pilotboost2nd, fimode2nd, timode2nd, tidepth2nd, paprmode2nd, cred2nd, l1bmode, l1dmode);
+        framesize1st, rate1st, fecmode1st, constellation1st, fftsize1st, numpayloadsyms1st, numpreamblesyms, guardinterval1st, pilotpattern1st, pilotboost1st, firstsbs, fimode1st, timode1st, tidepth1st, cred1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, fftsize2nd, numpayloadsyms2nd, guardinterval2nd, pilotpattern2nd, pilotboost2nd, fimode2nd, timode2nd, tidepth2nd, cred2nd, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_fftsize_t fftsize1st, int numpayloadsyms1st, int numpreamblesyms, atsc3_guardinterval_t guardinterval1st, atsc3_pilotpattern_t pilotpattern1st, atsc3_scattered_pilot_boost_t pilotboost1st, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode1st, atsc3_time_interleaver_mode_t timode1st, atsc3_time_interleaver_depth_t tidepth1st, atsc3_papr_t paprmode1st, atsc3_reduced_carriers_t cred1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_fftsize_t fftsize2nd, int numpayloadsyms2nd, atsc3_guardinterval_t guardinterval2nd, atsc3_pilotpattern_t pilotpattern2nd, atsc3_scattered_pilot_boost_t pilotboost2nd, atsc3_frequency_interleaver_t fimode2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_time_interleaver_depth_t tidepth2nd, atsc3_papr_t paprmode2nd, atsc3_reduced_carriers_t cred2nd, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_fftsize_t fftsize1st, int numpayloadsyms1st, int numpreamblesyms, atsc3_guardinterval_t guardinterval1st, atsc3_pilotpattern_t pilotpattern1st, atsc3_scattered_pilot_boost_t pilotboost1st, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode1st, atsc3_time_interleaver_mode_t timode1st, atsc3_time_interleaver_depth_t tidepth1st, atsc3_reduced_carriers_t cred1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_fftsize_t fftsize2nd, int numpayloadsyms2nd, atsc3_guardinterval_t guardinterval2nd, atsc3_pilotpattern_t pilotpattern2nd, atsc3_scattered_pilot_boost_t pilotboost2nd, atsc3_frequency_interleaver_t fimode2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_time_interleaver_depth_t tidepth2nd, atsc3_reduced_carriers_t cred2nd, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("subframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(2, 2, sizeof(output_type)))
@@ -165,7 +165,7 @@ namespace gr {
       l1basicinit->lls_flag = FALSE;
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
-      l1basicinit->papr_reduction = paprmode1st;
+      l1basicinit->papr_reduction = paprmode;
       l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0; /* always 0 */
@@ -995,7 +995,7 @@ namespace gr {
           }
           break;
       }
-      if (paprmode1st != PAPR_TR) {
+      if (paprmode != PAPR_TR) {
         papr_cells = 0;
       }
       frame_samples[0] = ((fftsamples + gisamples) * (numpayloadsyms1st + numpreamblesyms)) + BOOTSTRAP_SAMPLES;
@@ -1629,7 +1629,7 @@ namespace gr {
           }
           break;
       }
-      if (paprmode2nd != PAPR_TR) {
+      if (paprmode != PAPR_TR) {
         papr_cells = 0;
       }
       frame_samples[1] = ((fftsamples + gisamples) * (numpayloadsyms2nd + 0)) + BOOTSTRAP_SAMPLES;

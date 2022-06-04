@@ -56,7 +56,6 @@ templates:
           ${fimode1st.val},
           ${timode1st.val},
           ${tidepth1st.val},
-          ${paprmode1st.val},
           ${cred1st.val},
           ${framesize2nd.val},
           ${rate2nd.val},
@@ -106,8 +105,8 @@ templates:
           ${fimode2nd.val},
           ${timode2nd.val},
           ${tidepth2nd.val},
-          ${paprmode2nd.val},
           ${cred2nd.val},
+          ${paprmode.val},
           ${l1bmode.val},
           ${l1dmode.val})
 
@@ -353,13 +352,6 @@ parameters:
     option_labels: [512, 724, 887, 1024, 1254, 1448]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
--   id: paprmode1st
-    label: PAPR mode 1st
-    dtype: enum
-    options: [PAPR_OFF, PAPR_TR]
-    option_labels: [Disabled, Tone Reservation]
-    option_attributes:
-        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 -   id: cred1st
     label: Reduced Carriers 1st
     dtype: enum
@@ -597,13 +589,6 @@ parameters:
     option_labels: [512, 724, 887, 1024, 1254, 1448]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
--   id: paprmode2nd
-    label: PAPR mode 2nd
-    dtype: enum
-    options: [PAPR_OFF, PAPR_TR]
-    option_labels: [Disabled, Tone Reservation]
-    option_attributes:
-        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 -   id: cred2nd
     label: Reduced Carriers 2nd
     dtype: enum
@@ -611,6 +596,13 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: paprmode
+    label: PAPR mode
+    dtype: enum
+    options: [PAPR_OFF, PAPR_TR]
+    option_labels: [Disabled, Tone Reservation]
+    option_attributes:
+        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 -   id: l1bmode
     label: L1 Basic Mode
     dtype: enum

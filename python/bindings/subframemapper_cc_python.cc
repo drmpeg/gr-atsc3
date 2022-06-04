@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(subframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(5899f36fcd9f05090799bff0ec7e6f15)                     */
+/* BINDTOOL_HEADER_FILE_HASH(48077672e1396b6b613c35e160d6daed)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -51,7 +51,6 @@ void bind_subframemapper_cc(py::module& m)
            py::arg("fimode1st"),
            py::arg("timode1st"),
            py::arg("tidepth1st"),
-           py::arg("paprmode1st"),
            py::arg("cred1st"),
            py::arg("framesize2nd"),
            py::arg("rate2nd"),
@@ -65,8 +64,8 @@ void bind_subframemapper_cc(py::module& m)
            py::arg("fimode2nd"),
            py::arg("timode2nd"),
            py::arg("tidepth2nd"),
-           py::arg("paprmode2nd"),
            py::arg("cred2nd"),
+           py::arg("paprmode"),
            py::arg("l1bmode"),
            py::arg("l1dmode"),
            D(subframemapper_cc,make)
