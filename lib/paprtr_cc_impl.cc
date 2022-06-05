@@ -20,17 +20,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     paprtr_cc::sptr
-    paprtr_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, float vclip, int iterations, unsigned int vlength)
+    paprtr_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<paprtr_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, pilotpattern, firstsbs, paprmode, cred, vclip, iterations, vlength);
+        fftsize, numpayloadsyms, numpreamblesyms, pilotpattern, firstsbs, cred, paprmode, vclip, iterations, vlength);
     }
 
 
     /*
      * The private constructor
      */
-    paprtr_cc_impl::paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, float vclip, int iterations, unsigned int vlength)
+    paprtr_cc_impl::paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength)
       : gr::sync_block("paprtr_cc",
               gr::io_signature::make(1, 1, sizeof(input_type) * vlength),
               gr::io_signature::make(1, 1, sizeof(output_type) * vlength)),

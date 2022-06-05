@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, fecmode, paprmode, cred, l1bmode, l1dmode);
+        framesize, rate, fecmode, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, cred, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_plp_fec_mode_t fecmode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))

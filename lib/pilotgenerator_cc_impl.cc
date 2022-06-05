@@ -15,17 +15,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     pilotgenerator_cc::sptr
-    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, unsigned int vlength)
+    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<pilotgenerator_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, paprmode, cred, vlength);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, cred, paprmode, vlength);
     }
 
 
     /*
      * The private constructor
      */
-    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, unsigned int vlength)
+    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, unsigned int vlength)
       : gr::block("pilotgenerator_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type) * vlength)),

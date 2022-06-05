@@ -79,7 +79,7 @@ namespace gr {
 
 
      public:
-      paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred, float vclip, int iterations, unsigned int vlength);
+      paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength);
       ~paprtr_cc_impl();
 
       int work(

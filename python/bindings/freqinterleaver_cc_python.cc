@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(freqinterleaver_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(79397f7c216a6aca8b561125e5d20033)                     */
+/* BINDTOOL_HEADER_FILE_HASH(f359678aef9c613316006b849eee545a)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -44,8 +44,8 @@ void bind_freqinterleaver_cc(py::module& m)
            py::arg("pilotpattern"),
            py::arg("firstsbs"),
            py::arg("mode"),
-           py::arg("paprmode"),
            py::arg("cred"),
+           py::arg("paprmode"),
            D(freqinterleaver_cc,make)
         )
         

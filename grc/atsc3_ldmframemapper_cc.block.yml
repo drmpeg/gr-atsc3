@@ -65,8 +65,8 @@ templates:
           ${fimode.val},
           ${timode.val},
           ${tidepth.val},
-          ${paprmode.val},
           ${cred.val},
+          ${paprmode.val},
           ${l1bmode.val},
           ${l1dmode.val})
 
@@ -359,13 +359,6 @@ parameters:
     option_labels: [512, 724, 887, 1024]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
--   id: paprmode
-    label: PAPR mode
-    dtype: enum
-    options: [PAPR_OFF, PAPR_TR]
-    option_labels: [Disabled, Tone Reservation]
-    option_attributes:
-        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 -   id: cred
     label: Reduced Carriers
     dtype: enum
@@ -373,6 +366,13 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: paprmode
+    label: PAPR mode
+    dtype: enum
+    options: [PAPR_OFF, PAPR_TR]
+    option_labels: [Disabled, Tone Reservation]
+    option_attributes:
+        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 -   id: l1bmode
     label: L1 Basic Mode
     dtype: enum

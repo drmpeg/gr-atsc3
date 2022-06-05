@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     freqinterleaver_cc::sptr
-    freqinterleaver_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred)
+    freqinterleaver_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode)
     {
       return gnuradio::make_block_sptr<freqinterleaver_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, firstsbs, mode, paprmode, cred);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, firstsbs, mode, cred, paprmode);
     }
 
 
     /*
      * The private constructor
      */
-    freqinterleaver_cc_impl::freqinterleaver_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_papr_t paprmode, atsc3_reduced_carriers_t cred)
+    freqinterleaver_cc_impl::freqinterleaver_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode)
       : gr::sync_block("freqinterleaver_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))

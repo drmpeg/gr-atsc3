@@ -45,8 +45,8 @@ templates:
           ${pilotboost16.val},
           % endif
           ${firstsbs.val},
-          ${paprmode.val},
           ${cred.val},
+          ${paprmode.val},
           ${fftsize.vlength})
 
 parameters:
@@ -231,13 +231,6 @@ parameters:
     option_labels: [Disabled, Enabled]
     option_attributes:
         val: [atsc3.SBS_OFF, atsc3.SBS_ON]
--   id: paprmode
-    label: PAPR mode
-    dtype: enum
-    options: [PAPR_OFF, PAPR_TR]
-    option_labels: [Disabled, Tone Reservation]
-    option_attributes:
-        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 -   id: cred
     label: Reduced Carriers
     dtype: enum
@@ -245,6 +238,13 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: paprmode
+    label: PAPR mode
+    dtype: enum
+    options: [PAPR_OFF, PAPR_TR]
+    option_labels: [Disabled, Tone Reservation]
+    option_attributes:
+        val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
 
 inputs:
 -   domain: stream
