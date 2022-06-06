@@ -3355,8 +3355,8 @@ namespace gr {
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume (0, plp_size[0]);
-      consume (1, plp_size[1]);
+      consume (0, indexin[0]);
+      consume (1, indexin[1]);
 
       // Tell runtime system how many output items we produced.
       return WORK_CALLED_PRODUCE;

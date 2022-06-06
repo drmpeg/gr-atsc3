@@ -1382,6 +1382,7 @@ namespace gr {
     {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
+      int indexin = 0;
       gr_complex* level;
       int skipped_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation()) / decimation()) + (symbol_size + guard_interval);
 
@@ -1437,10 +1438,11 @@ namespace gr {
       }
       out += frame_items;
       in += frame_items;
+      indexin += frame_items;
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each (frame_items);
+      consume_each (indexin);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

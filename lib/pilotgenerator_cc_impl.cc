@@ -1597,7 +1597,7 @@ namespace gr {
       }
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each (input_cells);
+      consume_each (indexin);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

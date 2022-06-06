@@ -2276,6 +2276,7 @@ namespace gr {
         }
         memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[symbols - 1] - sbsnullcells));
         indexout += frame_symbols[symbols - 1] - sbsnullcells;
+        indexin += frame_symbols[symbols - 1] - sbsnullcells;
         for (int n = 0; n < right_nulls; n++) {
           out[indexout++] = zero;
         }
@@ -2286,7 +2287,7 @@ namespace gr {
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each (plp_size);
+      consume_each (indexin);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;
