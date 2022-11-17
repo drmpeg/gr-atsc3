@@ -1217,7 +1217,6 @@ namespace gr {
       Nextra = ((fl * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (symbol_size + guard_interval) - numpayloadsyms * (symbol_size + guard_interval);
       Nfinal = Nextra % numpayloadsyms;
       Nextra = Nextra / numpayloadsyms;
-      printf("Nextra = %d, %d\n", Nextra, Nfinal);
       if (flm == FLM_SYMBOL_ALIGNED) {
         frame_items = (symbols * symbol_size) + (symbols * guard_interval);
       }

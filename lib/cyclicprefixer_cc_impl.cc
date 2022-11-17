@@ -33,7 +33,6 @@ namespace gr {
       fftsamples = vlength;
       preamble_syms = numpreamblesyms;
       payload_syms = numpayloadsyms;
-      printf("fftsamples = %d\n", fftsamples);
       switch (guardinterval) {
         case GI_1_192:
           gisamples = 192;
@@ -78,7 +77,6 @@ namespace gr {
       Nextra = ((fl * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples + gisamples) - numpayloadsyms * (fftsamples + gisamples);
       Nfinal = Nextra % numpayloadsyms;
       Nextra = Nextra / numpayloadsyms;
-      printf("Nextra = %d, %d\n", Nextra, Nfinal);
       symbol = 0;
       flmode = flm;
       if (flm == FLM_SYMBOL_ALIGNED) {

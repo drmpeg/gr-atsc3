@@ -898,7 +898,6 @@ namespace gr {
       }
       Nextra = ((fl * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples + gisamples) - numpayloadsyms * (fftsamples + gisamples);
       l1basicinit->excess_samples_per_symbol = Nextra / numpayloadsyms;
-      printf("Nextra = %d, %d, %d\n", Nextra, l1basicinit->excess_samples_per_symbol, Nextra % numpayloadsyms);
       frame_samples = ((fftsamples + gisamples) * (numpayloadsyms + numpreamblesyms)) + BOOTSTRAP_SAMPLES;
       frame_symbols[0] = first_preamble_cells;
       total_preamble_cells = 0;
