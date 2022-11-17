@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(bootstrap_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(6b5593a660af3675e69d8574929d2e71)                     */
+/* BINDTOOL_HEADER_FILE_HASH(bcd8013453ff61900e96265e3a89c231)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -43,6 +43,8 @@ void bind_bootstrap_cc(py::module& m)
            py::arg("guardinterval"),
            py::arg("pilotpattern"),
            py::arg("frameinterval"),
+           py::arg("flm"),
+           py::arg("fl"),
            py::arg("l1bmode"),
            py::arg("outputmode"),
            py::arg("showlevels"),

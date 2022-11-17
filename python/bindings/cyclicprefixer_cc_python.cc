@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(framemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(c105957270660cc3d85ec778ad0b49bc)                     */
+/* BINDTOOL_HEADER_FILE(cyclicprefixer_cc.h)                                        */
+/* BINDTOOL_HEADER_FILE_HASH(db8ab51745608f716383c424da592665)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -23,41 +23,28 @@
 
 namespace py = pybind11;
 
-#include <atsc3/framemapper_cc.h>
+#include <atsc3/cyclicprefixer_cc.h>
 // pydoc.h is automatically generated in the build directory
-#include <framemapper_cc_pydoc.h>
+#include <cyclicprefixer_cc_pydoc.h>
 
-void bind_framemapper_cc(py::module& m)
+void bind_cyclicprefixer_cc(py::module& m)
 {
 
-    using framemapper_cc    = ::gr::atsc3::framemapper_cc;
+    using cyclicprefixer_cc    = ::gr::atsc3::cyclicprefixer_cc;
 
 
-    py::class_<framemapper_cc, gr::block, gr::basic_block,
-        std::shared_ptr<framemapper_cc>>(m, "framemapper_cc", D(framemapper_cc))
+    py::class_<cyclicprefixer_cc, gr::block, gr::basic_block,
+        std::shared_ptr<cyclicprefixer_cc>>(m, "cyclicprefixer_cc", D(cyclicprefixer_cc))
 
-        .def(py::init(&framemapper_cc::make),
-           py::arg("framesize"),
-           py::arg("rate"),
-           py::arg("fecmode"),
-           py::arg("constellation"),
+        .def(py::init(&cyclicprefixer_cc::make),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),
            py::arg("guardinterval"),
-           py::arg("pilotpattern"),
-           py::arg("pilotboost"),
-           py::arg("firstsbs"),
-           py::arg("fimode"),
-           py::arg("timode"),
-           py::arg("tidepth"),
-           py::arg("cred"),
            py::arg("flm"),
            py::arg("fl"),
-           py::arg("paprmode"),
-           py::arg("l1bmode"),
-           py::arg("l1dmode"),
-           D(framemapper_cc,make)
+           py::arg("vlength"),
+           D(cyclicprefixer_cc,make)
         )
         
 

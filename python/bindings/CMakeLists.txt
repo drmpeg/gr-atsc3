@@ -44,7 +44,8 @@ list(APPEND atsc3_python_files
     ldmcombiner_cc_python.cc
     ldmframemapper_cc_python.cc
     subframemapper_cc_python.cc
-    subbootstrap_cc_python.cc python_bindings.cc)
+    subbootstrap_cc_python.cc
+    cyclicprefixer_cc_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(atsc3
    ../..

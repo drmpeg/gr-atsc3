@@ -4,7 +4,7 @@ category: '[ATSC3.0]'
 
 templates:
   imports: import atsc3
-  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${pilotpattern.val}, ${frameinterval.val}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val}, ${vclip})
+  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${pilotpattern.val}, ${frameinterval.val}, ${flm.val}, ${fl}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val}, ${vclip})
 
 parameters:
 -   id: fftsize
@@ -44,6 +44,20 @@ parameters:
     option_labels: [50 ms, 100 ms, 150 ms, 200 ms, 250 ms, 300 ms, 350 ms, 400 ms, 500 ms, 600 ms, 700 ms, 800 ms, 900 ms, 1000 ms, 1100 ms, 1200 ms, 1300 ms, 1500 ms, 1700 ms, 1900 ms, 2100 ms, 2300 ms, 2500 ms, 2700 ms, 2900 ms, 3300 ms, 3700 ms, 4100 ms, 4500 ms, 4900 ms, 5300]
     option_attributes:
         val: [atsc3.MTTN_50, atsc3.MTTN_100, atsc3.MTTN_150, atsc3.MTTN_200, atsc3.MTTN_250, atsc3.MTTN_300, atsc3.MTTN_350, atsc3.MTTN_400, atsc3.MTTN_500, atsc3.MTTN_600, atsc3.MTTN_700, atsc3.MTTN_800, atsc3.MTTN_900, atsc3.MTTN_1000, atsc3.MTTN_1100, atsc3.MTTN_1200, atsc3.MTTN_1300, atsc3.MTTN_1500, atsc3.MTTN_1700, atsc3.MTTN_1900, atsc3.MTTN_2100, atsc3.MTTN_2300, atsc3.MTTN_2500, atsc3.MTTN_2700, atsc3.MTTN_2900, atsc3.MTTN_3300, atsc3.MTTN_3700, atsc3.MTTN_4100, atsc3.MTTN_4500, atsc3.MTTN_4900, atsc3.MTTN_5300]
+-   id: flm
+    label: Frame Length Mode
+    dtype: enum
+    default: FLM_SYMBOL_ALIGNED
+    options: [FLM_TIME_ALIGNED, FLM_SYMBOL_ALIGNED]
+    option_labels: [Time Aligned, Symbol Aligned]
+    option_attributes:
+        hide_fl: [none, all]
+        val: [atsc3.FLM_TIME_ALIGNED, atsc3.FLM_SYMBOL_ALIGNED]
+-   id: fl
+    label: Frame Length (ms)
+    dtype: int
+    default: '100'
+    hide: ${ flm.hide_fl }
 -   id: l1bmode
     label: L1 Basic Mode
     dtype: enum
