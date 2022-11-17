@@ -1865,7 +1865,7 @@ namespace gr {
         }
       }
       time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[0]);
-      if (time_interleaver == NULL) {
+      if (time_interleaver[0] == NULL) {
         GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
         throw std::bad_alloc();
       }
@@ -2068,7 +2068,7 @@ namespace gr {
         }
       }
       time_interleaver[1] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[1]);
-      if (time_interleaver == NULL) {
+      if (time_interleaver[1] == NULL) {
         GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
         throw std::bad_alloc();
       }
