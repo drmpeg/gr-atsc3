@@ -161,8 +161,8 @@ namespace gr {
       l1basicinit->lls_flag = FALSE;
       l1basicinit->time_info_flag = tifmode;
       if (tifmode != TIF_NOT_INCLUDED) {
-#ifdef TIME_VALIDATION
-        tai.tv_sec = 1458572400;
+#ifndef TIME_VALIDATION
+        tai.tv_sec = 1458572400;  /* March 21, 2016, 15:00 */
         tai.tv_nsec = 0;
 #else
         clock_gettime(CLOCK_TAI, &tai);
