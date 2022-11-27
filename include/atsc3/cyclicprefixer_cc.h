@@ -33,7 +33,7 @@ namespace gr {
        * class. atsc3::cyclicprefixer_cc::make is the public interface for
        * creating new instances.
        */
-      static sptr make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flm, int fl, unsigned int vlength);
+      static sptr make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flmode, int flen, unsigned int vlength);
     };
 
   } // namespace atsc3

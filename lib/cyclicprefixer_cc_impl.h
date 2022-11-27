@@ -18,7 +18,7 @@ namespace gr {
     {
      private:
       int symbol;
-      int flmode;
+      int fl_mode;
       int fftsamples;
       int gisamples;
       int preamble_syms;
@@ -27,7 +27,7 @@ namespace gr {
       int Nfinal;
 
      public:
-      cyclicprefixer_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flm, int fl, unsigned int vlength);
+      cyclicprefixer_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flmode, int flen, unsigned int vlength);
       ~cyclicprefixer_cc_impl();
 
       // Where all the action really happens

@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     bootstrap_cc::sptr
-    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flm, int fl, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
     {
       return gnuradio::make_block_sptr<bootstrap_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, flm, fl, l1bmode, outputmode, showlevels, vclip);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, flmode, flen, l1bmode, outputmode, showlevels, vclip);
     }
 
 
     /*
      * The private constructor
      */
-    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flm, int fl, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
       : gr::block("bootstrap_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -1214,10 +1214,10 @@ namespace gr {
         }
       }
 
-      Nextra = ((fl * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (symbol_size + guard_interval) - numpayloadsyms * (symbol_size + guard_interval);
+      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (symbol_size + guard_interval) - numpayloadsyms * (symbol_size + guard_interval);
       Nfinal = Nextra % numpayloadsyms;
       Nextra = Nextra / numpayloadsyms;
-      if (flm == FLM_SYMBOL_ALIGNED) {
+      if (flmode == FLM_SYMBOL_ALIGNED) {
         frame_items = (symbols * symbol_size) + (symbols * guard_interval);
       }
       else {

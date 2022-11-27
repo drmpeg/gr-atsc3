@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(bootstrap_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(bcd8013453ff61900e96265e3a89c231)                     */
+/* BINDTOOL_HEADER_FILE_HASH(965dfb2eb08416f7471fa68cb3e9aa13)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -43,8 +43,8 @@ void bind_bootstrap_cc(py::module& m)
            py::arg("guardinterval"),
            py::arg("pilotpattern"),
            py::arg("frameinterval"),
-           py::arg("flm"),
-           py::arg("fl"),
+           py::arg("flmode"),
+           py::arg("flen"),
            py::arg("l1bmode"),
            py::arg("outputmode"),
            py::arg("showlevels"),

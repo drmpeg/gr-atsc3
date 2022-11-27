@@ -14,10 +14,10 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     cyclicprefixer_cc::sptr
-    cyclicprefixer_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flm, int fl, unsigned int vlength)
+    cyclicprefixer_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flmode, int flen, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<cyclicprefixer_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, flm, fl, vlength
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, flmode, flen, vlength
         );
     }
 
@@ -25,7 +25,7 @@ namespace gr {
     /*
      * The private constructor
      */
-    cyclicprefixer_cc_impl::cyclicprefixer_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flm, int fl, unsigned int vlength)
+    cyclicprefixer_cc_impl::cyclicprefixer_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flmode, int flen, unsigned int vlength)
       : gr::block("cyclicprefixer_cc",
               gr::io_signature::make(1, 1, sizeof(input_type) * vlength),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -74,12 +74,12 @@ namespace gr {
           gisamples = 192;
           break;
       }
-      Nextra = ((fl * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples + gisamples) - numpayloadsyms * (fftsamples + gisamples);
+      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples + gisamples) - numpayloadsyms * (fftsamples + gisamples);
       Nfinal = Nextra % numpayloadsyms;
       Nextra = Nextra / numpayloadsyms;
       symbol = 0;
-      flmode = flm;
-      if (flm == FLM_SYMBOL_ALIGNED) {
+      fl_mode = flmode;
+      if (flmode == FLM_SYMBOL_ALIGNED) {
         set_relative_rate(fftsamples + gisamples);
         set_output_multiple(fftsamples + gisamples);
       }
@@ -99,7 +99,7 @@ namespace gr {
     void
     cyclicprefixer_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      if (flmode == FLM_TIME_ALIGNED) {
+      if (fl_mode == FLM_TIME_ALIGNED) {
         ninput_items_required[0] = noutput_items / (fftsamples + gisamples + Nextra + Nfinal);
       }
       else {
@@ -118,7 +118,7 @@ namespace gr {
       int symbols;
       int produced = 0;
 
-      if (flmode == FLM_TIME_ALIGNED) {
+      if (fl_mode == FLM_TIME_ALIGNED) {
         symbols = noutput_items / (fftsamples + gisamples + Nextra + Nfinal);
         for (int i = 0; i < symbols; i++) {
           if (symbol >= preamble_syms) {

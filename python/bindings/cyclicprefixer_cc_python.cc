@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(cyclicprefixer_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(db8ab51745608f716383c424da592665)                     */
+/* BINDTOOL_HEADER_FILE_HASH(55a090c4fb5d2c334630e16f1f8dcd5a)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,8 +41,8 @@ void bind_cyclicprefixer_cc(py::module& m)
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),
            py::arg("guardinterval"),
-           py::arg("flm"),
-           py::arg("fl"),
+           py::arg("flmode"),
+           py::arg("flen"),
            py::arg("vlength"),
            D(cyclicprefixer_cc,make)
         )

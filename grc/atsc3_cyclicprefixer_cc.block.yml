@@ -9,8 +9,8 @@ templates:
           ${numpayloadsyms},
           ${numpreamblesyms},
           ${guardinterval.val},
-          ${flm.val},
-          ${fl},
+          ${flmode.val},
+          ${flen},
           ${fftsize.vlength})
 
 parameters:
@@ -37,20 +37,20 @@ parameters:
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
     option_attributes:
         val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
--   id: flm
+-   id: flmode
     label: Frame Length Mode
     dtype: enum
     default: FLM_SYMBOL_ALIGNED
     options: [FLM_TIME_ALIGNED, FLM_SYMBOL_ALIGNED]
     option_labels: [Time Aligned, Symbol Aligned]
     option_attributes:
-        hide_fl: [none, all]
+        hide_flen: [none, all]
         val: [atsc3.FLM_TIME_ALIGNED, atsc3.FLM_SYMBOL_ALIGNED]
--   id: fl
+-   id: flen
     label: Frame Length (ms)
     dtype: int
     default: '100'
-    hide: ${ flm.hide_fl }
+    hide: ${ flmode.hide_flen }
 
 inputs:
 -   domain: stream
