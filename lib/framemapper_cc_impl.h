@@ -10,6 +10,7 @@
 
 #include <atsc3/framemapper_cc.h>
 #include "atsc3_defines.h"
+#include "time.h"
 #include <bitset>
 #include <deque>
 #include <vector>
@@ -137,7 +138,7 @@ namespace gr {
       int preamble_syms;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
-      int add_l1detail(gr_complex*, int, int);
+      int add_l1detail(gr_complex*, int, int, int);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
       void init_ti_randomizer(void);
@@ -172,6 +173,9 @@ namespace gr {
       int frame_samples;
       long long cells;
       int fec_cells;
+      struct timespec tai;
+      int time_msec, time_usec, time_nsec;
+      double frac_nsec, frame_nsec;
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
@@ -327,7 +331,7 @@ namespace gr {
       const static int sbs_data_cells_table_32K[16][5][5];
 
      public:
-      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flm, int fl, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~framemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

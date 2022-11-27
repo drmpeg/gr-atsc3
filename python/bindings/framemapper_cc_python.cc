@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(framemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(c105957270660cc3d85ec778ad0b49bc)                     */
+/* BINDTOOL_HEADER_FILE_HASH(6318046a794a77c13b249192c00176e6)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -52,8 +52,9 @@ void bind_framemapper_cc(py::module& m)
            py::arg("timode"),
            py::arg("tidepth"),
            py::arg("cred"),
-           py::arg("flm"),
-           py::arg("fl"),
+           py::arg("flmode"),
+           py::arg("flen"),
+           py::arg("tifmode"),
            py::arg("paprmode"),
            py::arg("l1bmode"),
            py::arg("l1dmode"),
