@@ -58,13 +58,13 @@ Features not implemented:
 3) Time and Frequency Division Multiplexing
 4) Hybrid Time Interleaver (HTI)
 5) Channel bonding
-6) Time information
-7) L1-Detail segmentation
-8) L1-Detail additional parity
-9) MISO
-10) MIMO
-11) ACE PAPR reduction
-12) Low Level Signaling (LLS)
+6) L1-Detail segmentation
+7) L1-Detail additional parity
+8) MISO
+9) MIMO
+10) ACE PAPR reduction
+11) Low Level Signaling (LLS)
+12) Baseband frame counter
 13) Transmitter Identification (TxID)
 14) IP packet input
 
