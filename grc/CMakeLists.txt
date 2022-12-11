@@ -22,5 +22,6 @@ install(FILES
     atsc3_ldmframemapper_cc.block.yml
     atsc3_subframemapper_cc.block.yml
     atsc3_subbootstrap_cc.block.yml
-    atsc3_cyclicprefixer_cc.block.yml DESTINATION share/gnuradio/grc/blocks
+    atsc3_cyclicprefixer_cc.block.yml
+    atsc3_tdmframemapper_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )

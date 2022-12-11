@@ -47,3 +47,4 @@ GR_ADD_TEST(qa_ldmframemapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR
 GR_ADD_TEST(qa_subframemapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_subframemapper_cc.py)
 GR_ADD_TEST(qa_subbootstrap_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_subbootstrap_cc.py)
 GR_ADD_TEST(qa_cyclicprefixer_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_cyclicprefixer_cc.py)
+GR_ADD_TEST(qa_tdmframemapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_tdmframemapper_cc.py)
