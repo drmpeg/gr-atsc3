@@ -192,11 +192,27 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      if (tifmode == TIF_NS_PRECISION) {
-        l1basicinit->L1_Detail_size_bytes = 27;
+      if (timode == TI_MODE_CONVOLUTIONAL) {
+        if (tifmode == TIF_NS_PRECISION) {
+          l1basicinit->L1_Detail_size_bytes = 29;
+        }
+        else if (tifmode == TIF_US_PRECISION) {
+          l1basicinit->L1_Detail_size_bytes = 28;
+        }
+        else if (tifmode == TIF_MS_PRECISION) {
+          l1basicinit->L1_Detail_size_bytes = 27;
+        }
+        else {
+          l1basicinit->L1_Detail_size_bytes = 25;
+        }
       }
       else {
-        l1basicinit->L1_Detail_size_bytes = 25;
+        if (tifmode == TIF_NS_PRECISION) {
+          l1basicinit->L1_Detail_size_bytes = 27;
+        }
+        else {
+          l1basicinit->L1_Detail_size_bytes = 25;
+        }
       }
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
@@ -313,6 +329,7 @@ namespace gr {
       }
       l1detailinit->reserved = 0x7fffffffffffffff;
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, FALSE);
+      printf("L1-Detail cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
       switch (fftsize) {
         case FFTSIZE_8K:
