@@ -14,6 +14,7 @@ templates:
           % else:
           ${constellation2.val},
           % endif
+          ${timode1st.val},
           ${framesize2nd.val},
           ${rate2nd.val},
           ${fecmode2nd.val},
@@ -22,6 +23,7 @@ templates:
           % else:
           ${constellation4.val},
           % endif
+          ${timode2nd.val},
           ${fftsize.val},
           ${numpayloadsyms},
           ${numpreamblesyms},
@@ -62,8 +64,6 @@ templates:
           % endif
           ${firstsbs.val},
           ${fimode.val},
-          ${timode.val},
-          ${tidepth.val},
           ${cred.val},
           ${paprmode.val},
           ${l1bmode.val},
@@ -110,6 +110,13 @@ parameters:
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
     hide: ${ framesize1st.hide_constellation2 }
+-   id: timode1st
+    label: Time Interleaver Mode 1st
+    dtype: enum
+    options: [TI_MODE_OFF, TI_MODE_HYBRID]
+    option_labels: [Disabled, Hybrid]
+    option_attributes:
+        val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
 -   id: framesize2nd
     label: FECFRAME size 2nd
     dtype: enum
@@ -150,6 +157,13 @@ parameters:
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
     hide: ${ framesize2nd.hide_constellation2 }
+-   id: timode2nd
+    label: Time Interleaver Mode 2nd
+    dtype: enum
+    options: [TI_MODE_OFF, TI_MODE_HYBRID]
+    option_labels: [Disabled, Hybrid]
+    option_attributes:
+        val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
 -   id: fftsize
     label: FFT Size
     dtype: enum
@@ -337,20 +351,6 @@ parameters:
     option_labels: [Preamble Only, All Symbols]
     option_attributes:
         val: [atsc3.FREQ_PREAMBLE_ONLY, atsc3.FREQ_ALL_SYMBOLS]
--   id: timode
-    label: Time Interleaver Mode
-    dtype: enum
-    options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
-    option_labels: [Disabled, Convolutional, Hybrid]
-    option_attributes:
-        val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
--   id: tidepth
-    label: Time Interleaver Depth
-    dtype: enum
-    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
-    option_labels: [512, 724, 887, 1024]
-    option_attributes:
-        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
 -   id: cred
     label: Reduced Carriers
     dtype: enum

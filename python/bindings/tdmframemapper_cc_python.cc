@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(tdmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(e8206ed887f7d3fb487116272f5f020b)                     */
+/* BINDTOOL_HEADER_FILE_HASH(e51fa676837b927e0c74cec6582cb47e)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,10 +41,12 @@ void bind_tdmframemapper_cc(py::module& m)
            py::arg("rate1st"),
            py::arg("fecmode1st"),
            py::arg("constellation1st"),
+           py::arg("timode1st"),
            py::arg("framesize2nd"),
            py::arg("rate2nd"),
            py::arg("fecmode2nd"),
            py::arg("constellation2nd"),
+           py::arg("timode2nd"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),
@@ -53,8 +55,6 @@ void bind_tdmframemapper_cc(py::module& m)
            py::arg("pilotboost"),
            py::arg("firstsbs"),
            py::arg("fimode"),
-           py::arg("timode"),
-           py::arg("tidepth"),
            py::arg("cred"),
            py::arg("paprmode"),
            py::arg("l1bmode"),
