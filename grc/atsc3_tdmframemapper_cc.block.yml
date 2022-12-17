@@ -15,6 +15,8 @@ templates:
           ${constellation2.val},
           % endif
           ${timode1st.val},
+          ${tiblocks1st},
+          ${tifecblocks1st},
           ${framesize2nd.val},
           ${rate2nd.val},
           ${fecmode2nd.val},
@@ -24,6 +26,9 @@ templates:
           ${constellation4.val},
           % endif
           ${timode2nd.val},
+          ${tiblocks2nd},
+          ${tifecblocks2nd},
+          ${plpsplit},
           ${fftsize.val},
           ${numpayloadsyms},
           ${numpreamblesyms},
@@ -116,7 +121,18 @@ parameters:
     options: [TI_MODE_OFF, TI_MODE_HYBRID]
     option_labels: [Disabled, Hybrid]
     option_attributes:
+        hide_tiblocks: [all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
+-   id: tiblocks1st
+    label: TI blocks 1st
+    dtype: int
+    default: '2'
+    hide: ${ timode1st.hide_tiblocks }
+-   id: tifecblocks1st
+    label: TI FEC blocks 1st
+    dtype: int
+    default: '14'
+    hide: ${ timode1st.hide_tiblocks }
 -   id: framesize2nd
     label: FECFRAME size 2nd
     dtype: enum
@@ -163,7 +179,22 @@ parameters:
     options: [TI_MODE_OFF, TI_MODE_HYBRID]
     option_labels: [Disabled, Hybrid]
     option_attributes:
+        hide_tiblocks: [all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
+-   id: tiblocks2nd
+    label: TI blocks 2nd
+    dtype: int
+    default: '2'
+    hide: ${ timode2nd.hide_tiblocks }
+-   id: tifecblocks2nd
+    label: TI FEC blocks 2nd
+    dtype: int
+    default: '44'
+    hide: ${ timode2nd.hide_tiblocks }
+-   id: plpsplit
+    label: PLP 0/1 size ratio
+    dtype: float
+    default: '0.5'
 -   id: fftsize
     label: FFT Size
     dtype: enum

@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     tdmframemapper_cc::sptr
-    tdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<tdmframemapper_cc_impl>(
-        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, paprmode, l1bmode, l1dmode);
+        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("tdmframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -169,7 +169,15 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      l1basicinit->L1_Detail_size_bytes = 30;
+      if (timode1st == TI_MODE_OFF && timode2nd == TI_MODE_OFF) {
+        l1basicinit->L1_Detail_size_bytes = 30;
+      }
+      else if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
+        l1basicinit->L1_Detail_size_bytes = 34;
+      }
+      else {
+        l1basicinit->L1_Detail_size_bytes = 32;
+      }
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
@@ -268,6 +276,12 @@ namespace gr {
       l1detailinit1st->plp_mod = constellation1st;
       l1detailinit1st->plp_cod = rate1st;
       l1detailinit1st->plp_TI_mode = timode1st;
+      l1detailinit1st->plp_TI_extended_interleaving = FALSE;
+      l1detailinit1st->plp_HTI_inter_subframe = FALSE;
+      l1detailinit1st->plp_HTI_num_ti_blocks = tiblocks1st;
+      l1detailinit1st->plp_HTI_num_fec_blocks_max = tifecblocks1st;
+      l1detailinit1st->plp_HTI_num_fec_blocks = tifecblocks1st;
+      l1detailinit1st->plp_HTI_cell_interleaver = TRUE;
       l1detailinit1st->plp_type = 0;
 
       l1detailinit2nd->plp_id = 1;
@@ -350,6 +364,12 @@ namespace gr {
       l1detailinit2nd->plp_mod = constellation2nd;
       l1detailinit2nd->plp_cod = rate2nd;
       l1detailinit2nd->plp_TI_mode = timode2nd;
+      l1detailinit2nd->plp_TI_extended_interleaving = FALSE;
+      l1detailinit2nd->plp_HTI_inter_subframe = FALSE;
+      l1detailinit2nd->plp_HTI_num_ti_blocks = tiblocks2nd;
+      l1detailinit2nd->plp_HTI_num_fec_blocks_max = tifecblocks2nd;
+      l1detailinit2nd->plp_HTI_num_fec_blocks = tifecblocks2nd;
+      l1detailinit2nd->plp_HTI_cell_interleaver = TRUE;
       l1detailinit2nd->plp_type = 0;
       l1detailinit2nd->reserved = 0x7fffffffffffffff;
 
@@ -982,19 +1002,18 @@ namespace gr {
       if (firstsbs) {
         plp_size_total = totalcells - l1cells - (2 * sbsnullcells);
         printf("PLP size total = %d\n", plp_size_total);
-
       }
       else {
         plp_size_total = totalcells - l1cells - sbsnullcells;
         printf("PLP size total = %d\n", plp_size_total);
       }
-      if (plp_size_total & 0x1) {
-        plp_size[0] = (plp_size_total / 2);
-        plp_size[1] = (plp_size_total / 2) + 1;
+      if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
+        plp_size[0] = tifecblocks1st * fec_cells[0];
+        plp_size[1] = tifecblocks2nd * fec_cells[1];
       }
       else {
-        plp_size[0] = (plp_size_total / 2);
-        plp_size[1] = plp_size[0];
+        plp_size[0] = (float)plp_size_total * plpsplit;
+        plp_size[1] = plp_size_total - plp_size[0];
       }
       l1detailinit1st->plp_size = plp_size[0];
       l1detailinit2nd->plp_size = plp_size[1];
@@ -1726,7 +1745,24 @@ namespace gr {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       if (l1detailinit1st->plp_TI_mode == TI_MODE_HYBRID) {
-        /* to be developed */
+        l1detail[offset_bits++] = l1detailinit1st->plp_type;
+        if (l1detailinit1st->plp_mod == MOD_QPSK) {
+          l1detail[offset_bits++] = l1detailinit1st->plp_TI_extended_interleaving;
+        }
+        l1detail[offset_bits++] = l1detailinit1st->plp_HTI_inter_subframe;
+        bits = l1detailinit1st->plp_HTI_num_ti_blocks - 1;
+        for (int n = 3; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit1st->plp_HTI_num_fec_blocks_max - 1;
+        for (int n = 11; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit1st->plp_HTI_num_fec_blocks - 1;
+        for (int n = 11; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        l1detail[offset_bits++] = l1detailinit1st->plp_HTI_cell_interleaver;
       }
       else {
         bits = block_start1st;
@@ -1774,7 +1810,24 @@ namespace gr {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       if (l1detailinit2nd->plp_TI_mode == TI_MODE_HYBRID) {
-        /* to be developed */
+        l1detail[offset_bits++] = l1detailinit2nd->plp_type;
+        if (l1detailinit2nd->plp_mod == MOD_QPSK) {
+          l1detail[offset_bits++] = l1detailinit2nd->plp_TI_extended_interleaving;
+        }
+        l1detail[offset_bits++] = l1detailinit2nd->plp_HTI_inter_subframe;
+        bits = l1detailinit2nd->plp_HTI_num_ti_blocks - 1;
+        for (int n = 3; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit2nd->plp_HTI_num_fec_blocks_max - 1;
+        for (int n = 11; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit2nd->plp_HTI_num_fec_blocks - 1;
+        for (int n = 11; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        l1detail[offset_bits++] = l1detailinit2nd->plp_HTI_cell_interleaver;
       }
       else {
         bits = block_start2nd;
@@ -2060,6 +2113,106 @@ namespace gr {
       return (rows);
     }
 
+    void
+    tdmframemapper_cc_impl::init_address(void)
+    {
+      int max_states, xor_size, pn_mask, result;
+      int q;
+      int lfsr;
+      int logic11[2] = {0, 3};
+      int logic12[2] = {0, 2};
+      int logic13[4] = {0, 1, 4, 6};
+      int logic14[6] = {0, 1, 4, 5, 9, 11};
+      int logic15[4] = {0, 1, 2, 12};
+      int* logic;
+      int pn_degree, Lr;
+      int Nd, index;
+
+      Nd = 0;
+      index = fec_cells[0];
+      while (index) {
+        index >>= 1;
+        Nd++;
+      }
+      printf("Nd = %d\n", Nd);
+
+      switch (Nd) {
+        case 11:
+          pn_degree = 11;
+          pn_mask = 0x7ff;
+          max_states = fec_cells[0];
+          logic = &logic11[0];
+          xor_size = 2;
+          break;
+        case 12:
+          pn_degree = 12;
+          pn_mask = 0xfff;
+          max_states = fec_cells[0];
+          logic = &logic12[0];
+          xor_size = 2;
+          break;
+        case 13:
+          pn_degree = 13;
+          pn_mask = 0x1fff;
+          max_states = fec_cells[0];
+          logic = &logic13[0];
+          xor_size = 4;
+          break;
+        case 14:
+          pn_degree = 14;
+          pn_mask = 0x3fff;
+          max_states = fec_cells[0];
+          logic = &logic14[0];
+          xor_size = 6;
+          break;
+        case 15:
+          pn_degree = 15;
+          pn_mask = 0x7fff;
+          max_states = fec_cells[0];
+          logic = &logic15[0];
+          xor_size = 4;
+          break;
+        default:
+          pn_degree = 11;
+          pn_mask = 0x7ff;
+          max_states = fec_cells[0];
+          logic = &logic11[0];
+          xor_size = 2;
+          break;
+      }
+
+      for (int i = 0; i < symbols; i++) {
+        std::vector<int>& Htime = this->Htime[i];
+        q = 0;
+
+        for (int j = 0; j < max_states; j++) {
+          if (j == 0 || j == 1) {
+            lfsr = 0;
+          }
+          else if (j == 2) {
+            lfsr = 1;
+          }
+          else {
+            result = 0;
+            for (int k = 0; k < xor_size; k++) {
+              result ^= (lfsr >> logic[k]) & 1;
+            }
+            lfsr &= pn_mask;
+            lfsr >>= 1;
+            lfsr |= result << (pn_degree - 1);
+          }
+          Lr = 0;
+          for (int n = 0; n < pn_degree; n++) {
+            Lr |= ((lfsr >> n) & 0x1) << 0;
+          }
+          Lr = Lr + ((j % 2) * (max_states / 2));
+          if (Lr < fec_cells[0]) {
+            Htime[q++] = Lr;
+          }
+        }
+      }
+    }
+
     const gr_complex zero = gr_complex(0.0, 0.0);
 
     int
@@ -2092,15 +2245,18 @@ namespace gr {
         right_nulls = left_nulls;
       }
       for (int i = 0; i < noutput_items; i += noutput_items) {
-        if (ti_mode[0] == TI_MODE_HYBRID) {
+//        if (ti_mode[0] == TI_MODE_HYBRID) {
+        if (0) {
           /* to be developed */
         }
         else {
           memcpy(&outtimeint[indexout_timeint], &in[indexin[0]], sizeof(gr_complex) * plp_size[0]);
+//          memset(&outtimeint[indexout_timeint], 0, sizeof(gr_complex) * plp_size[0]);
           indexin[0] += plp_size[0];
           indexout_timeint += plp_size[0];
         }
-        if (ti_mode[1] == TI_MODE_HYBRID) {
+//        if (ti_mode[1] == TI_MODE_HYBRID) {
+        if (0) {
           /* to be developed */
         }
         else {
