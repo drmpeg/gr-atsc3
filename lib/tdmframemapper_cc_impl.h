@@ -145,7 +145,7 @@ namespace gr {
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
       void block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows, int l1select);
-      void init_address(void);
+      void init_address(int);
       unsigned char l1_temp[FRAME_SIZE_SHORT];
       unsigned char l1_basic[FRAME_SIZE_SHORT];
       unsigned char l1_detail[FRAME_SIZE_SHORT];
@@ -177,7 +177,12 @@ namespace gr {
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
       int ti_mode[2];
+      int ti_blocks[2];
+      int ti_fecblocks[2];
       gr_complex *time_interleaver;
+      gr_complex *hybrid_time_interleaver[2];
+      std::vector<std::vector<std::vector<int>>> HtimeLr[2];
+      std::vector<std::vector<int>> HtimePr[2];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
@@ -300,8 +305,6 @@ namespace gr {
         }
         ldpc_encode_2nd.table_length = index;
       }
-
-      std::vector<std::vector<int>> Htime;
 
       const static int shortening_table[8][18];
       const static uint16_t ldpc_tab_3_15S[12][12];

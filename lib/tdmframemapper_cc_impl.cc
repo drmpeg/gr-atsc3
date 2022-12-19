@@ -1007,6 +1007,7 @@ namespace gr {
         plp_size_total = totalcells - l1cells - sbsnullcells;
         printf("PLP size total = %d\n", plp_size_total);
       }
+      /* Mixed TI modes not supported for now */
       if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
         plp_size[0] = tifecblocks1st * fec_cells[0];
         plp_size[1] = tifecblocks2nd * fec_cells[1];
@@ -1023,10 +1024,79 @@ namespace gr {
 
       ti_mode[0] = timode1st;
       ti_mode[1] = timode2nd;
+      ti_blocks[0] = tiblocks1st;
+      ti_blocks[1] = tiblocks2nd;
+      ti_fecblocks[0] = tifecblocks1st;
+      ti_fecblocks[1] = tifecblocks2nd;
       time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total);
       if (time_interleaver == NULL) {
-        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
+        GR_LOG_FATAL(d_logger, "TDM Frame Mapper, cannot allocate memory for time_interleaver.");
         throw std::bad_alloc();
+      }
+      hybrid_time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[0]);
+      if (hybrid_time_interleaver[0] == NULL) {
+        GR_LOG_FATAL(d_logger, "TDM Frame Mapper, cannot allocate memory for hybrid_time_interleaver 0.");
+        throw std::bad_alloc();
+      }
+      hybrid_time_interleaver[1] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[1]);
+      if (hybrid_time_interleaver[1] == NULL) {
+        GR_LOG_FATAL(d_logger, "TDM Frame Mapper, cannot allocate memory for hybrid_time_interleaver 1.");
+        throw std::bad_alloc();
+      }
+
+      if (timode1st == TI_MODE_HYBRID) {
+        HtimeLr[0].resize(ti_blocks[0]);
+        for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[0].size(); x++) {
+          HtimeLr[0][x].resize(ti_fecblocks[0] / ti_blocks[0]);
+          for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeLr[0][x].size(); i++) {
+            HtimeLr[0][x][i].resize(fec_cells[0]);
+          }
+        }
+        HtimePr[0].resize(ti_blocks[0]);
+        /* ti_fec_blocks must be a multiple of ti_blocks for now */
+        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[0].size(); i++) {
+          HtimePr[0][i].resize(ti_fecblocks[0] / ti_blocks[0]);
+        }
+        init_address(0);
+      }
+      if (timode2nd == TI_MODE_HYBRID) {
+        HtimeLr[1].resize(ti_blocks[1]);
+        for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[1].size(); x++) {
+          HtimeLr[1][x].resize(ti_fecblocks[1] / ti_blocks[1]);
+          for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeLr[1][x].size(); i++) {
+            HtimeLr[1][x][i].resize(fec_cells[1]);
+          }
+        }
+        HtimePr[1].resize(ti_blocks[1]);
+        /* ti_fec_blocks must be a multiple of ti_blocks for now */
+        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[1].size(); i++) {
+          HtimePr[1][i].resize(ti_fecblocks[1] / ti_blocks[1]);
+        }
+//        init_address(1);
+      }
+
+      int sr = 0x18f;
+      int b, packed;
+      for (int i = 0; i < plp_size_total;) {
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        for (int n = 7; n >= 0; n--) {
+          if (packed & (1 << n)) {
+            time_interleaver[i++] = gr_complex(-1, 0);
+          }
+          else {
+            time_interleaver[i++] = gr_complex(1, 0);
+          }
+          if (i == plp_size_total) {
+            break;
+          }
+        }
+        b = sr & 1;
+        sr >>= 1;
+        if (b) {
+          sr ^= POLYNOMIAL;
+        }
       }
 
       set_output_multiple(totalcells);
@@ -1037,6 +1107,8 @@ namespace gr {
      */
     tdmframemapper_cc_impl::~tdmframemapper_cc_impl()
     {
+      free(hybrid_time_interleaver[1]);
+      free(hybrid_time_interleaver[0]);
       free(time_interleaver);
     }
 
@@ -2114,10 +2186,10 @@ namespace gr {
     }
 
     void
-    tdmframemapper_cc_impl::init_address(void)
+    tdmframemapper_cc_impl::init_address(int plp)
     {
       int max_states, xor_size, pn_mask, result;
-      int q;
+      int q, k;
       int lfsr;
       int logic11[2] = {0, 3};
       int logic12[2] = {0, 2};
@@ -2127,9 +2199,10 @@ namespace gr {
       int* logic;
       int pn_degree, Lr;
       int Nd, index;
+      long long Pr;
 
       Nd = 0;
-      index = fec_cells[0];
+      index = fec_cells[plp];
       while (index) {
         index >>= 1;
         Nd++;
@@ -2140,75 +2213,104 @@ namespace gr {
         case 11:
           pn_degree = 11;
           pn_mask = 0x7ff;
-          max_states = fec_cells[0];
+          max_states = 2048;
           logic = &logic11[0];
           xor_size = 2;
           break;
         case 12:
           pn_degree = 12;
           pn_mask = 0xfff;
-          max_states = fec_cells[0];
+          max_states = 4096;
           logic = &logic12[0];
           xor_size = 2;
           break;
         case 13:
           pn_degree = 13;
           pn_mask = 0x1fff;
-          max_states = fec_cells[0];
+          max_states = 8192;
           logic = &logic13[0];
           xor_size = 4;
           break;
         case 14:
           pn_degree = 14;
           pn_mask = 0x3fff;
-          max_states = fec_cells[0];
+          max_states = 16384;
           logic = &logic14[0];
           xor_size = 6;
           break;
         case 15:
           pn_degree = 15;
           pn_mask = 0x7fff;
-          max_states = fec_cells[0];
+          max_states = 32768;
           logic = &logic15[0];
           xor_size = 4;
           break;
         default:
           pn_degree = 11;
           pn_mask = 0x7ff;
-          max_states = fec_cells[0];
+          max_states = 2048;
           logic = &logic11[0];
           xor_size = 2;
           break;
       }
 
-      for (int i = 0; i < symbols; i++) {
-        std::vector<int>& Htime = this->Htime[i];
-        q = 0;
+      printf("fec_cells = %d, %d\n", fec_cells[plp], max_states);
 
-        for (int j = 0; j < max_states; j++) {
-          if (j == 0 || j == 1) {
-            lfsr = 0;
-          }
-          else if (j == 2) {
-            lfsr = 1;
-          }
-          else {
-            result = 0;
-            for (int k = 0; k < xor_size; k++) {
-              result ^= (lfsr >> logic[k]) & 1;
+      for (int i = 0; i < ti_blocks[plp]; i++) {
+        std::vector<int>& Htime = this->HtimePr[plp][i];
+        q = 0;
+        k = 0;
+        for (int r = 0; r < ti_fecblocks[plp] / ti_blocks[plp]; r++) {
+          /* ti_fec_blocks must be a multiple of ti_blocks for now */
+          Pr = fec_cells[plp];
+          while (Pr >= fec_cells[plp]) {
+            Pr = 0;
+            for (int j = 0; j < Nd; j++) {
+              Pr |= (k & (1 << j)) << ((Nd + 16) - 1 - j * 2);
             }
-            lfsr &= pn_mask;
-            lfsr >>= 1;
-            lfsr |= result << (pn_degree - 1);
+            Pr >>= 16;
+            k = k + 1;
           }
-          Lr = 0;
-          for (int n = 0; n < pn_degree; n++) {
-            Lr |= ((lfsr >> n) & 0x1) << 0;
+          Htime[q++] = Pr;
+        }
+      }
+
+      for (int x = 0; x < ti_blocks[plp]; x++) {
+        for (int i = 0; i < ti_fecblocks[plp] / ti_blocks[plp]; i++) {
+          /* ti_fec_blocks must be a multiple of ti_blocks for now */
+          std::vector<int>& Htime = this->HtimeLr[plp][x][i];
+          std::vector<int>& HtimePr = this->HtimePr[plp][x];
+          q = 0;
+
+          for (int j = 0; j < max_states; j++) {
+            if (j == 0 || j == 1) {
+              lfsr = 0;
+            }
+            else if (j == 2) {
+              lfsr = 1;
+            }
+            else {
+              result = 0;
+              for (int k = 0; k < xor_size; k++) {
+                result ^= (lfsr >> logic[k]) & 1;
+              }
+              lfsr &= pn_mask;
+              lfsr >>= 1;
+              lfsr |= result << (pn_degree - 1);
+            }
+            lfsr |= (j % 2) << (pn_degree - 1);
+            if (j < 10) {
+//              printf("lfsr = %d\n", lfsr);
+            }
+            Lr = 0;
+            for (int n = 0; n < pn_degree; n++) {
+              Lr |= (lfsr >> n);    /* ??? */
+            }
+            if (Lr < fec_cells[plp]) {
+              Htime[q++] = (Lr + HtimePr[i]) % fec_cells[plp];
+            }
           }
-          Lr = Lr + ((j % 2) * (max_states / 2));
-          if (Lr < fec_cells[0]) {
-            Htime[q++] = Lr;
-          }
+          printf("q = %d\n", q);
         }
       }
     }
@@ -2222,6 +2324,8 @@ namespace gr {
                        gr_vector_void_star &output_items)
     {
       auto in = static_cast<const input_type*>(input_items[0]);
+      auto in0 = static_cast<const input_type*>(input_items[0]);
+      auto in1 = static_cast<const input_type*>(input_items[1]);
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin[2] = {0, 0};
       int indexout = 0;
@@ -2234,6 +2338,9 @@ namespace gr {
       int left_nulls;
       int right_nulls;
       int l1detailcells, l1totalcells;
+      int Ri, Ti, Ci;
+      std::vector<int> H;
+      gr_complex *outtimehti;
       gr_complex *outtimeint = &time_interleaver[0];
 
       if (sbsnullcells & 0x1) {
@@ -2245,23 +2352,67 @@ namespace gr {
         right_nulls = left_nulls;
       }
       for (int i = 0; i < noutput_items; i += noutput_items) {
-//        if (ti_mode[0] == TI_MODE_HYBRID) {
-        if (0) {
-          /* to be developed */
+        if (ti_mode[0] == TI_MODE_HYBRID) {
+          outtimehti = &hybrid_time_interleaver[0][0];
+          for (int x = 0; x < ti_blocks[0]; x++) {
+            for (int j = 0; j < ti_fecblocks[0] / ti_blocks[0]; j++) {
+              H = HtimeLr[0][x][j];
+              for (int n = 0; n < fec_cells[0]; n++) {
+//                *outtimehti++ = in0[H[n]];
+                *outtimehti++ = *in0++;  /* just for testing the loop*/
+              }
+            }
+          }
+          indexin[0] += plp_size[0];
+          in0 += plp_size[0];
+          in = &hybrid_time_interleaver[0][0];
+          for (int x = 0; x < ti_blocks[0]; x++) {
+            for (int j = 0; j < ti_fecblocks[0] / ti_blocks[0]; j++) {
+              for (int n = 0; n < fec_cells[0]; n++) {
+                Ri = n % fec_cells[0];
+                Ti = Ri % ti_fecblocks[0];
+                Ci = (Ti + (n / fec_cells[0])) % ti_fecblocks[0];
+//                *outtimeint++ = in[(fec_cells[0] * Ci) + Ri];
+                *outtimeint++ = *in++;  /* just for testing the loop*/
+              }
+            }
+          }
+          indexout_timeint += plp_size[0];
         }
         else {
-          memcpy(&outtimeint[indexout_timeint], &in[indexin[0]], sizeof(gr_complex) * plp_size[0]);
-//          memset(&outtimeint[indexout_timeint], 0, sizeof(gr_complex) * plp_size[0]);
+          memcpy(&outtimeint[indexout_timeint], &in0[indexin[0]], sizeof(gr_complex) * plp_size[0]);
           indexin[0] += plp_size[0];
           indexout_timeint += plp_size[0];
         }
-//        if (ti_mode[1] == TI_MODE_HYBRID) {
-        if (0) {
-          /* to be developed */
+        if (ti_mode[1] == TI_MODE_HYBRID) {
+          outtimehti = &hybrid_time_interleaver[1][0];
+          for (int x = 0; x < ti_blocks[1]; x++) {
+            for (int j = 0; j < ti_fecblocks[1] / ti_blocks[1]; j++) {
+              H = HtimeLr[1][x][j];
+              for (int n = 0; n < fec_cells[1]; n++) {
+//                *outtimehti++ = in1[H[n]];
+                *outtimehti++ = *in1++;  /* just for testing the loop*/
+              }
+            }
+          }
+          indexin[1] += plp_size[1];
+          in1 += plp_size[1];
+          in = &hybrid_time_interleaver[1][0];
+          for (int x = 0; x < ti_blocks[1]; x++) {
+            for (int j = 0; j < ti_fecblocks[1] / ti_blocks[1]; j++) {
+              for (int n = 0; n < fec_cells[1]; n++) {
+                Ri = n % fec_cells[1];
+                Ti = Ri % ti_fecblocks[1];
+                Ci = (Ti + (n / fec_cells[1])) % ti_fecblocks[1];
+//                *outtimeint++ = in[(fec_cells[1] * Ci) + Ri];
+                *outtimeint++ = *in++;  /* just for testing the loop */
+              }
+            }
+          }
+          indexout_timeint += plp_size[1];
         }
         else {
-          in = static_cast<const input_type*>(input_items[1]);
-          memcpy(&outtimeint[indexout_timeint], &in[indexin[1]], sizeof(gr_complex) * plp_size[1]);
+          memcpy(&outtimeint[indexout_timeint], &in1[indexin[1]], sizeof(gr_complex) * plp_size[1]);
           indexin[1] += plp_size[1];
           indexout_timeint += plp_size[1];
         }
