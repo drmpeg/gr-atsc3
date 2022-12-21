@@ -2211,43 +2211,43 @@ namespace gr {
 
       switch (Nd) {
         case 11:
-          pn_degree = 11;
-          pn_mask = 0x7ff;
+          pn_degree = 10;
+          pn_mask = 0x3ff;
           max_states = 2048;
           logic = &logic11[0];
           xor_size = 2;
           break;
         case 12:
-          pn_degree = 12;
-          pn_mask = 0xfff;
+          pn_degree = 11;
+          pn_mask = 0x7ff;
           max_states = 4096;
           logic = &logic12[0];
           xor_size = 2;
           break;
         case 13:
-          pn_degree = 13;
-          pn_mask = 0x1fff;
+          pn_degree = 12;
+          pn_mask = 0xfff;
           max_states = 8192;
           logic = &logic13[0];
           xor_size = 4;
           break;
         case 14:
-          pn_degree = 14;
-          pn_mask = 0x3fff;
+          pn_degree = 13;
+          pn_mask = 0x1fff;
           max_states = 16384;
           logic = &logic14[0];
           xor_size = 6;
           break;
         case 15:
-          pn_degree = 15;
-          pn_mask = 0x7fff;
+          pn_degree = 14;
+          pn_mask = 0x3fff;
           max_states = 32768;
           logic = &logic15[0];
           xor_size = 4;
           break;
         default:
-          pn_degree = 11;
-          pn_mask = 0x7ff;
+          pn_degree = 10;
+          pn_mask = 0x3ff;
           max_states = 2048;
           logic = &logic11[0];
           xor_size = 2;
@@ -2298,14 +2298,18 @@ namespace gr {
               lfsr >>= 1;
               lfsr |= result << (pn_degree - 1);
             }
-            lfsr |= (j % 2) << (pn_degree - 1);
+            lfsr |= (j % 2) << pn_degree;
             if (j < 10) {
 //              printf("lfsr = %d\n", lfsr);
             }
+#if 0
             Lr = 0;
             for (int n = 0; n < pn_degree; n++) {
-              Lr |= (lfsr >> n);    /* ??? */
+              Lr += (lfsr >> n);    /* ??? */
             }
+#else
+            Lr = lfsr;
+#endif
             if (Lr < fec_cells[plp]) {
               Htime[q++] = (Lr + HtimePr[i]) % fec_cells[plp];
             }
@@ -2358,8 +2362,7 @@ namespace gr {
             for (int j = 0; j < ti_fecblocks[0] / ti_blocks[0]; j++) {
               H = HtimeLr[0][x][j];
               for (int n = 0; n < fec_cells[0]; n++) {
-//                *outtimehti++ = in0[H[n]];
-                *outtimehti++ = *in0++;  /* just for testing the loop*/
+                *outtimehti++ = in0[H[n]];
               }
             }
           }
@@ -2372,8 +2375,7 @@ namespace gr {
                 Ri = n % fec_cells[0];
                 Ti = Ri % ti_fecblocks[0];
                 Ci = (Ti + (n / fec_cells[0])) % ti_fecblocks[0];
-//                *outtimeint++ = in[(fec_cells[0] * Ci) + Ri];
-                *outtimeint++ = *in++;  /* just for testing the loop*/
+                *outtimeint++ = in[(fec_cells[0] * Ci) + Ri];
               }
             }
           }
