@@ -9,8 +9,6 @@
 #include "subframemapper_cc_impl.h"
 #include <algorithm>
 
-#define L1_DETAIL_SIZE_BYTES 42
-
 namespace gr {
   namespace atsc3 {
 
@@ -178,7 +176,15 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred1st;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      l1basicinit->L1_Detail_size_bytes = L1_DETAIL_SIZE_BYTES;
+      if (timode1st == TI_MODE_OFF && timode2nd == TI_MODE_OFF) {
+        l1basicinit->L1_Detail_size_bytes = 37;
+      }
+      else if (timode1st == TI_MODE_CONVOLUTIONAL && timode2nd == TI_MODE_CONVOLUTIONAL) {
+        l1basicinit->L1_Detail_size_bytes = 42;
+      }
+      else {
+        l1basicinit->L1_Detail_size_bytes = 40;
+      }
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
@@ -403,6 +409,7 @@ namespace gr {
       }
       l1detailinit2nd->reserved = 0x7fffffffffffffff;
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0, 0);
+      printf("L1-Detail cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
       switch (fftsize1st) {
         case FFTSIZE_8K:
@@ -2069,7 +2076,7 @@ namespace gr {
       }
       time_interleaver[1] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[1]);
       if (time_interleaver[1] == NULL) {
-        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
+        GR_LOG_FATAL(d_logger, "Sub Frame Mapper, cannot allocate memory for time_interleaver.");
         throw std::bad_alloc();
       }
 
@@ -2749,6 +2756,7 @@ namespace gr {
       unsigned char *l1temp = l1_temp;
       L1_Detail *l1detailinit1st = &L1_Signalling[0].l1detail_data[0];
       L1_Detail *l1detailinit2nd = &L1_Signalling[0].l1detail_data[1];
+      L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       const unsigned char* d;
       unsigned char* p;
       int plen, nbch, groups;
@@ -2959,9 +2967,9 @@ namespace gr {
         }
         l1detail[offset_bits++] = l1detailinit2nd->plp_type;
       }
-      if ((((L1_DETAIL_SIZE_BYTES * 8) - 32) - offset_bits) > 0) {
+      if ((((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) > 0) {
         bitslong = l1detailinit2nd->reserved;
-        temp = (((L1_DETAIL_SIZE_BYTES * 8) - 32) - offset_bits) - 1;
+        temp = (((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) - 1;
         for (int n = temp; n >= 0; n--) {
           l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
         }

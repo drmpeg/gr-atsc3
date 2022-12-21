@@ -170,7 +170,12 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      l1basicinit->L1_Detail_size_bytes = 34;
+      if (timode == TI_MODE_CONVOLUTIONAL) {
+        l1basicinit->L1_Detail_size_bytes = 34;
+      }
+      else {
+        l1basicinit->L1_Detail_size_bytes = 31;
+      }
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
@@ -345,20 +350,11 @@ namespace gr {
       l1detailinit->plp_ldm_injection_level = level;
       l1detailinit->plp_TI_mode = timode;
       l1detailinit->plp_type = 0;
-      if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        l1detailinit->plp_TI_extended_interleaving = FALSE;
-        l1detailinit->plp_CTI_depth = tidepth;
-        if (constellation_core == MOD_QPSK) {
-          l1detailinit->reserved = 0x3;
-        }
-        else {
-          l1detailinit->reserved = 0x7;
-        }
-      }
-      else {
-        l1detailinit->reserved = 0x7fffffff;
-      }
+      l1detailinit->plp_TI_extended_interleaving = FALSE;
+      l1detailinit->plp_CTI_depth = tidepth;
+      l1detailinit->reserved = 0x7fffffffffffffff;
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0);
+      printf("L1-Detail cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
       switch (fftsize) {
         case FFTSIZE_8K:
@@ -1188,7 +1184,7 @@ namespace gr {
       }
       time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size);
       if (time_interleaver == NULL) {
-        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
+        GR_LOG_FATAL(d_logger, "LDM Frame Mapper, cannot allocate memory for time_interleaver.");
         throw std::bad_alloc();
       }
 
@@ -1857,13 +1853,14 @@ namespace gr {
       int npad, padbits, count, nrepeat, table;
       int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
-      int Anum, Aden, B, mod, rows;
+      int Anum, Aden, B, mod, rows, temp;
       long long bitslong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
       unsigned char *l1detail = l1_detail;
       unsigned char *l1temp = l1_temp;
       L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
+      L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       const unsigned char* d;
       unsigned char* p;
       int plen, nbch, groups;
@@ -2014,23 +2011,10 @@ namespace gr {
       for (int n = 4; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        if (l1detailinit->plp_mod_core == MOD_QPSK) {
-          bitslong = l1detailinit->reserved;
-          for (int n = 1; n >= 0; n--) {
-            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
-          }
-        }
-        else {
-          bitslong = l1detailinit->reserved;
-          for (int n = 2; n >= 0; n--) {
-            l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
-          }
-        }
-      }
-      else {
+      if ((((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) > 0) {
         bitslong = l1detailinit->reserved;
-        for (int n = 30; n >= 0; n--) {
+        temp = (((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) - 1;
+        for (int n = temp; n >= 0; n--) {
           l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
         }
       }
