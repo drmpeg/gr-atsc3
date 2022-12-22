@@ -1072,7 +1072,7 @@ namespace gr {
         for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[1].size(); i++) {
           HtimePr[1][i].resize(ti_fecblocks[1] / ti_blocks[1]);
         }
-//        init_address(1);
+        init_address(1);
       }
 
       int sr = 0x18f;
@@ -2197,7 +2197,7 @@ namespace gr {
       int logic14[6] = {0, 1, 4, 5, 9, 11};
       int logic15[4] = {0, 1, 2, 12};
       int* logic;
-      int pn_degree, Lr;
+      int pn_degree;
       int Nd, index;
       long long Pr;
 
@@ -2207,7 +2207,6 @@ namespace gr {
         index >>= 1;
         Nd++;
       }
-      printf("Nd = %d\n", Nd);
 
       switch (Nd) {
         case 11:
@@ -2254,8 +2253,6 @@ namespace gr {
           break;
       }
 
-      printf("fec_cells = %d, %d\n", fec_cells[plp], max_states);
-
       for (int i = 0; i < ti_blocks[plp]; i++) {
         std::vector<int>& Htime = this->HtimePr[plp][i];
         q = 0;
@@ -2299,22 +2296,10 @@ namespace gr {
               lfsr |= result << (pn_degree - 1);
             }
             lfsr |= (j % 2) << pn_degree;
-            if (j < 10) {
-//              printf("lfsr = %d\n", lfsr);
-            }
-#if 0
-            Lr = 0;
-            for (int n = 0; n < pn_degree; n++) {
-              Lr += (lfsr >> n);    /* ??? */
-            }
-#else
-            Lr = lfsr;
-#endif
-            if (Lr < fec_cells[plp]) {
-              Htime[q++] = (Lr + HtimePr[i]) % fec_cells[plp];
+            if (lfsr < fec_cells[plp]) {
+              Htime[q++] = (lfsr + HtimePr[i]) % fec_cells[plp];
             }
           }
-          printf("q = %d\n", q);
         }
       }
     }
@@ -2364,20 +2349,19 @@ namespace gr {
               for (int n = 0; n < fec_cells[0]; n++) {
                 *outtimehti++ = in0[H[n]];
               }
+              in0 += fec_cells[0];
             }
           }
           indexin[0] += plp_size[0];
-          in0 += plp_size[0];
           in = &hybrid_time_interleaver[0][0];
           for (int x = 0; x < ti_blocks[0]; x++) {
-            for (int j = 0; j < ti_fecblocks[0] / ti_blocks[0]; j++) {
-              for (int n = 0; n < fec_cells[0]; n++) {
-                Ri = n % fec_cells[0];
-                Ti = Ri % ti_fecblocks[0];
-                Ci = (Ti + (n / fec_cells[0])) % ti_fecblocks[0];
-                *outtimeint++ = in[(fec_cells[0] * Ci) + Ri];
-              }
+            for (int n = 0; n < fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]); n++) {
+              Ri = n % fec_cells[0];
+              Ti = Ri % (ti_fecblocks[0] / ti_blocks[0]);
+              Ci = (Ti + (n / fec_cells[0])) % (ti_fecblocks[0] / ti_blocks[0]);
+              *outtimeint++ = in[(fec_cells[0] * Ci) + Ri];
             }
+            in += fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]);
           }
           indexout_timeint += plp_size[0];
         }
@@ -2392,24 +2376,21 @@ namespace gr {
             for (int j = 0; j < ti_fecblocks[1] / ti_blocks[1]; j++) {
               H = HtimeLr[1][x][j];
               for (int n = 0; n < fec_cells[1]; n++) {
-//                *outtimehti++ = in1[H[n]];
-                *outtimehti++ = *in1++;  /* just for testing the loop*/
+                *outtimehti++ = in1[H[n]];
               }
+              in1 += fec_cells[1];
             }
           }
           indexin[1] += plp_size[1];
-          in1 += plp_size[1];
           in = &hybrid_time_interleaver[1][0];
           for (int x = 0; x < ti_blocks[1]; x++) {
-            for (int j = 0; j < ti_fecblocks[1] / ti_blocks[1]; j++) {
-              for (int n = 0; n < fec_cells[1]; n++) {
-                Ri = n % fec_cells[1];
-                Ti = Ri % ti_fecblocks[1];
-                Ci = (Ti + (n / fec_cells[1])) % ti_fecblocks[1];
-//                *outtimeint++ = in[(fec_cells[1] * Ci) + Ri];
-                *outtimeint++ = *in++;  /* just for testing the loop */
-              }
+            for (int n = 0; n < fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]); n++) {
+              Ri = n % fec_cells[1];
+              Ti = Ri % (ti_fecblocks[1] / ti_blocks[1]);
+              Ci = (Ti + (n / fec_cells[1])) % (ti_fecblocks[1] / ti_blocks[1]);
+              *outtimeint++ = in[(fec_cells[1] * Ci) + Ri];
             }
+            in += fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]);
           }
           indexout_timeint += plp_size[1];
         }
