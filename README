@@ -53,20 +53,18 @@ calibration of the bootstrap resampler.
 
 Features not implemented:
 
-1) Time Division Multiplexing
-2) Frequency Division Multiplexing
-3) Time and Frequency Division Multiplexing
-4) Hybrid Time Interleaver (HTI)
-5) Channel bonding
-6) L1-Detail segmentation
-7) L1-Detail additional parity
-8) MISO
-9) MIMO
-10) ACE PAPR reduction
-11) Low Level Signaling (LLS)
-12) Baseband frame counter
-13) Transmitter Identification (TxID)
-14) IP packet input
+1) Frequency Division Multiplexing
+2) Time and Frequency Division Multiplexing
+3) Channel bonding
+4) L1-Detail segmentation
+5) L1-Detail additional parity
+6) MISO
+7) MIMO
+8) ACE PAPR reduction
+9) Low Level Signaling (LLS)
+10) Baseband frame counter
+11) Transmitter Identification (TxID)
+12) IP packet input
 
 Build instructions:
 
