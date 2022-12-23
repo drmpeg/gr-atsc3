@@ -183,6 +183,7 @@ namespace gr {
       gr_complex *hybrid_time_interleaver[2];
       std::vector<std::vector<std::vector<int>>> HtimeLr[2];
       std::vector<std::vector<int>> HtimePr[2];
+      std::vector<std::vector<int>> HtimeTBI[2];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;

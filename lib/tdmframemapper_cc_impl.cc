@@ -1007,10 +1007,17 @@ namespace gr {
         plp_size_total = totalcells - l1cells - sbsnullcells;
         printf("PLP size total = %d\n", plp_size_total);
       }
-      /* Mixed TI modes not supported for now */
       if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
         plp_size[0] = tifecblocks1st * fec_cells[0];
         plp_size[1] = tifecblocks2nd * fec_cells[1];
+      }
+      else if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_OFF) {
+        plp_size[0] = tifecblocks1st * fec_cells[0];
+        plp_size[1] = plp_size_total - plp_size[0];
+      }
+      else if (timode1st == TI_MODE_OFF && timode2nd == TI_MODE_HYBRID) {
+        plp_size[1] = tifecblocks2nd * fec_cells[1];
+        plp_size[0] = plp_size_total - plp_size[1];
       }
       else {
         plp_size[0] = (float)plp_size_total * plpsplit;
@@ -1057,6 +1064,11 @@ namespace gr {
         for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[0].size(); i++) {
           HtimePr[0][i].resize(ti_fecblocks[0] / ti_blocks[0]);
         }
+        HtimeTBI[0].resize(ti_blocks[0]);
+        /* ti_fec_blocks must be a multiple of ti_blocks for now */
+        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeTBI[0].size(); i++) {
+          HtimeTBI[0][i].resize(fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]));
+        }
         init_address(0);
       }
       if (timode2nd == TI_MODE_HYBRID) {
@@ -1071,6 +1083,11 @@ namespace gr {
         /* ti_fec_blocks must be a multiple of ti_blocks for now */
         for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[1].size(); i++) {
           HtimePr[1][i].resize(ti_fecblocks[1] / ti_blocks[1]);
+        }
+        HtimeTBI[1].resize(ti_blocks[1]);
+        /* ti_fec_blocks must be a multiple of ti_blocks for now */
+        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeTBI[1].size(); i++) {
+          HtimeTBI[1][i].resize(fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]));
         }
         init_address(1);
       }
@@ -2200,6 +2217,7 @@ namespace gr {
       int pn_degree;
       int Nd, index;
       long long Pr;
+      int Ri, Ti, Ci;
 
       Nd = 0;
       index = fec_cells[plp];
@@ -2302,6 +2320,15 @@ namespace gr {
           }
         }
       }
+      for (int x = 0; x < ti_blocks[plp]; x++) {
+        std::vector<int>& Htime = this->HtimeTBI[plp][x];
+        for (int n = 0; n < fec_cells[plp] * (ti_fecblocks[plp] / ti_blocks[plp]); n++) {
+          Ri = n % fec_cells[plp];
+          Ti = Ri % (ti_fecblocks[plp] / ti_blocks[plp]);
+          Ci = (Ti + (n / fec_cells[plp])) % (ti_fecblocks[plp] / ti_blocks[plp]);
+          Htime[n] = (fec_cells[plp] * Ci) + Ri;
+        }
+      }
     }
 
     const gr_complex zero = gr_complex(0.0, 0.0);
@@ -2318,8 +2345,7 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin[2] = {0, 0};
       int indexout = 0;
-      int indexin_timeint = 0;
-      int indexout_timeint = 0;
+      int indexin_timeint;
       int preamblesyms = preamble_syms;
       int rows, datacells;
       int time_offset;
@@ -2327,10 +2353,9 @@ namespace gr {
       int left_nulls;
       int right_nulls;
       int l1detailcells, l1totalcells;
-      int Ri, Ti, Ci;
       std::vector<int> H;
       gr_complex *outtimehti;
-      gr_complex *outtimeint = &time_interleaver[0];
+      gr_complex *outtimeint;
 
       if (sbsnullcells & 0x1) {
         left_nulls = (sbsnullcells / 2);
@@ -2341,6 +2366,7 @@ namespace gr {
         right_nulls = left_nulls;
       }
       for (int i = 0; i < noutput_items; i += noutput_items) {
+        outtimeint = &time_interleaver[0];
         if (ti_mode[0] == TI_MODE_HYBRID) {
           outtimehti = &hybrid_time_interleaver[0][0];
           for (int x = 0; x < ti_blocks[0]; x++) {
@@ -2355,20 +2381,17 @@ namespace gr {
           indexin[0] += plp_size[0];
           in = &hybrid_time_interleaver[0][0];
           for (int x = 0; x < ti_blocks[0]; x++) {
+            H = HtimeTBI[0][x];
             for (int n = 0; n < fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]); n++) {
-              Ri = n % fec_cells[0];
-              Ti = Ri % (ti_fecblocks[0] / ti_blocks[0]);
-              Ci = (Ti + (n / fec_cells[0])) % (ti_fecblocks[0] / ti_blocks[0]);
-              *outtimeint++ = in[(fec_cells[0] * Ci) + Ri];
+              *outtimeint++ = in[H[n]];
             }
             in += fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]);
           }
-          indexout_timeint += plp_size[0];
         }
         else {
-          memcpy(&outtimeint[indexout_timeint], &in0[indexin[0]], sizeof(gr_complex) * plp_size[0]);
+          memcpy(&outtimeint[0], &in0[indexin[0]], sizeof(gr_complex) * plp_size[0]);
           indexin[0] += plp_size[0];
-          indexout_timeint += plp_size[0];
+          outtimeint += plp_size[0];
         }
         if (ti_mode[1] == TI_MODE_HYBRID) {
           outtimehti = &hybrid_time_interleaver[1][0];
@@ -2384,23 +2407,20 @@ namespace gr {
           indexin[1] += plp_size[1];
           in = &hybrid_time_interleaver[1][0];
           for (int x = 0; x < ti_blocks[1]; x++) {
+            H = HtimeTBI[1][x];
             for (int n = 0; n < fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]); n++) {
-              Ri = n % fec_cells[1];
-              Ti = Ri % (ti_fecblocks[1] / ti_blocks[1]);
-              Ci = (Ti + (n / fec_cells[1])) % (ti_fecblocks[1] / ti_blocks[1]);
-              *outtimeint++ = in[(fec_cells[1] * Ci) + Ri];
+              *outtimeint++ = in[H[n]];
             }
             in += fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]);
           }
-          indexout_timeint += plp_size[1];
         }
         else {
-          memcpy(&outtimeint[indexout_timeint], &in1[indexin[1]], sizeof(gr_complex) * plp_size[1]);
+          memcpy(&outtimeint[0], &in1[indexin[1]], sizeof(gr_complex) * plp_size[1]);
           indexin[1] += plp_size[1];
-          indexout_timeint += plp_size[1];
+          outtimeint += plp_size[1];
         }
         in = &time_interleaver[0];
-        indexin_timeint = indexout_timeint = 0;
+        indexin_timeint = 0;
 
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
         indexout += add_l1basic(&out[0], time_offset);
