@@ -17,6 +17,7 @@
 #define NBCH_3_15 3240
 #define NBCH_6_15 6480
 #define MAX_INTERLEAVER_DEPTH 1448
+#define NUM_PLPS 2
 
 typedef struct {
   int version;
@@ -179,11 +180,13 @@ namespace gr {
       int ti_mode[2];
       int ti_blocks[2];
       int ti_fecblocks[2];
+      int ti_fecblocks_max[2];
       gr_complex *time_interleaver;
       gr_complex *hybrid_time_interleaver[2];
       std::vector<std::vector<std::vector<int>>> HtimeLr[2];
       std::vector<std::vector<int>> HtimePr[2];
       std::vector<std::vector<int>> HtimeTBI[2];
+      std::vector<int> HtimeNfec[2];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
@@ -326,7 +329,7 @@ namespace gr {
       const static int sbs_data_cells_table_32K[16][5][5];
 
      public:
-      tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~tdmframemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

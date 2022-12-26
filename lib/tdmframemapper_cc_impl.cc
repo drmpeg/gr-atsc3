@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     tdmframemapper_cc::sptr
-    tdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<tdmframemapper_cc_impl>(
-        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, paprmode, l1bmode, l1dmode);
+        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocksmax1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocksmax2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("tdmframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -279,7 +279,7 @@ namespace gr {
       l1detailinit1st->plp_TI_extended_interleaving = FALSE;
       l1detailinit1st->plp_HTI_inter_subframe = FALSE;
       l1detailinit1st->plp_HTI_num_ti_blocks = tiblocks1st;
-      l1detailinit1st->plp_HTI_num_fec_blocks_max = tifecblocks1st;
+      l1detailinit1st->plp_HTI_num_fec_blocks_max = tifecblocksmax1st;
       l1detailinit1st->plp_HTI_num_fec_blocks = tifecblocks1st;
       l1detailinit1st->plp_HTI_cell_interleaver = TRUE;
       l1detailinit1st->plp_type = 0;
@@ -367,7 +367,7 @@ namespace gr {
       l1detailinit2nd->plp_TI_extended_interleaving = FALSE;
       l1detailinit2nd->plp_HTI_inter_subframe = FALSE;
       l1detailinit2nd->plp_HTI_num_ti_blocks = tiblocks2nd;
-      l1detailinit2nd->plp_HTI_num_fec_blocks_max = tifecblocks2nd;
+      l1detailinit2nd->plp_HTI_num_fec_blocks_max = tifecblocksmax2nd;
       l1detailinit2nd->plp_HTI_num_fec_blocks = tifecblocks2nd;
       l1detailinit2nd->plp_HTI_cell_interleaver = TRUE;
       l1detailinit2nd->plp_type = 0;
@@ -1035,6 +1035,8 @@ namespace gr {
       ti_blocks[1] = tiblocks2nd;
       ti_fecblocks[0] = tifecblocks1st;
       ti_fecblocks[1] = tifecblocks2nd;
+      ti_fecblocks_max[0] = tifecblocksmax1st;
+      ti_fecblocks_max[1] = tifecblocksmax2nd;
       time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total);
       if (time_interleaver == NULL) {
         GR_LOG_FATAL(d_logger, "TDM Frame Mapper, cannot allocate memory for time_interleaver.");
@@ -1051,45 +1053,26 @@ namespace gr {
         throw std::bad_alloc();
       }
 
-      if (timode1st == TI_MODE_HYBRID) {
-        HtimeLr[0].resize(ti_blocks[0]);
-        for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[0].size(); x++) {
-          HtimeLr[0][x].resize(ti_fecblocks[0] / ti_blocks[0]);
-          for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeLr[0][x].size(); i++) {
-            HtimeLr[0][x][i].resize(fec_cells[0]);
+      for (int plp = 0; plp < NUM_PLPS; plp++) {
+        if (ti_mode[plp] == TI_MODE_HYBRID) {
+          HtimeLr[plp].resize(ti_blocks[plp]);
+          for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[plp].size(); x++) {
+            HtimeLr[plp][x].resize(ti_fecblocks_max[plp] / ti_blocks[plp]);
+            for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeLr[plp][x].size(); i++) {
+              HtimeLr[plp][x][i].resize(fec_cells[plp]);
+            }
           }
-        }
-        HtimePr[0].resize(ti_blocks[0]);
-        /* ti_fec_blocks must be a multiple of ti_blocks for now */
-        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[0].size(); i++) {
-          HtimePr[0][i].resize(ti_fecblocks[0] / ti_blocks[0]);
-        }
-        HtimeTBI[0].resize(ti_blocks[0]);
-        /* ti_fec_blocks must be a multiple of ti_blocks for now */
-        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeTBI[0].size(); i++) {
-          HtimeTBI[0][i].resize(fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]));
-        }
-        init_address(0);
-      }
-      if (timode2nd == TI_MODE_HYBRID) {
-        HtimeLr[1].resize(ti_blocks[1]);
-        for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[1].size(); x++) {
-          HtimeLr[1][x].resize(ti_fecblocks[1] / ti_blocks[1]);
-          for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeLr[1][x].size(); i++) {
-            HtimeLr[1][x][i].resize(fec_cells[1]);
+          HtimePr[plp].resize(ti_blocks[plp]);
+          for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[plp].size(); i++) {
+            HtimePr[plp][i].resize(ti_fecblocks_max[plp] / ti_blocks[plp]);
           }
+          HtimeTBI[plp].resize(ti_blocks[plp]);
+          for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeTBI[plp].size(); i++) {
+            HtimeTBI[plp][i].resize(fec_cells[plp] * (ti_fecblocks_max[plp] / ti_blocks[plp]));
+          }
+          HtimeNfec[plp].resize(ti_blocks[plp]);
+          init_address(plp);
         }
-        HtimePr[1].resize(ti_blocks[1]);
-        /* ti_fec_blocks must be a multiple of ti_blocks for now */
-        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[1].size(); i++) {
-          HtimePr[1][i].resize(ti_fecblocks[1] / ti_blocks[1]);
-        }
-        HtimeTBI[1].resize(ti_blocks[1]);
-        /* ti_fec_blocks must be a multiple of ti_blocks for now */
-        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeTBI[1].size(); i++) {
-          HtimeTBI[1][i].resize(fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]));
-        }
-        init_address(1);
       }
 
       int sr = 0x18f;
@@ -2206,7 +2189,7 @@ namespace gr {
     tdmframemapper_cc_impl::init_address(int plp)
     {
       int max_states, xor_size, pn_mask, result;
-      int q, k;
+      int q, k, z;
       int lfsr;
       int logic11[2] = {0, 3};
       int logic12[2] = {0, 2};
@@ -2218,6 +2201,17 @@ namespace gr {
       int Nd, index;
       long long Pr;
       int Ri, Ti, Ci;
+      std::vector<int>& HtimeNfec = this->HtimeNfec[plp];
+
+      for (int x = 0; x < ti_blocks[plp]; x++) {
+        if (x < (ti_blocks[plp] - (ti_fecblocks[plp] % ti_blocks[plp]))) {
+          HtimeNfec[x] = ti_fecblocks[plp] / ti_blocks[plp];
+        }
+        else {
+          HtimeNfec[x] = (ti_fecblocks[plp] / ti_blocks[plp]) + 1;
+        }
+        printf("Nfec = %d\n", HtimeNfec[x]);
+      }
 
       Nd = 0;
       index = fec_cells[plp];
@@ -2275,8 +2269,7 @@ namespace gr {
         std::vector<int>& Htime = this->HtimePr[plp][i];
         q = 0;
         k = 0;
-        for (int r = 0; r < ti_fecblocks[plp] / ti_blocks[plp]; r++) {
-          /* ti_fec_blocks must be a multiple of ti_blocks for now */
+        for (int r = 0; r < HtimeNfec[i]; r++) {
           Pr = fec_cells[plp];
           while (Pr >= fec_cells[plp]) {
             Pr = 0;
@@ -2291,8 +2284,7 @@ namespace gr {
       }
 
       for (int x = 0; x < ti_blocks[plp]; x++) {
-        for (int i = 0; i < ti_fecblocks[plp] / ti_blocks[plp]; i++) {
-          /* ti_fec_blocks must be a multiple of ti_blocks for now */
+        for (int i = 0; i < HtimeNfec[x]; i++) {
           std::vector<int>& Htime = this->HtimeLr[plp][x][i];
           std::vector<int>& HtimePr = this->HtimePr[plp][x];
           q = 0;
@@ -2322,12 +2314,19 @@ namespace gr {
       }
       for (int x = 0; x < ti_blocks[plp]; x++) {
         std::vector<int>& Htime = this->HtimeTBI[plp][x];
-        for (int n = 0; n < fec_cells[plp] * (ti_fecblocks[plp] / ti_blocks[plp]); n++) {
+        q = z = 0;
+        for (int n = 0; n < fec_cells[plp] * (ti_fecblocks_max[plp] / ti_blocks[plp]); n++) {
           Ri = n % fec_cells[plp];
-          Ti = Ri % (ti_fecblocks[plp] / ti_blocks[plp]);
-          Ci = (Ti + (n / fec_cells[plp])) % (ti_fecblocks[plp] / ti_blocks[plp]);
-          Htime[n] = (fec_cells[plp] * Ci) + Ri;
+          Ti = Ri % (ti_fecblocks_max[plp] / ti_blocks[plp]);
+          Ci = (Ti + (n / fec_cells[plp])) % (ti_fecblocks_max[plp] / ti_blocks[plp]);
+          if ((fec_cells[plp] * Ci) + Ri >= ((ti_fecblocks_max[plp] / ti_blocks[plp]) - HtimeNfec[x]) * fec_cells[plp]) {
+            Htime[q++] = (fec_cells[plp] * Ci) + Ri;
+          }
+          else {
+            z++;
+          }
         }
+        printf("q = %d, z = %d\n", q, z);
       }
     }
 
@@ -2340,8 +2339,7 @@ namespace gr {
                        gr_vector_void_star &output_items)
     {
       auto in = static_cast<const input_type*>(input_items[0]);
-      auto in0 = static_cast<const input_type*>(input_items[0]);
-      auto in1 = static_cast<const input_type*>(input_items[1]);
+      auto inx = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin[2] = {0, 0};
       int indexout = 0;
@@ -2367,57 +2365,35 @@ namespace gr {
       }
       for (int i = 0; i < noutput_items; i += noutput_items) {
         outtimeint = &time_interleaver[0];
-        if (ti_mode[0] == TI_MODE_HYBRID) {
-          outtimehti = &hybrid_time_interleaver[0][0];
-          for (int x = 0; x < ti_blocks[0]; x++) {
-            for (int j = 0; j < ti_fecblocks[0] / ti_blocks[0]; j++) {
-              H = HtimeLr[0][x][j];
-              for (int n = 0; n < fec_cells[0]; n++) {
-                *outtimehti++ = in0[H[n]];
+        for (int plp = 0; plp < NUM_PLPS; plp++) {
+          inx = static_cast<const input_type*>(input_items[plp]);
+          if (ti_mode[plp] == TI_MODE_HYBRID) {
+            std::vector<int>& HtimeNfec = this->HtimeNfec[plp];
+            outtimehti = &hybrid_time_interleaver[plp][0];
+            for (int x = 0; x < ti_blocks[plp]; x++) {
+              for (int j = 0; j < HtimeNfec[x]; j++) {
+                H = HtimeLr[plp][x][j];
+                for (int n = 0; n < fec_cells[plp]; n++) {
+                  *outtimehti++ = inx[H[n]];
+                }
+                inx += fec_cells[plp];
               }
-              in0 += fec_cells[0];
             }
-          }
-          indexin[0] += plp_size[0];
-          in = &hybrid_time_interleaver[0][0];
-          for (int x = 0; x < ti_blocks[0]; x++) {
-            H = HtimeTBI[0][x];
-            for (int n = 0; n < fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]); n++) {
-              *outtimeint++ = in[H[n]];
-            }
-            in += fec_cells[0] * (ti_fecblocks[0] / ti_blocks[0]);
-          }
-        }
-        else {
-          memcpy(&outtimeint[0], &in0[indexin[0]], sizeof(gr_complex) * plp_size[0]);
-          indexin[0] += plp_size[0];
-          outtimeint += plp_size[0];
-        }
-        if (ti_mode[1] == TI_MODE_HYBRID) {
-          outtimehti = &hybrid_time_interleaver[1][0];
-          for (int x = 0; x < ti_blocks[1]; x++) {
-            for (int j = 0; j < ti_fecblocks[1] / ti_blocks[1]; j++) {
-              H = HtimeLr[1][x][j];
-              for (int n = 0; n < fec_cells[1]; n++) {
-                *outtimehti++ = in1[H[n]];
+            indexin[plp] += plp_size[plp];
+            in = &hybrid_time_interleaver[plp][0];
+            for (int x = 0; x < ti_blocks[plp]; x++) {
+              H = HtimeTBI[plp][x];
+              for (int n = 0; n < fec_cells[plp] * HtimeNfec[x]; n++) {
+                *outtimeint++ = in[H[n]];
               }
-              in1 += fec_cells[1];
+              in += fec_cells[plp] * HtimeNfec[x];
             }
           }
-          indexin[1] += plp_size[1];
-          in = &hybrid_time_interleaver[1][0];
-          for (int x = 0; x < ti_blocks[1]; x++) {
-            H = HtimeTBI[1][x];
-            for (int n = 0; n < fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]); n++) {
-              *outtimeint++ = in[H[n]];
-            }
-            in += fec_cells[1] * (ti_fecblocks[1] / ti_blocks[1]);
+          else {
+            memcpy(&outtimeint[0], &inx[indexin[plp]], sizeof(gr_complex) * plp_size[plp]);
+            indexin[plp] += plp_size[plp];
+            outtimeint += plp_size[plp];
           }
-        }
-        else {
-          memcpy(&outtimeint[0], &in1[indexin[1]], sizeof(gr_complex) * plp_size[1]);
-          indexin[1] += plp_size[1];
-          outtimeint += plp_size[1];
         }
         in = &time_interleaver[0];
         indexin_timeint = 0;

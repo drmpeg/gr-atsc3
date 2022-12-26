@@ -16,6 +16,7 @@ templates:
           % endif
           ${timode1st.val},
           ${tiblocks1st},
+          ${tifecblocksmax1st},
           ${tifecblocks1st},
           ${framesize2nd.val},
           ${rate2nd.val},
@@ -27,6 +28,7 @@ templates:
           % endif
           ${timode2nd.val},
           ${tiblocks2nd},
+          ${tifecblocksmax2nd},
           ${tifecblocks2nd},
           ${plpsplit},
           ${fftsize.val},
@@ -128,6 +130,11 @@ parameters:
     dtype: int
     default: '2'
     hide: ${ timode1st.hide_tiblocks }
+-   id: tifecblocksmax1st
+    label: TI FEC blocks max 1st
+    dtype: int
+    default: '14'
+    hide: ${ timode1st.hide_tiblocks }
 -   id: tifecblocks1st
     label: TI FEC blocks 1st
     dtype: int
@@ -185,6 +192,11 @@ parameters:
     label: TI blocks 2nd
     dtype: int
     default: '2'
+    hide: ${ timode2nd.hide_tiblocks }
+-   id: tifecblocksmax2nd
+    label: TI FEC blocks max 2nd
+    dtype: int
+    default: '44'
     hide: ${ timode2nd.hide_tiblocks }
 -   id: tifecblocks2nd
     label: TI FEC blocks 2nd
