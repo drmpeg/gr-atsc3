@@ -27,14 +27,13 @@ The goal of this project is to build a software-defined ATSC 3.0
 transmitter, based on the A322 Physical Layer Protocol and A321
 System Discovery and Signaling specifications.
 
-https://muygs2x2vhb2pjk6g160f1s8-wpengine.netdna-ssl.com/wp-content/uploads/2021/04/A322-2021-Physical-Layer-Protocol.pdf
+https://prdatsc.wpenginepowered.com/wp-content/uploads/2022/11/A322-2022-11-Physical-Layer-Protocol.pdf
 
-https://muygs2x2vhb2pjk6g160f1s8-wpengine.netdna-ssl.com/wp-content/uploads/2021/04/A321-2016-System-Discovery-and-Signaling.pdf
+https://prdatsc.wpenginepowered.com/wp-content/uploads/2022/04/A321-2022-03-System-Discovery-and-Signaling.pdf
 
 The baseline implementation has been verified against the ATSC 3.0
 validation and verification suite. The current implementation only
-supports the convolutional time interleaver and Transport Stream
-input.
+supports Transport Stream input.
 
 A test flow graph is available in examples/vv031.grc. The parameters
 match the ~15 dB S/N of ATSC 1.0 at 21.343539 Mbps. The test stream is
