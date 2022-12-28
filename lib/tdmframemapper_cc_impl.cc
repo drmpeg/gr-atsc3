@@ -2189,7 +2189,7 @@ namespace gr {
     tdmframemapper_cc_impl::init_address(int plp)
     {
       int max_states, xor_size, pn_mask, result;
-      int q, k, z;
+      int q, k;
       int lfsr;
       int logic11[2] = {0, 3};
       int logic12[2] = {0, 2};
@@ -2210,7 +2210,6 @@ namespace gr {
         else {
           HtimeNfec[x] = (ti_fecblocks[plp] / ti_blocks[plp]) + 1;
         }
-        printf("Nfec = %d\n", HtimeNfec[x]);
       }
 
       Nd = 0;
@@ -2314,7 +2313,7 @@ namespace gr {
       }
       for (int x = 0; x < ti_blocks[plp]; x++) {
         std::vector<int>& Htime = this->HtimeTBI[plp][x];
-        q = z = 0;
+        q = 0;
         for (int n = 0; n < fec_cells[plp] * (ti_fecblocks_max[plp] / ti_blocks[plp]); n++) {
           Ri = n % fec_cells[plp];
           Ti = Ri % (ti_fecblocks_max[plp] / ti_blocks[plp]);
@@ -2322,11 +2321,7 @@ namespace gr {
           if ((fec_cells[plp] * Ci) + Ri >= ((ti_fecblocks_max[plp] / ti_blocks[plp]) - HtimeNfec[x]) * fec_cells[plp]) {
             Htime[q++] = (fec_cells[plp] * Ci) + Ri;
           }
-          else {
-            z++;
-          }
         }
-        printf("q = %d, z = %d\n", q, z);
       }
     }
 
@@ -2351,6 +2346,7 @@ namespace gr {
       int left_nulls;
       int right_nulls;
       int l1detailcells, l1totalcells;
+      int virtual_offset;
       std::vector<int> H;
       gr_complex *outtimehti;
       gr_complex *outtimeint;
@@ -2382,9 +2378,10 @@ namespace gr {
             indexin[plp] += plp_size[plp];
             in = &hybrid_time_interleaver[plp][0];
             for (int x = 0; x < ti_blocks[plp]; x++) {
+              virtual_offset = ((ti_fecblocks_max[plp] / ti_blocks[plp]) - HtimeNfec[x]) * fec_cells[plp];
               H = HtimeTBI[plp][x];
               for (int n = 0; n < fec_cells[plp] * HtimeNfec[x]; n++) {
-                *outtimeint++ = in[H[n]];
+                *outtimeint++ = in[H[n] - virtual_offset];
               }
               in += fec_cells[plp] * HtimeNfec[x];
             }
