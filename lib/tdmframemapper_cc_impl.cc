@@ -1055,20 +1055,21 @@ namespace gr {
 
       for (int plp = 0; plp < NUM_PLPS; plp++) {
         if (ti_mode[plp] == TI_MODE_HYBRID) {
+          Nfec_ti_max[plp] = (ti_fecblocks_max[plp] / ti_blocks[plp]) + (ti_fecblocks_max[plp] % ti_blocks[plp] != 0);
           HtimeLr[plp].resize(ti_blocks[plp]);
           for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[plp].size(); x++) {
-            HtimeLr[plp][x].resize(ti_fecblocks_max[plp] / ti_blocks[plp]);
+            HtimeLr[plp][x].resize(Nfec_ti_max[plp]);
             for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeLr[plp][x].size(); i++) {
               HtimeLr[plp][x][i].resize(fec_cells[plp]);
             }
           }
           HtimePr[plp].resize(ti_blocks[plp]);
           for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr[plp].size(); i++) {
-            HtimePr[plp][i].resize(ti_fecblocks_max[plp] / ti_blocks[plp]);
+            HtimePr[plp][i].resize(Nfec_ti_max[plp]);
           }
           HtimeTBI[plp].resize(ti_blocks[plp]);
           for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeTBI[plp].size(); i++) {
-            HtimeTBI[plp][i].resize(fec_cells[plp] * (ti_fecblocks_max[plp] / ti_blocks[plp]));
+            HtimeTBI[plp][i].resize(fec_cells[plp] * Nfec_ti_max[plp]);
           }
           HtimeNfec[plp].resize(ti_blocks[plp]);
           init_address(plp);
@@ -2314,11 +2315,11 @@ namespace gr {
       for (int x = 0; x < ti_blocks[plp]; x++) {
         std::vector<int>& Htime = this->HtimeTBI[plp][x];
         q = 0;
-        for (int n = 0; n < fec_cells[plp] * (ti_fecblocks_max[plp] / ti_blocks[plp]); n++) {
+        for (int n = 0; n < fec_cells[plp] * Nfec_ti_max[plp]; n++) {
           Ri = n % fec_cells[plp];
-          Ti = Ri % (ti_fecblocks_max[plp] / ti_blocks[plp]);
-          Ci = (Ti + (n / fec_cells[plp])) % (ti_fecblocks_max[plp] / ti_blocks[plp]);
-          if ((fec_cells[plp] * Ci) + Ri >= ((ti_fecblocks_max[plp] / ti_blocks[plp]) - HtimeNfec[x]) * fec_cells[plp]) {
+          Ti = Ri % Nfec_ti_max[plp];
+          Ci = (Ti + (n / fec_cells[plp])) % Nfec_ti_max[plp];
+          if ((fec_cells[plp] * Ci) + Ri >= (Nfec_ti_max[plp] - HtimeNfec[x]) * fec_cells[plp]) {
             Htime[q++] = (fec_cells[plp] * Ci) + Ri;
           }
         }
@@ -2378,7 +2379,7 @@ namespace gr {
             indexin[plp] += plp_size[plp];
             in = &hybrid_time_interleaver[plp][0];
             for (int x = 0; x < ti_blocks[plp]; x++) {
-              virtual_offset = ((ti_fecblocks_max[plp] / ti_blocks[plp]) - HtimeNfec[x]) * fec_cells[plp];
+              virtual_offset = (Nfec_ti_max[plp] - HtimeNfec[x]) * fec_cells[plp];
               H = HtimeTBI[plp][x];
               for (int n = 0; n < fec_cells[plp] * HtimeNfec[x]; n++) {
                 *outtimeint++ = in[H[n] - virtual_offset];

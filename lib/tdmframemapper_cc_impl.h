@@ -113,7 +113,7 @@ typedef struct {
 
 typedef struct {
   L1_Basic l1basic_data;
-  L1_Detail l1detail_data[2];
+  L1_Detail l1detail_data[NUM_PLPS];
 } L1Signalling;
 
 typedef struct{
@@ -131,7 +131,7 @@ namespace gr {
       int l1b_mode;
       int l1d_mode;
       int plp_size_total;
-      int plp_size[2];
+      int plp_size[NUM_PLPS];
       int first_sbs;
       int symbols;
       int total_cells;
@@ -172,21 +172,22 @@ namespace gr {
       int frame_symbols[4352];
       long long samples;
       int frame_samples;
-      long long cells[2];
-      int fec_cells[2];
+      long long cells[NUM_PLPS];
+      int fec_cells[NUM_PLPS];
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
-      int ti_mode[2];
-      int ti_blocks[2];
-      int ti_fecblocks[2];
-      int ti_fecblocks_max[2];
+      int ti_mode[NUM_PLPS];
+      int ti_blocks[NUM_PLPS];
+      int ti_fecblocks[NUM_PLPS];
+      int ti_fecblocks_max[NUM_PLPS];
+      int Nfec_ti_max[NUM_PLPS];
       gr_complex *time_interleaver;
-      gr_complex *hybrid_time_interleaver[2];
-      std::vector<std::vector<std::vector<int>>> HtimeLr[2];
-      std::vector<std::vector<int>> HtimePr[2];
-      std::vector<std::vector<int>> HtimeTBI[2];
-      std::vector<int> HtimeNfec[2];
+      gr_complex *hybrid_time_interleaver[NUM_PLPS];
+      std::vector<std::vector<std::vector<int>>> HtimeLr[NUM_PLPS];
+      std::vector<std::vector<int>> HtimePr[NUM_PLPS];
+      std::vector<std::vector<int>> HtimeTBI[NUM_PLPS];
+      std::vector<int> HtimeNfec[NUM_PLPS];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
