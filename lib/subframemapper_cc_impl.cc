@@ -167,7 +167,7 @@ namespace gr {
       l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0; /* always 0 */
-      l1basicinit->num_subframes = 1;
+      l1basicinit->num_subframes = NUM_SUBFRAMES - 1;
       l1basicinit->preamble_num_symbols = numpreamblesyms - 1;
       if (numpreamblesyms == 1) {
         l1basicinit->preamble_reduced_carriers = 0;
@@ -1873,7 +1873,7 @@ namespace gr {
       }
       time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[0]);
       if (time_interleaver[0] == NULL) {
-        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
+        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver 0.");
         throw std::bad_alloc();
       }
 
@@ -2076,7 +2076,7 @@ namespace gr {
       }
       time_interleaver[1] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[1]);
       if (time_interleaver[1] == NULL) {
-        GR_LOG_FATAL(d_logger, "Sub Frame Mapper, cannot allocate memory for time_interleaver.");
+        GR_LOG_FATAL(d_logger, "Sub Frame Mapper, cannot allocate memory for time_interleaver 1.");
         throw std::bad_alloc();
       }
 
@@ -3269,7 +3269,7 @@ namespace gr {
       commutator_start[0] = commutator[0];
       commutator_start[1] = commutator[1];
       for (int i = 0; i < noutput_items; i += noutput_items) {
-        for (int subframe = 0; subframe < 2; subframe++) {
+        for (int subframe = 0; subframe < NUM_SUBFRAMES; subframe++) {
           auto in = static_cast<const input_type*>(input_items[subframe]);
           auto out = static_cast<output_type*>(output_items[subframe]);
           preamblesyms = preamble_syms[subframe];

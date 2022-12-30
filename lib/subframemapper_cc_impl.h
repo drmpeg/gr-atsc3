@@ -17,6 +17,7 @@
 #define NBCH_3_15 3240
 #define NBCH_6_15 6480
 #define MAX_INTERLEAVER_DEPTH 1448
+#define NUM_SUBFRAMES 2
 
 typedef struct {
   int version;
@@ -112,7 +113,7 @@ typedef struct {
 
 typedef struct {
   L1_Basic l1basic_data;
-  L1_Detail l1detail_data[2];
+  L1_Detail l1detail_data[NUM_SUBFRAMES];
 } L1Signalling;
 
 typedef struct{
@@ -129,12 +130,12 @@ namespace gr {
      private:
       int l1b_mode;
       int l1d_mode;
-      int plp_size[2];
-      int first_sbs[2];
-      int symbols[2];
-      int total_cells[2];
-      int sbsnullcells[2];
-      int preamble_syms[2];
+      int plp_size[NUM_SUBFRAMES];
+      int first_sbs[NUM_SUBFRAMES];
+      int symbols[NUM_SUBFRAMES];
+      int total_cells[NUM_SUBFRAMES];
+      int sbsnullcells[NUM_SUBFRAMES];
+      int preamble_syms[NUM_SUBFRAMES];
       int max_output_cells;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
@@ -168,24 +169,24 @@ namespace gr {
       gr_complex m_64qam[64];
       gr_complex m_l1b_256qam[256];
       gr_complex m_l1d_256qam[256];
-      int frame_symbols[2][4352];
+      int frame_symbols[NUM_SUBFRAMES][4352];
       long long samples;
-      int frame_samples[2];
-      long long cells[2];
-      int fec_cells[2];
+      int frame_samples[NUM_SUBFRAMES];
+      long long cells[NUM_SUBFRAMES];
+      int fec_cells[NUM_SUBFRAMES];
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
-      int ti_mode[2];
-      int ti_depth[2];
+      int ti_mode[NUM_SUBFRAMES];
+      int ti_depth[NUM_SUBFRAMES];
       int ti_randomize[(MAX_INTERLEAVER_DEPTH * MAX_INTERLEAVER_DEPTH) * 4];
-      int commutator[2];
+      int commutator[NUM_SUBFRAMES];
       gr_complex ti_qpsk[4];
       gr_complex ti_16qam[16];
       gr_complex ti_64qam[64];
       gr_complex ti_256qam[256];
-      gr_complex *time_interleaver[2];
-      std::vector<std::deque<gr_complex>> delay_line[2];
+      gr_complex *time_interleaver[NUM_SUBFRAMES];
+      std::vector<std::deque<gr_complex>> delay_line[NUM_SUBFRAMES];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
