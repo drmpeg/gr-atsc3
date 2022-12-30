@@ -1669,7 +1669,7 @@ namespace gr {
       else {
         printf("PLP1 total cells = %d\n", totalcells[1]);
         plp_size[1] = totalcells[1] - sbsnullcells[1];
-        printf("PLP size = %d\n", plp_size[1]);
+        printf("PLP1 size = %d\n", plp_size[1]);
       }
       l1detailinit2nd->plp_size = plp_size[1];
 
