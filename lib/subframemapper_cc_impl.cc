@@ -1033,13 +1033,13 @@ namespace gr {
       total_cells[0] = totalcells[0];
       l1detailinit1st->sbs_null_cells = sbsnullcells[0] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("PLP0 total cells = %d\n", totalcells[0]);
-      printf("PLP0 SBS null cells = %d\n", sbsnullcells[0]);
       if (firstsbs) {
+        printf("PLP0 SBS null cells = %d\n", sbsnullcells[0] * 2);
         plp_size[0] = totalcells[0] - l1cells - (2 * sbsnullcells[0]);
         printf("PLP0 size = %d\n", plp_size[0]);
-
       }
       else {
+        printf("PLP0 SBS null cells = %d\n", sbsnullcells[0]);
         plp_size[0] = totalcells[0] - l1cells - sbsnullcells[0];
         printf("PLP0 size = %d\n", plp_size[0]);
       }
@@ -1660,14 +1660,14 @@ namespace gr {
       }
       total_cells[1] = totalcells[1];
       l1detailinit2nd->sbs_null_cells = sbsnullcells[1] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
-      printf("PLP1 total cells = %d\n", totalcells[1]);
       printf("PLP1 SBS null cells = %d\n", sbsnullcells[1]);
       if (first_sbs[1]) {
+        printf("PLP1 total cells = %d\n", totalcells[1] * 2);
         plp_size[1] = totalcells[1] - (2 * sbsnullcells[1]);
         printf("PLP1 size = %d\n", plp_size[1]);
-
       }
       else {
+        printf("PLP1 total cells = %d\n", totalcells[1]);
         plp_size[1] = totalcells[1] - sbsnullcells[1];
         printf("PLP size = %d\n", plp_size[1]);
       }

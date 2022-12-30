@@ -961,13 +961,13 @@ namespace gr {
       total_cells = totalcells;
       l1detailinit->sbs_null_cells = sbsnullcells = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("total cells = %d\n", totalcells);
-      printf("SBS null cells = %d\n", sbsnullcells);
       if (firstsbs) {
+        printf("SBS null cells = %d\n", sbsnullcells * 2);
         plp_size = totalcells - l1cells - (2 * sbsnullcells);
         printf("PLP size = %d\n", plp_size);
-
       }
       else {
+        printf("SBS null cells = %d\n", sbsnullcells);
         plp_size = totalcells - l1cells - sbsnullcells;
         printf("PLP size = %d\n", plp_size);
       }
