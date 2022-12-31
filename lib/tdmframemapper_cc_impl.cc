@@ -1011,6 +1011,9 @@ namespace gr {
       if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
         plp_size[0] = tifecblocks1st * fec_cells[0];
         plp_size[1] = tifecblocks2nd * fec_cells[1];
+        if ((plp_size[0] + plp_size[1]) > plp_size_total) {
+          throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
+        }
       }
       else if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_OFF) {
         plp_size[0] = tifecblocks1st * fec_cells[0];

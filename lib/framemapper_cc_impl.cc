@@ -994,7 +994,7 @@ namespace gr {
       plp_size_total = plp_size;
       if (timode == TI_MODE_HYBRID) {
         if (tifecblocks * fec_cells > plp_size_total) {
-          throw std::runtime_error("Hybrid Time Interleaver PLP size too big.");
+          throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
         }
         plp_size = tifecblocks * fec_cells;
       }
