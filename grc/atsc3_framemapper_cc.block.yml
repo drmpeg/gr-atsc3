@@ -56,6 +56,9 @@ templates:
           ${fimode.val},
           ${timode.val},
           ${tidepth.val},
+          ${tiblocks},
+          ${tifecblocksmax},
+          ${tifecblocks},
           ${cred.val},
           ${flmode.val},
           ${flen},
@@ -298,6 +301,8 @@ parameters:
     options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
     option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
+        hide_tidepth: [all, none, all]
+        hide_tiblocks: [all, all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
 -   id: tidepth
     label: Time Interleaver Depth
@@ -306,6 +311,23 @@ parameters:
     option_labels: [512, 724, 887, 1024, 1254, 1448]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+    default: 'TI_DEPTH_1024'
+    hide: ${ timode.hide_tidepth }
+-   id: tiblocks
+    label: TI blocks
+    dtype: int
+    default: '2'
+    hide: ${ timode.hide_tiblocks }
+-   id: tifecblocksmax
+    label: TI FEC blocks max
+    dtype: int
+    default: '14'
+    hide: ${ timode.hide_tiblocks }
+-   id: tifecblocks
+    label: TI FEC blocks
+    dtype: int
+    default: '14'
+    hide: ${ timode.hide_tiblocks }
 -   id: cred
     label: Reduced Carriers
     dtype: enum

@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, fecmode, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, cred, flmode, flen, tifmode, paprmode, l1bmode, l1dmode);
+        framesize, rate, fecmode, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, tiblocks, tifecblocksmax, tifecblocks, cred, flmode, flen, tifmode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -206,6 +206,20 @@ namespace gr {
           l1basicinit->L1_Detail_size_bytes = 25;
         }
       }
+      else if (timode == TI_MODE_HYBRID) {
+        if (tifmode == TIF_NS_PRECISION) {
+          l1basicinit->L1_Detail_size_bytes = 29;
+        }
+        else if (tifmode == TIF_US_PRECISION) {
+          l1basicinit->L1_Detail_size_bytes = 27;
+        }
+        else if (tifmode == TIF_MS_PRECISION) {
+          l1basicinit->L1_Detail_size_bytes = 26;
+        }
+        else {
+          l1basicinit->L1_Detail_size_bytes = 25;
+        }
+      }
       else {
         if (tifmode == TIF_NS_PRECISION) {
           l1basicinit->L1_Detail_size_bytes = 27;
@@ -312,6 +326,11 @@ namespace gr {
       l1detailinit->plp_mod = constellation;
       l1detailinit->plp_cod = rate;
       l1detailinit->plp_TI_mode = timode;
+      l1detailinit->plp_HTI_inter_subframe = FALSE;
+      l1detailinit->plp_HTI_num_ti_blocks = tiblocks;
+      l1detailinit->plp_HTI_num_fec_blocks_max = tifecblocksmax;
+      l1detailinit->plp_HTI_num_fec_blocks = tifecblocks;
+      l1detailinit->plp_HTI_cell_interleaver = TRUE;
       l1detailinit->plp_type = 0;
       if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
         if (tidepth == TI_DEPTH_1254) {
@@ -326,6 +345,9 @@ namespace gr {
           l1detailinit->plp_TI_extended_interleaving = FALSE;
           l1detailinit->plp_CTI_depth = tidepth;
         }
+      }
+      else {
+        l1detailinit->plp_TI_extended_interleaving = FALSE;
       }
       l1detailinit->reserved = 0x7fffffffffffffff;
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, FALSE);
@@ -964,13 +986,19 @@ namespace gr {
       if (firstsbs) {
         printf("SBS null cells = %d\n", sbsnullcells * 2);
         plp_size = totalcells - l1cells - (2 * sbsnullcells);
-        printf("PLP size = %d\n", plp_size);
       }
       else {
         printf("SBS null cells = %d\n", sbsnullcells);
         plp_size = totalcells - l1cells - sbsnullcells;
-        printf("PLP size = %d\n", plp_size);
       }
+      plp_size_total = plp_size;
+      if (timode == TI_MODE_HYBRID) {
+        if (tifecblocks * fec_cells > plp_size_total) {
+          throw std::runtime_error("Hybrid Time Interleaver PLP size too big.");
+        }
+        plp_size = tifecblocks * fec_cells;
+      }
+      printf("PLP size = %d\n", plp_size);
       l1detailinit->plp_size = plp_size;
 
       switch(tidepth) {
@@ -1001,6 +1029,9 @@ namespace gr {
       randomindex = 0;
       ti_mode = timode;
       ti_depth = depth;
+      ti_blocks = tiblocks;
+      ti_fecblocks = tifecblocks;
+      ti_fecblocks_max = tifecblocksmax;
       commutator = 0;
       switch (rate) {
         case C2_15:
@@ -1171,10 +1202,60 @@ namespace gr {
             break;
         }
       }
-      time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size);
+      time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total);
       if (time_interleaver == NULL) {
         GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver.");
         throw std::bad_alloc();
+      }
+      hybrid_time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size);
+      if (hybrid_time_interleaver == NULL) {
+        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for hybrid_time_interleaver.");
+        throw std::bad_alloc();
+      }
+
+      if (ti_mode == TI_MODE_HYBRID) {
+        Nfec_ti_max = (ti_fecblocks_max / ti_blocks) + (ti_fecblocks_max % ti_blocks != 0);
+        HtimeLr.resize(ti_blocks);
+        for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr.size(); x++) {
+          HtimeLr[x].resize(Nfec_ti_max);
+          for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeLr[x].size(); i++) {
+            HtimeLr[x][i].resize(fec_cells);
+          }
+        }
+        HtimePr.resize(ti_blocks);
+        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimePr.size(); i++) {
+          HtimePr[i].resize(Nfec_ti_max);
+        }
+        HtimeTBI.resize(ti_blocks);
+        for (std::vector<std::vector<int>>::size_type i = 0; i != HtimeTBI.size(); i++) {
+          HtimeTBI[i].resize(fec_cells * Nfec_ti_max);
+        }
+        HtimeNfec.resize(ti_blocks);
+        init_address();
+      }
+
+      int sr = 0x18f;
+      int b, packed;
+      for (int i = 0; i < plp_size_total;) {
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        for (int n = 7; n >= 0; n--) {
+          if (packed & (1 << n)) {
+            time_interleaver[i++] = gr_complex(-1, 0);
+          }
+          else {
+            time_interleaver[i++] = gr_complex(1, 0);
+          }
+          if (i == plp_size_total) {
+            break;
+          }
+        }
+        b = sr & 1;
+        sr >>= 1;
+        if (b) {
+          sr ^= POLYNOMIAL;
+        }
       }
 
       set_output_multiple(totalcells);
@@ -1185,6 +1266,7 @@ namespace gr {
      */
     framemapper_cc_impl::~framemapper_cc_impl()
     {
+      free(hybrid_time_interleaver);
       free(time_interleaver);
     }
 
@@ -1972,6 +2054,26 @@ namespace gr {
           }
         }
       }
+      else if (l1detailinit->plp_TI_mode == TI_MODE_HYBRID) {
+        l1detail[offset_bits++] = l1detailinit->plp_type;
+        if (l1detailinit->plp_mod == MOD_QPSK) {
+          l1detail[offset_bits++] = l1detailinit->plp_TI_extended_interleaving;
+        }
+        l1detail[offset_bits++] = l1detailinit->plp_HTI_inter_subframe;
+        bits = l1detailinit->plp_HTI_num_ti_blocks - 1;
+        for (int n = 3; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit->plp_HTI_num_fec_blocks_max - 1;
+        for (int n = 11; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit->plp_HTI_num_fec_blocks - 1;
+        for (int n = 11; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        l1detail[offset_bits++] = l1detailinit->plp_HTI_cell_interleaver;
+      }
       else {
         bits = block_start;
         for (int n = 14; n >= 0; n--) {
@@ -2256,6 +2358,146 @@ namespace gr {
       return (rows);
     }
 
+    void
+    framemapper_cc_impl::init_address(void)
+    {
+      int max_states, xor_size, pn_mask, result;
+      int q, k;
+      int lfsr;
+      int logic11[2] = {0, 3};
+      int logic12[2] = {0, 2};
+      int logic13[4] = {0, 1, 4, 6};
+      int logic14[6] = {0, 1, 4, 5, 9, 11};
+      int logic15[4] = {0, 1, 2, 12};
+      int* logic;
+      int pn_degree;
+      int Nd, index;
+      long long Pr;
+      int Ri, Ti, Ci;
+      std::vector<int>& HtimeNfec = this->HtimeNfec;
+
+      for (int x = 0; x < ti_blocks; x++) {
+        if (x < (ti_blocks - (ti_fecblocks % ti_blocks))) {
+          HtimeNfec[x] = ti_fecblocks / ti_blocks;
+        }
+        else {
+          HtimeNfec[x] = (ti_fecblocks / ti_blocks) + 1;
+        }
+      }
+
+      Nd = 0;
+      index = fec_cells;
+      while (index) {
+        index >>= 1;
+        Nd++;
+      }
+
+      switch (Nd) {
+        case 11:
+          pn_degree = 10;
+          pn_mask = 0x3ff;
+          max_states = 2048;
+          logic = &logic11[0];
+          xor_size = 2;
+          break;
+        case 12:
+          pn_degree = 11;
+          pn_mask = 0x7ff;
+          max_states = 4096;
+          logic = &logic12[0];
+          xor_size = 2;
+          break;
+        case 13:
+          pn_degree = 12;
+          pn_mask = 0xfff;
+          max_states = 8192;
+          logic = &logic13[0];
+          xor_size = 4;
+          break;
+        case 14:
+          pn_degree = 13;
+          pn_mask = 0x1fff;
+          max_states = 16384;
+          logic = &logic14[0];
+          xor_size = 6;
+          break;
+        case 15:
+          pn_degree = 14;
+          pn_mask = 0x3fff;
+          max_states = 32768;
+          logic = &logic15[0];
+          xor_size = 4;
+          break;
+        default:
+          pn_degree = 10;
+          pn_mask = 0x3ff;
+          max_states = 2048;
+          logic = &logic11[0];
+          xor_size = 2;
+          break;
+      }
+
+      for (int i = 0; i < ti_blocks; i++) {
+        std::vector<int>& Htime = this->HtimePr[i];
+        q = 0;
+        k = 0;
+        for (int r = 0; r < HtimeNfec[i]; r++) {
+          Pr = fec_cells;
+          while (Pr >= fec_cells) {
+            Pr = 0;
+            for (int j = 0; j < Nd; j++) {
+              Pr |= (k & (1 << j)) << ((Nd + 16) - 1 - j * 2);
+            }
+            Pr >>= 16;
+            k = k + 1;
+          }
+          Htime[q++] = Pr;
+        }
+      }
+
+      for (int x = 0; x < ti_blocks; x++) {
+        for (int i = 0; i < HtimeNfec[x]; i++) {
+          std::vector<int>& Htime = this->HtimeLr[x][i];
+          std::vector<int>& HtimePr = this->HtimePr[x];
+          q = 0;
+
+          for (int j = 0; j < max_states; j++) {
+            if (j == 0 || j == 1) {
+              lfsr = 0;
+            }
+            else if (j == 2) {
+              lfsr = 1;
+            }
+            else {
+              result = 0;
+              for (int k = 0; k < xor_size; k++) {
+                result ^= (lfsr >> logic[k]) & 1;
+              }
+              lfsr &= pn_mask;
+              lfsr >>= 1;
+              lfsr |= result << (pn_degree - 1);
+            }
+            lfsr |= (j % 2) << pn_degree;
+            if (lfsr < fec_cells) {
+              Htime[q++] = (lfsr + HtimePr[i]) % fec_cells;
+            }
+          }
+        }
+      }
+      for (int x = 0; x < ti_blocks; x++) {
+        std::vector<int>& Htime = this->HtimeTBI[x];
+        q = 0;
+        for (int n = 0; n < fec_cells * Nfec_ti_max; n++) {
+          Ri = n % fec_cells;
+          Ti = Ri % Nfec_ti_max;
+          Ci = (Ti + (n / fec_cells)) % Nfec_ti_max;
+          if ((fec_cells * Ci) + Ri >= (Nfec_ti_max - HtimeNfec[x]) * fec_cells) {
+            Htime[q++] = (fec_cells * Ci) + Ri;
+          }
+        }
+      }
+    }
+
     const gr_complex zero = gr_complex(0.0, 0.0);
 
     int
@@ -2265,9 +2507,11 @@ namespace gr {
                        gr_vector_void_star &output_items)
     {
       auto in = static_cast<const input_type*>(input_items[0]);
+      auto inx = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin = 0;
       int indexout = 0;
+      int indexin_timeint;
       int preamblesyms = preamble_syms;
       int rows, datacells;
       int time_offset, fec_block_start;
@@ -2275,7 +2519,10 @@ namespace gr {
       int right_nulls;
       int l1detailcells, l1totalcells;
       int commutator_start = 0;
-      gr_complex *outtimeint = &time_interleaver[0];
+      int virtual_offset;
+      std::vector<int> H;
+      gr_complex *outtimehti;
+      gr_complex *outtimeint;
 
       if (sbsnullcells & 0x1) {
         left_nulls = (sbsnullcells / 2);
@@ -2286,27 +2533,57 @@ namespace gr {
         right_nulls = left_nulls;
       }
       for (int i = 0; i < noutput_items; i += noutput_items) {
+        outtimeint = &time_interleaver[0];
         if (ti_mode == TI_MODE_CONVOLUTIONAL) {
           commutator_start = commutator;
           for (int n = 0; n < plp_size; n++) {
-            delay_line[commutator].push_front(in[indexin++]);
-            outtimeint[indexout++] = delay_line[commutator].back();
+            delay_line[commutator].push_front(inx[indexin++]);
+            outtimeint[n] = delay_line[commutator].back();
             delay_line[commutator].pop_back();
             commutator = (commutator + 1) % ti_depth;
           }
-          in = &time_interleaver[0];
-          indexin = indexout = 0;
         }
+        else if (ti_mode == TI_MODE_HYBRID) {
+          std::vector<int>& HtimeNfec = this->HtimeNfec;
+          outtimehti = &hybrid_time_interleaver[0];
+          for (int x = 0; x < ti_blocks; x++) {
+            for (int j = 0; j < HtimeNfec[x]; j++) {
+              H = HtimeLr[x][j];
+              for (int n = 0; n < fec_cells; n++) {
+                *outtimehti++ = inx[H[n]];
+              }
+              inx += fec_cells;
+            }
+          }
+          indexin += plp_size;
+          in = &hybrid_time_interleaver[0];
+          for (int x = 0; x < ti_blocks; x++) {
+            virtual_offset = (Nfec_ti_max - HtimeNfec[x]) * fec_cells;
+            H = HtimeTBI[x];
+            for (int n = 0; n < fec_cells * HtimeNfec[x]; n++) {
+              *outtimeint++ = in[H[n] - virtual_offset];
+            }
+            in += fec_cells * HtimeNfec[x];
+          }
+        }
+        else {
+          memcpy(&outtimeint[0], &inx[indexin], sizeof(gr_complex) * plp_size);
+          indexin += plp_size;
+        }
+        in = &time_interleaver[0];
+        indexin_timeint = 0;
+
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
         indexout += add_l1basic(&out[0], time_offset);
+
         fec_block_start = cells % fec_cells;
         if (fec_block_start) {
           fec_block_start = fec_cells - (cells % fec_cells);
         }
-
         if (ti_mode == TI_MODE_CONVOLUTIONAL) {
           fec_block_start = fec_block_start + ti_depth * ((commutator_start + fec_block_start) % ti_depth);
         }
+
         l1detailcells = add_l1detail(&l1_dummy[0], fec_block_start, commutator_start, TRUE);
         rows = l1detailcells / preamblesyms;
         for (int i = 0; i < preamblesyms; i++) {
@@ -2324,32 +2601,32 @@ namespace gr {
           datacells += frame_symbols[n];
         }
         datacells -= l1totalcells;
-        memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * datacells);
-        indexin += datacells;
+        memcpy(&out[indexout], &in[indexin_timeint], sizeof(gr_complex) * datacells);
+        indexin_timeint += datacells;
         indexout += datacells;
         if (first_sbs) {
           for (int n = 0; n < left_nulls; n++) {
             out[indexout++] = zero;
           }
-          memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[preamblesyms] - sbsnullcells));
+          memcpy(&out[indexout], &in[indexin_timeint], sizeof(gr_complex) * (frame_symbols[preamblesyms] - sbsnullcells));
           indexout += frame_symbols[preamblesyms] - sbsnullcells;
           for (int n = 0; n < right_nulls; n++) {
             out[indexout++] = zero;
           }
-          indexin += frame_symbols[preamblesyms] - sbsnullcells;
+          indexin_timeint += frame_symbols[preamblesyms] - sbsnullcells;
           preamblesyms++;
         }
         for (int n = preamblesyms; n < symbols - 1; n++) {
-          memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * frame_symbols[n]);
-          indexin += frame_symbols[n];
+          memcpy(&out[indexout], &in[indexin_timeint], sizeof(gr_complex) * frame_symbols[n]);
+          indexin_timeint += frame_symbols[n];
           indexout += frame_symbols[n];
         }
         for (int n = 0; n < left_nulls; n++) {
           out[indexout++] = zero;
         }
-        memcpy(&out[indexout], &in[indexin], sizeof(gr_complex) * (frame_symbols[symbols - 1] - sbsnullcells));
+        memcpy(&out[indexout], &in[indexin_timeint], sizeof(gr_complex) * (frame_symbols[symbols - 1] - sbsnullcells));
         indexout += frame_symbols[symbols - 1] - sbsnullcells;
-        indexin += frame_symbols[symbols - 1] - sbsnullcells;
+        indexin_timeint += frame_symbols[symbols - 1] - sbsnullcells;
         for (int n = 0; n < right_nulls; n++) {
           out[indexout++] = zero;
         }
