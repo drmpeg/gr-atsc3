@@ -39,6 +39,7 @@ namespace py = pybind11;
     void bind_subbootstrap_cc(py::module& m);
     void bind_cyclicprefixer_cc(py::module& m);
     void bind_tdmframemapper_cc(py::module& m);
+    void bind_fdmframemapper_cc(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -85,5 +86,6 @@ PYBIND11_MODULE(atsc3_python, m)
     bind_subbootstrap_cc(m);
     bind_cyclicprefixer_cc(m);
     bind_tdmframemapper_cc(m);
+    bind_fdmframemapper_cc(m);
     // ) END BINDING_FUNCTION_CALLS
 }

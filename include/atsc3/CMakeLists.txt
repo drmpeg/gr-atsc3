@@ -28,5 +28,6 @@ install(FILES
     subframemapper_cc.h
     subbootstrap_cc.h
     cyclicprefixer_cc.h
-    tdmframemapper_cc.h DESTINATION include/atsc3
+    tdmframemapper_cc.h
+    fdmframemapper_cc.h DESTINATION include/atsc3
 )
