@@ -52,8 +52,8 @@ calibration of the bootstrap resampler.
 
 Features not implemented:
 
-1) Frequency Division Multiplexing
-2) Time and Frequency Division Multiplexing
+1) Time and Frequency Division Multiplexing
+2) Convolutional Delay Line (CDL)
 3) Channel bonding
 4) L1-Detail segmentation
 5) L1-Detail additional parity
