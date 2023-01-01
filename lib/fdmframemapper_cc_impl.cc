@@ -178,7 +178,7 @@ namespace gr {
         l1basicinit->L1_Detail_size_bytes = 43;
       }
       else {
-        l1basicinit->L1_Detail_size_bytes = 32;
+        l1basicinit->L1_Detail_size_bytes = 41;
       }
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
@@ -1015,32 +1015,50 @@ namespace gr {
       if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
         plp_size[0] = tifecblocks1st * fec_cells[0];
         plp_size[1] = tifecblocks2nd * fec_cells[1];
-        if ((plp_size[0] + plp_size[1]) > data_cells * subslices) {
-          throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
-        }
         slice_size[0] = (plp_size[0] / subslices) + (plp_size[0] % subslices != 0);
         slice_size[1] = (plp_size[1] / subslices) + (plp_size[1] % subslices != 0);
         slice_last_size[0] = plp_size[0] - (slice_size[0] * (subslices - 1));
         slice_last_size[1] = plp_size[1] - (slice_size[1] * (subslices - 1));
-        slice_unused_size = data_cells - slice_size[0] - slice_size[1];
+        slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
       }
       else if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_OFF) {
         plp_size[0] = tifecblocks1st * fec_cells[0];
         plp_size[1] = plp_size_total - plp_size[0];
+        plp_size[1] = (plp_size[1] / fec_cells[1]) * fec_cells[1];
+        slice_size[0] = (plp_size[0] / subslices) + (plp_size[0] % subslices != 0);
+        slice_size[1] = (plp_size[1] / subslices) + (plp_size[1] % subslices != 0);
+        slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
+        plp_size[1] += slice_unused_size * subslices;
+        slice_size[1] = (plp_size[1] / subslices) + (plp_size[1] % subslices != 0);
+        slice_last_size[0] = plp_size[0] - (slice_size[0] * (subslices - 1));
+        slice_last_size[1] = plp_size[1] - (slice_size[1] * (subslices - 1));
+        slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
       }
       else if (timode1st == TI_MODE_OFF && timode2nd == TI_MODE_HYBRID) {
         plp_size[1] = tifecblocks2nd * fec_cells[1];
         plp_size[0] = plp_size_total - plp_size[1];
+        plp_size[0] = (plp_size[0] / fec_cells[0]) * fec_cells[0];
+        slice_size[0] = (plp_size[0] / subslices) + (plp_size[0] % subslices != 0);
+        slice_size[1] = (plp_size[1] / subslices) + (plp_size[1] % subslices != 0);
+        slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
+        plp_size[0] += slice_unused_size * subslices;
+        slice_size[0] = (plp_size[0] / subslices) + (plp_size[0] % subslices != 0);
+        slice_last_size[0] = plp_size[0] - (slice_size[0] * (subslices - 1));
+        slice_last_size[1] = plp_size[1] - (slice_size[1] * (subslices - 1));
+        slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
       }
       else {
-        splitcells = (float)data_cells * plpsplit;
+        splitcells = (float)(data_cells - papr_cells) * plpsplit;
         plp_size[0] = splitcells * subslices;
-        plp_size[1] = (data_cells - splitcells) * subslices;
+        plp_size[1] = (data_cells - papr_cells - splitcells) * subslices;
         slice_size[0] = splitcells;
-        slice_size[1] = data_cells - splitcells;
+        slice_size[1] = data_cells - papr_cells - splitcells;
         slice_last_size[0] = slice_size[0];
         slice_last_size[1] = slice_size[1];
         slice_unused_size = 0;
+      }
+      if ((plp_size[0] + plp_size[1]) > (data_cells - papr_cells) * subslices) {
+        throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
       }
       l1detailinit1st->plp_size = plp_size[0];
       l1detailinit2nd->plp_size = plp_size[1];
@@ -1058,8 +1076,8 @@ namespace gr {
       }
       l1detailinit1st->plp_start = plp_offset;
       l1detailinit2nd->plp_start = plp_offset + slice_size[0];
-      l1detailinit1st->plp_subslice_interval = data_cells;
-      l1detailinit2nd->plp_subslice_interval = data_cells;
+      l1detailinit1st->plp_subslice_interval = data_cells - papr_cells;
+      l1detailinit2nd->plp_subslice_interval = data_cells - papr_cells;
 
       ti_mode[0] = timode1st;
       ti_mode[1] = timode2nd;
