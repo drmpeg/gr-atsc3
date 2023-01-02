@@ -1020,6 +1020,7 @@ namespace gr {
         slice_last_size[0] = plp_size[0] - (slice_size[0] * (subslices - 1));
         slice_last_size[1] = plp_size[1] - (slice_size[1] * (subslices - 1));
         slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
+        printf("unused FDM carriers = %d\n", slice_unused_size);
       }
       else if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_OFF) {
         plp_size[0] = tifecblocks1st * fec_cells[0];
