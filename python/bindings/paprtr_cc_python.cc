@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(paprtr_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(1ca50ab827285f03c5181cdab8b11188)                     */
+/* BINDTOOL_HEADER_FILE_HASH(c673e4153f7d4b260d0cb746a22f0055)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -40,6 +40,7 @@ void bind_paprtr_cc(py::module& m)
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),
+           py::arg("guardinterval"),
            py::arg("pilotpattern"),
            py::arg("firstsbs"),
            py::arg("cred"),

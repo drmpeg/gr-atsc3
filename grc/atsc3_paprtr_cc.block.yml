@@ -9,6 +9,7 @@ templates:
           ${fftsize.val},
           ${numpayloadsyms},
           ${numpreamblesyms},
+          ${guardinterval.val},
           ${pilotpattern.val},
           ${firstsbs.val},
           ${cred.val},
@@ -34,6 +35,13 @@ parameters:
     label: Number of Preamble Symbols
     dtype: int
     default: '2'
+-   id: guardinterval
+    label: Guard Interval samples
+    dtype: enum
+    options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
+    option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
+    option_attributes:
+        val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
 -   id: pilotpattern
     label: Pilot Pattern
     dtype: enum

@@ -956,7 +956,7 @@ namespace gr {
         for (int i = 0; i < carriers; i++) {
           data_carrier_map[i] = DATA_CARRIER;
         }
-        trshift = dx * ((symbol - (preamble_symbols - 2)) % dy);
+        trshift = dx * ((symbol - (preamble_symbols - dy)) % dy);
         if (frame_symbols[symbol] == SBS_SYMBOL || frame_symbols[symbol] == PREAMBLE_SYMBOL) {
           trshift = 0;
         }
@@ -987,7 +987,7 @@ namespace gr {
               }
               if (symbol != 0 && papr_mode == PAPR_TR) {
                 index = 0;
-                if (dx == 3 || dx == 4 || dx == 8) {
+                if (preamble_dx == 3 || preamble_dx == 4 || preamble_dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_8K[index] + trshift) == i) {
                       data_carrier_map[i - shift] = TRPAPR_CARRIER;
@@ -1187,7 +1187,7 @@ namespace gr {
               }
               if (symbol != 0 && papr_mode == PAPR_TR) {
                 index = 0;
-                if (dx == 3 || dx == 4 || dx == 8) {
+                if (preamble_dx == 3 || preamble_dx == 4 || preamble_dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_16K[index] + trshift) == i) {
                       data_carrier_map[i - shift] = TRPAPR_CARRIER;
@@ -1369,7 +1369,7 @@ namespace gr {
               }
               if (symbol != 0 && papr_mode == PAPR_TR) {
                 index = 0;
-                if (dx == 3 || dx == 4 || dx == 8) {
+                if (preamble_dx == 3 || preamble_dx == 4 || preamble_dx == 8) {
                   for (int i = 0; i < max_carriers; i++) {
                     if ((trpapr_alt_table_32K[index] + trshift) == i) {
                       data_carrier_map[i - shift] = TRPAPR_CARRIER;

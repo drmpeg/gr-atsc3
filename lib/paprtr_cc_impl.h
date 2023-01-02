@@ -46,6 +46,7 @@ namespace gr {
       int carriers;
       int max_carriers;
       int preamble_carriers;
+      int preamble_dx;
       int preamble_symbols;
       double v_clip;
       int num_iterations;
@@ -70,6 +71,7 @@ namespace gr {
       void init_pilots(int);
 
       const static int carriers_table[3][5];
+      const static int preamble_dx_table[32];
       const static int trpapr_table_8K[72];
       const static int trpapr_table_16K[144];
       const static int trpapr_table_32K[288];
@@ -79,7 +81,7 @@ namespace gr {
 
 
      public:
-      paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength);
+      paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength);
       ~paprtr_cc_impl();
 
       int work(

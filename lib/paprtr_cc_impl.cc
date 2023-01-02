@@ -20,17 +20,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     paprtr_cc::sptr
-    paprtr_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength)
+    paprtr_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<paprtr_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, pilotpattern, firstsbs, cred, paprmode, vclip, iterations, vlength);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, firstsbs, cred, paprmode, vclip, iterations, vlength);
     }
 
 
     /*
      * The private constructor
      */
-    paprtr_cc_impl::paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength)
+    paprtr_cc_impl::paprtr_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, float vclip, int iterations, unsigned int vlength)
       : gr::sync_block("paprtr_cc",
               gr::io_signature::make(1, 1, sizeof(input_type) * vlength),
               gr::io_signature::make(1, 1, sizeof(output_type) * vlength)),
@@ -56,6 +56,32 @@ namespace gr {
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              preamble_dx = preamble_dx_table[0];
+              break;
+            case GI_2_384:
+              preamble_dx = preamble_dx_table[1];
+              break;
+            case GI_3_512:
+              preamble_dx = preamble_dx_table[2];
+              break;
+            case GI_4_768:
+              preamble_dx = preamble_dx_table[3];
+              break;
+            case GI_5_1024:
+              preamble_dx = preamble_dx_table[4];
+              break;
+            case GI_6_1536:
+              preamble_dx = preamble_dx_table[5];
+              break;
+            case GI_7_2048:
+              preamble_dx = preamble_dx_table[6];
+              break;
+            default:
+              preamble_dx = preamble_dx_table[0];
+              break;
+          }
           break;
         case FFTSIZE_16K:
           N_TR = 144;
@@ -64,6 +90,44 @@ namespace gr {
           carriers = carriers_table[FFTSIZE_16K][cred];
           max_carriers = carriers_table[FFTSIZE_16K][0];
           preamble_carriers = carriers_table[FFTSIZE_16K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              preamble_dx = preamble_dx_table[7];
+              break;
+            case GI_2_384:
+              preamble_dx = preamble_dx_table[8];
+              break;
+            case GI_3_512:
+              preamble_dx = preamble_dx_table[9];
+              break;
+            case GI_4_768:
+              preamble_dx = preamble_dx_table[10];
+              break;
+            case GI_5_1024:
+              preamble_dx = preamble_dx_table[11];
+              break;
+            case GI_6_1536:
+              preamble_dx = preamble_dx_table[12];
+              break;
+            case GI_7_2048:
+              preamble_dx = preamble_dx_table[13];
+              break;
+            case GI_8_2432:
+              preamble_dx = preamble_dx_table[14];
+              break;
+            case GI_9_3072:
+              preamble_dx = preamble_dx_table[15];
+              break;
+            case GI_10_3648:
+              preamble_dx = preamble_dx_table[16];
+              break;
+            case GI_11_4096:
+              preamble_dx = preamble_dx_table[17];
+              break;
+            default:
+              preamble_dx = preamble_dx_table[7];
+              break;
+          }
           break;
         case FFTSIZE_32K:
           N_TR = 288;
@@ -72,6 +136,57 @@ namespace gr {
           carriers = carriers_table[FFTSIZE_32K][cred];
           max_carriers = carriers_table[FFTSIZE_32K][0];
           preamble_carriers = carriers_table[FFTSIZE_32K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              preamble_dx = preamble_dx_table[18];
+              break;
+            case GI_2_384:
+              preamble_dx = preamble_dx_table[19];
+              break;
+            case GI_3_512:
+              preamble_dx = preamble_dx_table[20];
+              break;
+            case GI_4_768:
+              preamble_dx = preamble_dx_table[21];
+              break;
+            case GI_5_1024:
+              preamble_dx = preamble_dx_table[22];
+              break;
+            case GI_6_1536:
+              preamble_dx = preamble_dx_table[23];
+              break;
+            case GI_7_2048:
+              preamble_dx = preamble_dx_table[24];
+              break;
+            case GI_8_2432:
+              preamble_dx = preamble_dx_table[25];
+              break;
+            case GI_9_3072:
+              if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
+                preamble_dx = preamble_dx_table[26];
+              }
+              else {
+                preamble_dx = preamble_dx_table[27];
+              }
+              break;
+            case GI_10_3648:
+              if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
+                preamble_dx = preamble_dx_table[28];
+              }
+              else {
+                preamble_dx = preamble_dx_table[29];
+              }
+              break;
+            case GI_11_4096:
+              preamble_dx = preamble_dx_table[30];
+              break;
+            case GI_12_4864:
+              preamble_dx = preamble_dx_table[31];
+              break;
+            default:
+              preamble_dx = preamble_dx_table[18];
+              break;
+          }
           break;
         default:
           N_TR = 72;
@@ -80,6 +195,32 @@ namespace gr {
           carriers = carriers_table[FFTSIZE_8K][cred];
           max_carriers = carriers_table[FFTSIZE_8K][0];
           preamble_carriers = carriers_table[FFTSIZE_8K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              preamble_dx = preamble_dx_table[0];
+              break;
+            case GI_2_384:
+              preamble_dx = preamble_dx_table[1];
+              break;
+            case GI_3_512:
+              preamble_dx = preamble_dx_table[2];
+              break;
+            case GI_4_768:
+              preamble_dx = preamble_dx_table[3];
+              break;
+            case GI_5_1024:
+              preamble_dx = preamble_dx_table[4];
+              break;
+            case GI_6_1536:
+              preamble_dx = preamble_dx_table[5];
+              break;
+            case GI_7_2048:
+              preamble_dx = preamble_dx_table[6];
+              break;
+            default:
+              preamble_dx = preamble_dx_table[0];
+              break;
+          }
           break;
       }
       switch (pilotpattern) {
@@ -191,14 +332,33 @@ namespace gr {
       for (int i = 0; i < carriers; i++) {
         tr_carrier_map[i] = DATA_CARRIER;
       }
-      shift = dx * ((symbol - (preamble_symbols - 2)) % dy);
+      shift = dx * ((symbol - (preamble_symbols - dy)) % dy);
       if (frame_symbols[symbol] == SBS_SYMBOL || frame_symbols[symbol] == PREAMBLE_SYMBOL) {
         shift = 0;
       }
       reduced_carrier_shift = (max_carriers - carriers) / 2;
       shift = shift - reduced_carrier_shift;
 
-      if ((dx == 3 || dx == 4 || dx == 8) && (frame_symbols[symbol] == SBS_SYMBOL || frame_symbols[symbol] == PREAMBLE_SYMBOL)) {
+      if ((preamble_dx == 3 || preamble_dx == 4 || preamble_dx == 8) && (frame_symbols[symbol] == PREAMBLE_SYMBOL)) {
+        switch (fft_size) {
+          case FFTSIZE_8K:
+            for (int i = 0; i < 72; i++) {
+              tr_carrier_map[trpapr_alt_table_8K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+          case FFTSIZE_16K:
+            for (int i = 0; i < 144; i++) {
+              tr_carrier_map[trpapr_alt_table_16K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+          case FFTSIZE_32K:
+            for (int i = 0; i < 288; i++) {
+              tr_carrier_map[trpapr_alt_table_32K[i] + shift] = TRPAPR_CARRIER;
+            }
+            break;
+        }
+      }
+      else if ((dx == 3 || dx == 4 || dx == 8) && (frame_symbols[symbol] == SBS_SYMBOL)) {
         switch (fft_size) {
           case FFTSIZE_8K:
             for (int i = 0; i < 72; i++) {
@@ -378,6 +538,11 @@ namespace gr {
       {6913, 6817, 6721, 6625, 6529},
       {13825, 13633, 13441, 13249, 13057},
       {27649, 27265, 26881, 26497, 26113}
+    };
+
+    const int paprtr_cc_impl::preamble_dx_table[32] = {
+      16, 8, 6, 4, 3, 4, 3, 32, 16, 12, 8, 6, 4, 3, 3, 4,
+      4, 3, 32, 32, 24, 16, 12, 8, 6, 6, 8, 3, 8, 3, 3, 3
     };
 
     const int paprtr_cc_impl::trpapr_table_8K[72] = {
