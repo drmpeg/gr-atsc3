@@ -435,7 +435,10 @@ namespace gr {
                 }
               }
               std::fill_n(&ones_freq[index], right_nulls, 0);
-              if ((dx == 3 || dx == 4 || dx == 8) && (frame_symbols[j] == SBS_SYMBOL || frame_symbols[j] == PREAMBLE_SYMBOL)) {
+              if ((preamble_dx == 3 || preamble_dx == 4 || preamble_dx == 8) && (frame_symbols[j] == PREAMBLE_SYMBOL)) {
+                papr_map = tr_papr_alt_map;
+              }
+              if ((dx == 3 || dx == 4 || dx == 8) && (frame_symbols[j] == SBS_SYMBOL)) {
                 papr_map = tr_papr_alt_map;
               }
               else {

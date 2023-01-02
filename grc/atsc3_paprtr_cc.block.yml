@@ -52,10 +52,10 @@ parameters:
 -   id: firstsbs
     label: First SBS insertion
     dtype: enum
-    options: [SBS_OFF]
-    option_labels: [Disabled]
+    options: [SBS_OFF, SBS_ON]
+    option_labels: [Disabled, Enabled]
     option_attributes:
-        val: [atsc3.SBS_OFF]
+        val: [atsc3.SBS_OFF, atsc3.SBS_ON]
 -   id: cred
     label: Reduced Carriers
     dtype: enum

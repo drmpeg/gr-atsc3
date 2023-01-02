@@ -549,7 +549,7 @@ namespace gr {
         total_preamble_cells += (preamble_cells - papr_cells);
       }
       if (firstsbs == TRUE) {
-        frame_cells[numpreamblesyms] = sbs_cells;
+        frame_cells[numpreamblesyms] = sbs_cells - papr_cells;
         for (int n = 0; n < numpayloadsyms; n++) {
           frame_cells[n + numpreamblesyms + 1] = (data_cells - papr_cells);
         }
