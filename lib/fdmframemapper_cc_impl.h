@@ -130,7 +130,6 @@ namespace gr {
      private:
       int l1b_mode;
       int l1d_mode;
-      int plp_size_total;
       int plp_size[NUM_PLPS];
       int slice_size[NUM_PLPS];
       int slice_last_size[NUM_PLPS];

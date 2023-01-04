@@ -458,7 +458,7 @@ namespace gr {
               for (int k = 1; k <= num_iterations; k++) {
                 y = 0.0;
                 volk_32f_x2_add_32f((float*)ctemp.data(), (float*)in, (float*)c.data(), papr_fft_size * 2);
-                volk_32fc_magnitude_32f( magnitude.data(), ctemp.data(), papr_fft_size);
+                volk_32fc_magnitude_32f(magnitude.data(), ctemp.data(), papr_fft_size);
                 for (int n = 0; n < papr_fft_size; n++) {
                   if (magnitude[n] > y) {
                     y = magnitude[n];

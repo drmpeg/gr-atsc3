@@ -156,7 +156,7 @@ namespace gr {
       int b, packed;
 
       for (int i = 0; i < FRAME_SIZE_NORMAL;) {
-        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
                           ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
                           ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
         for (int n = 7; n >= 0; n--) {

@@ -42,6 +42,7 @@ namespace gr {
       int sbs_cells;
       int sbs_data_cells;
       int papr_cells;
+      int plp_size_total;
 
       samples = 0;
       cells[0] = cells[1] = 0;
@@ -1083,7 +1084,7 @@ namespace gr {
       int sr = 0x18f;
       int b, packed;
       for (int i = 0; i < plp_size_total;) {
-        packed = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
                           ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
                           ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
         for (int n = 7; n >= 0; n--) {
@@ -1154,7 +1155,7 @@ namespace gr {
       int b;
 
       for (int i = 0; i < MAX_L1DETAIL_MSG_SIZE; i++) {
-        fm_randomize[i] = ((sr & 0x4) << 5) | ((sr & 0x8 ) << 3) | ((sr & 0x10) << 1) | \
+        fm_randomize[i] = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
                           ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
                           ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
         b = sr & 1;
