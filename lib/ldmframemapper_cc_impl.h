@@ -132,6 +132,7 @@ namespace gr {
      private:
       int l1b_mode;
       int l1d_mode;
+      int plp_size_total;
       int plp_size;
       int first_sbs;
       int symbols;
@@ -148,6 +149,7 @@ namespace gr {
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
       void block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows, int l1select);
+      void init_address(void);
       unsigned char l1_temp[FRAME_SIZE_SHORT];
       unsigned char l1_basic[FRAME_SIZE_SHORT];
       unsigned char l1_detail[FRAME_SIZE_SHORT];
@@ -181,6 +183,10 @@ namespace gr {
 
       int ti_mode;
       int ti_depth;
+      int ti_blocks;
+      int ti_fecblocks;
+      int ti_fecblocks_max;
+      int Nfec_ti_max;
       int ti_randomize[(MAX_INTERLEAVER_DEPTH * MAX_INTERLEAVER_DEPTH) * 4];
       int commutator;
       gr_complex ti_qpsk[4];
@@ -188,6 +194,11 @@ namespace gr {
       gr_complex ti_64qam[64];
       gr_complex ti_256qam[256];
       gr_complex *time_interleaver;
+      gr_complex *hybrid_time_interleaver;
+      std::vector<std::vector<std::vector<int>>> HtimeLr;
+      std::vector<std::vector<int>> HtimePr;
+      std::vector<std::vector<int>> HtimeTBI;
+      std::vector<int> HtimeNfec;
       std::vector<std::deque<gr_complex>> delay_line;
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
@@ -331,7 +342,7 @@ namespace gr {
       const static int sbs_data_cells_table_32K[16][5][5];
 
      public:
-      ldmframemapper_cc_impl(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      ldmframemapper_cc_impl(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~ldmframemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
