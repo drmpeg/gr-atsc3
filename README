@@ -1,4 +1,4 @@
-# Copyright 2021,2022 Ron Economos
+# Copyright 2021-2023 Ron Economos
 #
 # This file is part of gr-atsc3
 #
@@ -52,7 +52,7 @@ calibration of the bootstrap resampler.
 
 Features not implemented:
 
-1) Time and Frequency Division Multiplexing
+1) Mixed Time and Frequency Division Multiplexing
 2) Convolutional Delay Line (CDL)
 3) Channel bonding
 4) L1-Detail segmentation
