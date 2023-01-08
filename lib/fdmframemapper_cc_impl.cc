@@ -1099,9 +1099,9 @@ namespace gr {
         GR_LOG_FATAL(d_logger, "FDM Frame Mapper, cannot allocate memory for time_interleaver 1.");
         throw std::bad_alloc();
       }
-      freq_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total);
-      if (freq_interleaver == NULL) {
-        GR_LOG_FATAL(d_logger, "FDM Frame Mapper, cannot allocate memory for freq_interleaver.");
+      freq_disperser = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total);
+      if (freq_disperser == NULL) {
+        GR_LOG_FATAL(d_logger, "FDM Frame Mapper, cannot allocate memory for freq_disperser.");
         throw std::bad_alloc();
       }
       hybrid_time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[0]);
@@ -1146,10 +1146,10 @@ namespace gr {
                  ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
         for (int n = 7; n >= 0; n--) {
           if (packed & (1 << n)) {
-            freq_interleaver[i++] = gr_complex(-1, 0);
+            freq_disperser[i++] = gr_complex(-1, 0);
           }
           else {
-            freq_interleaver[i++] = gr_complex(1, 0);
+            freq_disperser[i++] = gr_complex(1, 0);
           }
           if (i == plp_size_total) {
             break;
@@ -1172,7 +1172,7 @@ namespace gr {
     {
       free(hybrid_time_interleaver[1]);
       free(hybrid_time_interleaver[0]);
-      free(freq_interleaver);
+      free(freq_disperser);
       free(time_interleaver[1]);
       free(time_interleaver[0]);
     }
@@ -2447,8 +2447,8 @@ namespace gr {
       std::vector<int> H;
       gr_complex *outtimehti;
       gr_complex *outtimeint;
-      gr_complex *outfreqint;
-      gr_complex *infreqint[NUM_PLPS];
+      gr_complex *outfreqdisp;
+      gr_complex *infreqdisp[NUM_PLPS];
 
       if (sbsnullcells & 0x1) {
         left_nulls = (sbsnullcells / 2);
@@ -2491,23 +2491,23 @@ namespace gr {
             outtimeint += plp_size[plp];
           }
         }
-        in = &freq_interleaver[0];
+        in = &freq_disperser[0];
         indexin_timeint = 0;
 
-        infreqint[0] = &time_interleaver[0][0];
-        infreqint[1] = &time_interleaver[1][0];
-        outfreqint = &freq_interleaver[plp_offset];
+        infreqdisp[0] = &time_interleaver[0][0];
+        infreqdisp[1] = &time_interleaver[1][0];
+        outfreqdisp = &freq_disperser[plp_offset];
         for (int n = 0; n < symbols - preamble_syms - (first_sbs ? 2 : 1) - 1; n++) {
-          memcpy(outfreqint, infreqint[0], sizeof(gr_complex) * slice_size[0]);
-          infreqint[0] += slice_size[0];
-          outfreqint += slice_size[0];
-          memcpy(outfreqint, infreqint[1], sizeof(gr_complex) * slice_size[1]);
-          infreqint[1] += slice_size[1];
-          outfreqint += slice_size[1] + slice_unused_size;
+          memcpy(outfreqdisp, infreqdisp[0], sizeof(gr_complex) * slice_size[0]);
+          infreqdisp[0] += slice_size[0];
+          outfreqdisp += slice_size[0];
+          memcpy(outfreqdisp, infreqdisp[1], sizeof(gr_complex) * slice_size[1]);
+          infreqdisp[1] += slice_size[1];
+          outfreqdisp += slice_size[1] + slice_unused_size;
         }
-        memcpy(outfreqint, infreqint[0], sizeof(gr_complex) * slice_last_size[0]);
-        outfreqint += slice_last_size[0] + (slice_size[0] - slice_last_size[0]);
-        memcpy(outfreqint, infreqint[1], sizeof(gr_complex) * slice_last_size[1]);
+        memcpy(outfreqdisp, infreqdisp[0], sizeof(gr_complex) * slice_last_size[0]);
+        outfreqdisp += slice_last_size[0] + (slice_size[0] - slice_last_size[0]);
+        memcpy(outfreqdisp, infreqdisp[1], sizeof(gr_complex) * slice_last_size[1]);
 
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
         indexout += add_l1basic(&out[0], time_offset);
