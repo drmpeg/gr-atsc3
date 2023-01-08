@@ -2162,8 +2162,8 @@ namespace gr {
       for (int x = 0; x < NUM_SUBFRAMES; x++) {
         for (int i = 0; i < plp_size_total[x];) {
           packed = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
-                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
-                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+                   ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                   ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
           for (int n = 7; n >= 0; n--) {
             if (packed & (1 << n)) {
               time_interleaver[x][i++] = gr_complex(-1, 0);
@@ -2254,8 +2254,8 @@ namespace gr {
 
       for (int i = 0; i < (MAX_INTERLEAVER_DEPTH * MAX_INTERLEAVER_DEPTH) * 4;) {
         packed = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
-                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
-                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+                 ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                 ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
         for (int n = 7; n >= 0; n--) {
           ti_randomize[i++] = packed & (1 << n) ? 1 : 0;
         }

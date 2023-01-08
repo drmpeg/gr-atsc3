@@ -1085,8 +1085,8 @@ namespace gr {
       int b, packed;
       for (int i = 0; i < plp_size_total;) {
         packed = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
-                          ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
-                          ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+                 ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                 ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
         for (int n = 7; n >= 0; n--) {
           if (packed & (1 << n)) {
             time_interleaver[i++] = gr_complex(-1, 0);
@@ -2342,7 +2342,7 @@ namespace gr {
       auto in = static_cast<const input_type*>(input_items[0]);
       auto inx = static_cast<const input_type*>(input_items[0]);
       auto out = static_cast<output_type*>(output_items[0]);
-      int indexin[2] = {0, 0};
+      int indexin[NUM_PLPS] = {0, 0};
       int indexout = 0;
       int indexin_timeint;
       int preamblesyms = preamble_syms;
