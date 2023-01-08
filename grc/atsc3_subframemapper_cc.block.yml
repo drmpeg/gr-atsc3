@@ -56,6 +56,9 @@ templates:
           ${fimode1st.val},
           ${timode1st.val},
           ${tidepth1st.val},
+          ${tiblocks1st},
+          ${tifecblocksmax1st},
+          ${tifecblocks1st},
           ${cred1st.val},
           ${framesize2nd.val},
           ${rate2nd.val},
@@ -105,6 +108,9 @@ templates:
           ${fimode2nd.val},
           ${timode2nd.val},
           ${tidepth2nd.val},
+          ${tiblocks2nd},
+          ${tifecblocksmax2nd},
+          ${tifecblocks2nd},
           ${cred2nd.val},
           ${paprmode.val},
           ${l1bmode.val},
@@ -344,6 +350,8 @@ parameters:
     options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
     option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
+        hide_tidepth: [all, none, all]
+        hide_tiblocks: [all, all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
 -   id: tidepth1st
     label: Time Interleaver Depth 1st
@@ -352,6 +360,23 @@ parameters:
     option_labels: [512, 724, 887, 1024, 1254, 1448]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+    default: 'TI_DEPTH_1024'
+    hide: ${ timode1st.hide_tidepth }
+-   id: tiblocks1st
+    label: TI blocks 1st
+    dtype: int
+    default: '2'
+    hide: ${ timode1st.hide_tiblocks }
+-   id: tifecblocksmax1st
+    label: TI FEC blocks max 1st
+    dtype: int
+    default: '14'
+    hide: ${ timode1st.hide_tiblocks }
+-   id: tifecblocks1st
+    label: TI FEC blocks 1st
+    dtype: int
+    default: '14'
+    hide: ${ timode1st.hide_tiblocks }
 -   id: cred1st
     label: Reduced Carriers 1st
     dtype: enum
@@ -581,6 +606,8 @@ parameters:
     options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
     option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
+        hide_tidepth: [all, none, all]
+        hide_tiblocks: [all, all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
 -   id: tidepth2nd
     label: Time Interleaver Depth 2nd
@@ -589,6 +616,23 @@ parameters:
     option_labels: [512, 724, 887, 1024, 1254, 1448]
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+    default: 'TI_DEPTH_1024'
+    hide: ${ timode2nd.hide_tidepth }
+-   id: tiblocks2nd
+    label: TI blocks 2nd
+    dtype: int
+    default: '2'
+    hide: ${ timode2nd.hide_tiblocks }
+-   id: tifecblocksmax2nd
+    label: TI FEC blocks max 2nd
+    dtype: int
+    default: '44'
+    hide: ${ timode2nd.hide_tiblocks }
+-   id: tifecblocks2nd
+    label: TI FEC blocks 2nd
+    dtype: int
+    default: '44'
+    hide: ${ timode2nd.hide_tiblocks }
 -   id: cred2nd
     label: Reduced Carriers 2nd
     dtype: enum

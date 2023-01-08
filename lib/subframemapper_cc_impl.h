@@ -147,6 +147,7 @@ namespace gr {
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
       void block_interleaver(unsigned char *l1, const unsigned char *l1t, gr_complex *out, int mode, int rows, int l1select);
+      void init_address(int);
       unsigned char l1_temp[FRAME_SIZE_SHORT];
       unsigned char l1_basic[FRAME_SIZE_SHORT];
       unsigned char l1_detail[FRAME_SIZE_SHORT];
@@ -179,6 +180,10 @@ namespace gr {
 
       int ti_mode[NUM_SUBFRAMES];
       int ti_depth[NUM_SUBFRAMES];
+      int ti_blocks[NUM_SUBFRAMES];
+      int ti_fecblocks[NUM_SUBFRAMES];
+      int ti_fecblocks_max[NUM_SUBFRAMES];
+      int Nfec_ti_max[NUM_SUBFRAMES];
       int ti_randomize[(MAX_INTERLEAVER_DEPTH * MAX_INTERLEAVER_DEPTH) * 4];
       int commutator[NUM_SUBFRAMES];
       gr_complex ti_qpsk[4];
@@ -186,6 +191,11 @@ namespace gr {
       gr_complex ti_64qam[64];
       gr_complex ti_256qam[256];
       gr_complex *time_interleaver[NUM_SUBFRAMES];
+      gr_complex *hybrid_time_interleaver[NUM_SUBFRAMES];
+      std::vector<std::vector<std::vector<int>>> HtimeLr[NUM_SUBFRAMES];
+      std::vector<std::vector<int>> HtimePr[NUM_SUBFRAMES];
+      std::vector<std::vector<int>> HtimeTBI[NUM_SUBFRAMES];
+      std::vector<int> HtimeNfec[NUM_SUBFRAMES];
       std::vector<std::deque<gr_complex>> delay_line[NUM_SUBFRAMES];
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
@@ -329,7 +339,7 @@ namespace gr {
       const static int sbs_data_cells_table_32K[16][5][5];
 
      public:
-      subframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_fftsize_t fftsize1st, int numpayloadsyms1st, int numpreamblesyms, atsc3_guardinterval_t guardinterval1st, atsc3_pilotpattern_t pilotpattern1st, atsc3_scattered_pilot_boost_t pilotboost1st, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode1st, atsc3_time_interleaver_mode_t timode1st, atsc3_time_interleaver_depth_t tidepth1st, atsc3_reduced_carriers_t cred1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_fftsize_t fftsize2nd, int numpayloadsyms2nd, atsc3_guardinterval_t guardinterval2nd, atsc3_pilotpattern_t pilotpattern2nd, atsc3_scattered_pilot_boost_t pilotboost2nd, atsc3_frequency_interleaver_t fimode2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_time_interleaver_depth_t tidepth2nd, atsc3_reduced_carriers_t cred2nd, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      subframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_fftsize_t fftsize1st, int numpayloadsyms1st, int numpreamblesyms, atsc3_guardinterval_t guardinterval1st, atsc3_pilotpattern_t pilotpattern1st, atsc3_scattered_pilot_boost_t pilotboost1st, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode1st, atsc3_time_interleaver_mode_t timode1st, atsc3_time_interleaver_depth_t tidepth1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_reduced_carriers_t cred1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_fftsize_t fftsize2nd, int numpayloadsyms2nd, atsc3_guardinterval_t guardinterval2nd, atsc3_pilotpattern_t pilotpattern2nd, atsc3_scattered_pilot_boost_t pilotboost2nd, atsc3_frequency_interleaver_t fimode2nd, atsc3_time_interleaver_mode_t timode2nd, atsc3_time_interleaver_depth_t tidepth2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, atsc3_reduced_carriers_t cred2nd, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~subframemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
