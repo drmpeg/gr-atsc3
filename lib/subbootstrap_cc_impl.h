@@ -22,6 +22,7 @@
 #define SYSTEM_BANDWIDTH_6MHZ 0
 #define BSR_COEFFICIENT 2
 #define PADDING_SAMPLES 16 // TODO: calculate this from the length of the input filter in set_taps
+#define NUM_SUBFRAMES 2
 
 namespace gr {
   namespace atsc3 {
@@ -29,9 +30,9 @@ namespace gr {
     class subbootstrap_cc_impl : public subbootstrap_cc
     {
      private:
-      int symbol_size[2];
-      int guard_interval[2];
-      int frame_items[2];
+      int symbol_size[NUM_SUBFRAMES];
+      int guard_interval[NUM_SUBFRAMES];
+      int frame_items[NUM_SUBFRAMES];
       int insertion_items;
       int pnseq[ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2)];
       gr_complex zcseq[ZADOFF_CHU_LENGTH];

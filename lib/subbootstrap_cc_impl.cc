@@ -46,7 +46,7 @@ namespace gr {
         imag_negative_threshold_count(0),
         bootstrap_fft(BOOTSTRAP_FFT_SIZE, 1)
     {
-      int symbols[2];
+      int symbols[NUM_SUBFRAMES];
       int total_frame_items;
       int bootstrap_fft_size = BOOTSTRAP_FFT_SIZE;
       int zcindex, pnindex;
@@ -1443,7 +1443,7 @@ namespace gr {
       auto in0 = static_cast<const input_type*>(input_items[0]);
       auto in1 = static_cast<const input_type*>(input_items[1]);
       auto out = static_cast<output_type*>(output_items[0]);
-      int indexin[2] = {0, 0};
+      int indexin[NUM_SUBFRAMES] = {0, 0};
       gr_complex* level;
       int skipped_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation()) / decimation()) + (symbol_size[0] + guard_interval[0]);
 
