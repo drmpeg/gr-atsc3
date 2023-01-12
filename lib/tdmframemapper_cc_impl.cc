@@ -30,7 +30,7 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
-      L1_Detail *l1detailinit[2];
+      L1_Detail *l1detailinit[NUM_PLPS];
       double normalization;
       int rateindex, i, j, l1cells, totalcells;
       int fftsamples, gisamples;
@@ -1759,7 +1759,7 @@ namespace gr {
       unsigned char b, tempbch, msb;
       unsigned char *l1detail = l1_detail;
       unsigned char *l1temp = l1_temp;
-      L1_Detail *l1detailinit[2];
+      L1_Detail *l1detailinit[NUM_PLPS];
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       const unsigned char* d;
       unsigned char* p;
