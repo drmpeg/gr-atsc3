@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2022 Ron Economos.
+ * Copyright 2022,2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -17,6 +17,8 @@
 #define NBCH_3_15 3240
 #define NBCH_6_15 6480
 #define MAX_INTERLEAVER_DEPTH 1448
+#define NUM_SUBFRAMES 1
+#define NUM_PLPS 2
 
 typedef struct {
   int version;
@@ -81,12 +83,9 @@ typedef struct {
   int plp_start;
   int plp_size;
   int plp_scrambler_type;
-  int plp_fec_type_core;
-  int plp_mod_core;
-  int plp_cod_core;
-  int plp_fec_type_enh;
-  int plp_mod_enh;
-  int plp_cod_enh;
+  int plp_fec_type;
+  int plp_mod;
+  int plp_cod;
   int plp_TI_mode;
   int plp_fec_block_start;
   int plp_CTI_fec_block_start;
@@ -115,7 +114,7 @@ typedef struct {
 
 typedef struct {
   L1_Basic l1basic_data;
-  L1_Detail l1detail_data;
+  L1_Detail l1detail_data[NUM_PLPS];
 } L1Signalling;
 
 typedef struct{

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2022 Ron Economos.
+ * Copyright 2022,2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -30,7 +30,7 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
-      L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
+      L1_Detail *l1detailinit[NUM_PLPS];
       double normalization;
       int rateindex, i, j, l1cells, totalcells;
       int fftsamples, gisamples;
@@ -45,6 +45,8 @@ namespace gr {
       int depth;
       int randombits, randomindex;
 
+      l1detailinit[0] = &L1_Signalling[0].l1detail_data[0];
+      l1detailinit[1] = &L1_Signalling[0].l1detail_data[1];
       samples = 0;
       cells = 0;
       l1b_mode = l1bmode;
@@ -162,8 +164,8 @@ namespace gr {
       l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0; /* always 0 */
-      l1basicinit->num_subframes = 0;
-      l1basicinit->preamble_num_symbols = numpreamblesyms - 1;
+      l1basicinit->num_subframes = NUM_SUBFRAMES;
+      l1basicinit->preamble_num_symbols = numpreamblesyms;
       if (numpreamblesyms == 1) {
         l1basicinit->preamble_reduced_carriers = 0;
       }
@@ -187,22 +189,22 @@ namespace gr {
       l1basicinit->first_sub_fft_size = fftsize;
       l1basicinit->first_sub_reduced_carriers = cred;
       l1basicinit->first_sub_guard_interval = guardinterval;
-      l1basicinit->first_sub_num_ofdm_symbols = numpayloadsyms - 1;
+      l1basicinit->first_sub_num_ofdm_symbols = numpayloadsyms;
       l1basicinit->first_sub_scattered_pilot_pattern = pilotpattern;
       l1basicinit->first_sub_scattered_pilot_boost = pilotboost;
       l1basicinit->first_sub_sbs_first = firstsbs;
       l1basicinit->first_sub_sbs_last = SBS_ON;
       l1basicinit->reserved = 0xffffffffffff;
 
-      l1detailinit->version = 0;
-      l1detailinit->num_rf = 0;
-      l1detailinit->frequency_interleaver = fimode;
-      l1detailinit->num_plp = 1;
-      l1detailinit->plp_id = 0;
-      l1detailinit->plp_lls_flag = FALSE;
-      l1detailinit->plp_layer = 0;
-      l1detailinit->plp_start = 0;
-      l1detailinit->plp_scrambler_type = 0;
+      l1detailinit[0]->version = 0;
+      l1detailinit[0]->num_rf = 0;
+      l1detailinit[0]->frequency_interleaver = fimode;
+      l1detailinit[0]->num_plp = NUM_PLPS;
+      l1detailinit[0]->plp_id = 0;
+      l1detailinit[0]->plp_lls_flag = FALSE;
+      l1detailinit[0]->plp_layer = 0;
+      l1detailinit[0]->plp_start = 0;
+      l1detailinit[0]->plp_scrambler_type = 0;
       if (framesize_core == FECFRAME_SHORT) {
         switch (constellation_core) {
           case MOD_QPSK:
@@ -223,16 +225,16 @@ namespace gr {
         }
         switch (fecmode_core) {
           case PLP_FEC_NONE:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_ONLY_16K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_ONLY_16K;
             break;
           case PLP_FEC_CRC32:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_CRC_16K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_CRC_16K;
             break;
           case PLP_FEC_BCH:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_16K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_BCH_16K;
             break;
           default:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_16K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_BCH_16K;
             break;
         }
       }
@@ -262,19 +264,36 @@ namespace gr {
         }
         switch (fecmode_core) {
           case PLP_FEC_NONE:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_ONLY_64K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_ONLY_64K;
             break;
           case PLP_FEC_CRC32:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_CRC_64K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_CRC_64K;
             break;
           case PLP_FEC_BCH:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_64K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_BCH_64K;
             break;
           default:
-            l1detailinit->plp_fec_type_core = FEC_TYPE_BCH_64K;
+            l1detailinit[0]->plp_fec_type = FEC_TYPE_BCH_64K;
             break;
         }
       }
+      l1detailinit[0]->plp_mod = constellation_core;
+      l1detailinit[0]->plp_cod = rate_core;
+      l1detailinit[0]->plp_TI_mode = timode;
+      l1detailinit[0]->plp_TI_extended_interleaving = FALSE;
+      l1detailinit[0]->plp_HTI_inter_subframe = FALSE;
+      l1detailinit[0]->plp_HTI_num_ti_blocks = tiblocks;
+      l1detailinit[0]->plp_HTI_num_fec_blocks_max = tifecblocksmax;
+      l1detailinit[0]->plp_HTI_num_fec_blocks = tifecblocks;
+      l1detailinit[0]->plp_HTI_cell_interleaver = TRUE;
+      l1detailinit[0]->plp_type = 0;
+      l1detailinit[0]->plp_CTI_depth = tidepth;
+
+      l1detailinit[1]->plp_id = 1;
+      l1detailinit[1]->plp_lls_flag = FALSE;
+      l1detailinit[1]->plp_layer = 1;
+      l1detailinit[1]->plp_start = 0;
+      l1detailinit[1]->plp_scrambler_type = 0;
       if (framesize_enh == FECFRAME_SHORT) {
         switch (constellation_enh) {
           case MOD_QPSK:
@@ -295,16 +314,16 @@ namespace gr {
         }
         switch (fecmode_enh) {
           case PLP_FEC_NONE:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_ONLY_16K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_ONLY_16K;
             break;
           case PLP_FEC_CRC32:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_CRC_16K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_CRC_16K;
             break;
           case PLP_FEC_BCH:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_16K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_BCH_16K;
             break;
           default:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_16K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_BCH_16K;
             break;
         }
       }
@@ -334,34 +353,33 @@ namespace gr {
         }
         switch (fecmode_enh) {
           case PLP_FEC_NONE:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_ONLY_64K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_ONLY_64K;
             break;
           case PLP_FEC_CRC32:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_CRC_64K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_CRC_64K;
             break;
           case PLP_FEC_BCH:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_64K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_BCH_64K;
             break;
           default:
-            l1detailinit->plp_fec_type_enh = FEC_TYPE_BCH_64K;
+            l1detailinit[1]->plp_fec_type = FEC_TYPE_BCH_64K;
             break;
         }
       }
-      l1detailinit->plp_mod_core = constellation_core;
-      l1detailinit->plp_cod_core = rate_core;
-      l1detailinit->plp_mod_enh = constellation_enh;
-      l1detailinit->plp_cod_enh = rate_enh;
-      l1detailinit->plp_ldm_injection_level = level;
-      l1detailinit->plp_TI_mode = timode;
-      l1detailinit->plp_HTI_inter_subframe = FALSE;
-      l1detailinit->plp_HTI_num_ti_blocks = tiblocks;
-      l1detailinit->plp_HTI_num_fec_blocks_max = tifecblocksmax;
-      l1detailinit->plp_HTI_num_fec_blocks = tifecblocks;
-      l1detailinit->plp_HTI_cell_interleaver = TRUE;
-      l1detailinit->plp_type = 0;
-      l1detailinit->plp_TI_extended_interleaving = FALSE;
-      l1detailinit->plp_CTI_depth = tidepth;
-      l1detailinit->reserved = 0x7fffffffffffffff;
+      l1detailinit[1]->plp_mod = constellation_enh;
+      l1detailinit[1]->plp_cod = rate_enh;
+      l1detailinit[1]->plp_ldm_injection_level = level;
+      l1detailinit[1]->plp_TI_mode = timode;
+      l1detailinit[1]->plp_TI_extended_interleaving = FALSE;
+      l1detailinit[1]->plp_HTI_inter_subframe = FALSE;
+      l1detailinit[1]->plp_HTI_num_ti_blocks = tiblocks;
+      l1detailinit[1]->plp_HTI_num_fec_blocks_max = tifecblocksmax;
+      l1detailinit[1]->plp_HTI_num_fec_blocks = tifecblocks;
+      l1detailinit[1]->plp_HTI_cell_interleaver = TRUE;
+      l1detailinit[1]->plp_type = 0;
+      l1detailinit[1]->plp_CTI_depth = tidepth;
+      l1detailinit[1]->reserved = 0x7fffffffffffffff;
+
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0);
       printf("L1-Detail cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0);
@@ -985,7 +1003,7 @@ namespace gr {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
       }
       total_cells = totalcells;
-      l1detailinit->sbs_null_cells = sbsnullcells = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
+      l1detailinit[0]->sbs_null_cells = sbsnullcells = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("total cells = %d\n", totalcells);
       if (firstsbs) {
         printf("SBS null cells = %d\n", sbsnullcells * 2);
@@ -1003,7 +1021,8 @@ namespace gr {
         plp_size = tifecblocks * fec_cells_core;
       }
       printf("PLP size = %d\n", plp_size);
-      l1detailinit->plp_size = plp_size;
+      l1detailinit[0]->plp_size = plp_size;
+      l1detailinit[1]->plp_size = plp_size;
 
       switch(tidepth) {
         case TI_DEPTH_512:
@@ -1657,11 +1676,11 @@ namespace gr {
           l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
       }
-      bits = l1basicinit->num_subframes;
+      bits = l1basicinit->num_subframes - 1;
       for (int n = 7; n >= 0; n--) {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1basicinit->preamble_num_symbols;
+      bits = l1basicinit->preamble_num_symbols - 1;
       for (int n = 2; n >= 0; n--) {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
@@ -1706,7 +1725,7 @@ namespace gr {
       for (int n = 3; n >= 0; n--) {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1basicinit->first_sub_num_ofdm_symbols;
+      bits = l1basicinit->first_sub_num_ofdm_symbols - 1;
       for (int n = 10; n >= 0; n--) {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
@@ -1927,7 +1946,7 @@ namespace gr {
       unsigned char b, tempbch, msb;
       unsigned char *l1detail = l1_detail;
       unsigned char *l1temp = l1_temp;
-      L1_Detail *l1detailinit = &L1_Signalling[0].l1detail_data;
+      L1_Detail *l1detailinit[NUM_PLPS];
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       const unsigned char* d;
       unsigned char* p;
@@ -1936,171 +1955,118 @@ namespace gr {
       const int q2 = q2_val;
       const int m1 = m1_val;
 
-      bits = l1detailinit->version;
+      l1detailinit[0] = &L1_Signalling[0].l1detail_data[0];
+      l1detailinit[1] = &L1_Signalling[0].l1detail_data[1];
+      bits = l1detailinit[0]->version;
       for (int n = 3; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1detailinit->num_rf;
+      bits = l1detailinit[0]->num_rf;
       for (int n = 2; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      l1detail[offset_bits++] = l1detailinit->frequency_interleaver;
-      bits = l1detailinit->sbs_null_cells;
+      l1detail[offset_bits++] = l1detailinit[0]->frequency_interleaver;
+      bits = l1detailinit[0]->sbs_null_cells;
       for (int n = 12; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1detailinit->num_plp;
+      bits = l1detailinit[0]->num_plp - 1;
       for (int n = 5; n >= 0; n--) {
         l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
-      bits = l1detailinit->plp_id;
-      for (int n = 5; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      l1detail[offset_bits++] = l1detailinit->plp_lls_flag;
-      bits = l1detailinit->plp_layer;
-      for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_start;
-      for (int n = 23; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_size;
-      for (int n = 23; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_scrambler_type;
-      for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_fec_type_core;
-      for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_mod_core;
-      for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_cod_core;
-      for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_TI_mode;
-      for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        bits = block_start_core;
-        for (int n = 21; n >= 0; n--) {
+      for (int j = 0; j < l1detailinit[0]->num_plp; j++) {
+        bits = l1detailinit[j]->plp_id;
+        for (int n = 5; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        l1detail[offset_bits++] = l1detailinit->plp_type;
-        if (l1detailinit->plp_mod_core == MOD_QPSK) {
-          l1detail[offset_bits++] = l1detailinit->plp_TI_extended_interleaving;
-          bits = l1detailinit->plp_CTI_depth;
-          for (int n = 2; n >= 0; n--) {
-            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-          }
-          bits = start_row;
-          for (int n = 10; n >= 0; n--) {
-            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-          }
+        l1detail[offset_bits++] = l1detailinit[j]->plp_lls_flag;
+        bits = l1detailinit[j]->plp_layer;
+        for (int n = 1; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        else {
-          bits = l1detailinit->plp_CTI_depth;
-          for (int n = 2; n >= 0; n--) {
-            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-          }
-          bits = start_row;
-          for (int n = 10; n >= 0; n--) {
-            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-          }
+        bits = l1detailinit[j]->plp_start;
+        for (int n = 23; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-      }
-      else if (l1detailinit->plp_TI_mode == TI_MODE_HYBRID) {
-        l1detail[offset_bits++] = l1detailinit->plp_type;
-        if (l1detailinit->plp_mod_core == MOD_QPSK) {
-          l1detail[offset_bits++] = l1detailinit->plp_TI_extended_interleaving;
+        bits = l1detailinit[j]->plp_size;
+        for (int n = 23; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        l1detail[offset_bits++] = l1detailinit->plp_HTI_inter_subframe;
-        bits = l1detailinit->plp_HTI_num_ti_blocks - 1;
+        bits = l1detailinit[j]->plp_scrambler_type;
+        for (int n = 1; n >= 0; n--) {
+          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        }
+        bits = l1detailinit[j]->plp_fec_type;
         for (int n = 3; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        bits = l1detailinit->plp_HTI_num_fec_blocks_max - 1;
-        for (int n = 11; n >= 0; n--) {
+        bits = l1detailinit[j]->plp_mod;
+        for (int n = 3; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        bits = l1detailinit->plp_HTI_num_fec_blocks - 1;
-        for (int n = 11; n >= 0; n--) {
+        bits = l1detailinit[j]->plp_cod;
+        for (int n = 3; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        l1detail[offset_bits++] = l1detailinit->plp_HTI_cell_interleaver;
-      }
-      else {
-        bits = block_start_core;
-        for (int n = 14; n >= 0; n--) {
+        bits = l1detailinit[j]->plp_TI_mode;
+        for (int n = 1; n >= 0; n--) {
           l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
-        l1detail[offset_bits++] = l1detailinit->plp_type;
-      }
-      /* PLP 1 */
-      bits = l1detailinit->plp_id + 1;
-      for (int n = 5; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      l1detail[offset_bits++] = l1detailinit->plp_lls_flag;
-      bits = l1detailinit->plp_layer + 1;
-      for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_start;
-      for (int n = 23; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_size;
-      for (int n = 23; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_scrambler_type;
-      for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_fec_type_enh;
-      for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_mod_enh;
-      for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_cod_enh;
-      for (int n = 3; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      bits = l1detailinit->plp_TI_mode;
-      for (int n = 1; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
-      }
-      if (l1detailinit->plp_TI_mode == TI_MODE_OFF) {
-        bits = block_start_enh;
-        for (int n = 14; n >= 0; n--) {
-          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        if (l1detailinit[j]->plp_TI_mode == TI_MODE_OFF) {
+          bits = j == 0 ? block_start_core : block_start_enh;
+          for (int n = 14; n >= 0; n--) {
+            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+          }
         }
-      }
-      else if (l1detailinit->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        bits = block_start_enh;
-        for (int n = 21; n >= 0; n--) {
-          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        else if (l1detailinit[j]->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+          bits = j == 0 ? block_start_core : block_start_enh;
+          for (int n = 21; n >= 0; n--) {
+            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+          }
         }
-      }
-      bits = l1detailinit->plp_ldm_injection_level;
-      for (int n = 4; n >= 0; n--) {
-        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        if (l1detailinit[j]->plp_layer == 0) {
+          l1detail[offset_bits++] = l1detailinit[j]->plp_type;
+          if (l1detailinit[j]->plp_TI_mode == TI_MODE_CONVOLUTIONAL || l1detailinit[j]->plp_TI_mode == TI_MODE_HYBRID) {
+            if (l1detailinit[j]->plp_mod == MOD_QPSK) {
+              l1detail[offset_bits++] = l1detailinit[j]->plp_TI_extended_interleaving;
+            }
+          }
+          if (l1detailinit[j]->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+            bits = l1detailinit[j]->plp_CTI_depth;
+            for (int n = 2; n >= 0; n--) {
+              l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+            }
+            bits = start_row;
+            for (int n = 10; n >= 0; n--) {
+              l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+            }
+          }
+          else if (l1detailinit[j]->plp_TI_mode == TI_MODE_HYBRID) {
+            l1detail[offset_bits++] = l1detailinit[j]->plp_HTI_inter_subframe;
+            bits = l1detailinit[j]->plp_HTI_num_ti_blocks - 1;
+            for (int n = 3; n >= 0; n--) {
+              l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+            }
+            bits = l1detailinit[j]->plp_HTI_num_fec_blocks_max - 1;
+            for (int n = 11; n >= 0; n--) {
+              l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+            }
+            bits = l1detailinit[j]->plp_HTI_num_fec_blocks - 1;
+            for (int n = 11; n >= 0; n--) {
+              l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+            }
+            l1detail[offset_bits++] = l1detailinit[j]->plp_HTI_cell_interleaver;
+          }
+        }
+        else {
+          bits = l1detailinit[j]->plp_ldm_injection_level;
+          for (int n = 4; n >= 0; n--) {
+            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+          }
+        }
       }
       if ((((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) > 0) {
-        bitslong = l1detailinit->reserved;
+        bitslong = l1detailinit[1]->reserved;
         temp = (((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) - 1;
         for (int n = temp; n >= 0; n--) {
           l1detail[offset_bits++] = bitslong & (1 << n) ? 1 : 0;
