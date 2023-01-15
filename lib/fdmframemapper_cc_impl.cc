@@ -164,7 +164,7 @@ namespace gr {
       l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0; /* always 0 */
-      l1basicinit->num_subframes = 0;
+      l1basicinit->num_subframes = NUM_SUBFRAMES;
       l1basicinit->preamble_num_symbols = numpreamblesyms;
       if (numpreamblesyms == 1) {
         l1basicinit->preamble_reduced_carriers = 0;
@@ -1548,7 +1548,7 @@ namespace gr {
           l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
         }
       }
-      bits = l1basicinit->num_subframes;
+      bits = l1basicinit->num_subframes - 1;
       for (int n = 7; n >= 0; n--) {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }

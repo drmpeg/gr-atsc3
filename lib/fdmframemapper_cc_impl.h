@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2022 Ron Economos.
+ * Copyright 2022,2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -17,6 +17,7 @@
 #define NBCH_3_15 3240
 #define NBCH_6_15 6480
 #define MAX_INTERLEAVER_DEPTH 1448
+#define NUM_SUBFRAMES 1
 #define NUM_PLPS 2
 
 typedef struct {
