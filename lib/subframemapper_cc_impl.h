@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2022 Ron Economos.
+ * Copyright 2022,2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -18,6 +18,7 @@
 #define NBCH_6_15 6480
 #define MAX_INTERLEAVER_DEPTH 1448
 #define NUM_SUBFRAMES 2
+#define NUM_PLPS 1
 
 typedef struct {
   int version;
@@ -113,7 +114,7 @@ typedef struct {
 
 typedef struct {
   L1_Basic l1basic_data;
-  L1_Detail l1detail_data[NUM_SUBFRAMES];
+  L1_Detail l1detail_data[NUM_SUBFRAMES][NUM_PLPS];
 } L1Signalling;
 
 typedef struct{
