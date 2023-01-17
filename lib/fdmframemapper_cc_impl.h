@@ -114,7 +114,7 @@ typedef struct {
 
 typedef struct {
   L1_Basic l1basic_data;
-  L1_Detail l1detail_data[NUM_PLPS];
+  L1_Detail l1detail_data[NUM_SUBFRAMES][NUM_PLPS];
 } L1Signalling;
 
 typedef struct{
@@ -143,7 +143,7 @@ namespace gr {
       int preamble_syms;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int);
-      int add_l1detail(gr_complex*, int, int, int);
+      int add_l1detail(gr_complex*, int, int, int, int);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
       void calculate_crc_table();
