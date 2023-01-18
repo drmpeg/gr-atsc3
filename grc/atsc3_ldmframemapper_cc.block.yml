@@ -69,6 +69,8 @@ templates:
           ${tifecblocksmax},
           ${tifecblocks},
           ${cred.val},
+          ${flmode.val},
+          ${flen},
           ${paprmode.val},
           ${l1bmode.val},
           ${l1dmode.val})
@@ -388,6 +390,20 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: flmode
+    label: Frame Length Mode
+    dtype: enum
+    default: FLM_SYMBOL_ALIGNED
+    options: [FLM_TIME_ALIGNED, FLM_SYMBOL_ALIGNED]
+    option_labels: [Time Aligned, Symbol Aligned]
+    option_attributes:
+        hide_flen: [none, all]
+        val: [atsc3.FLM_TIME_ALIGNED, atsc3.FLM_SYMBOL_ALIGNED]
+-   id: flen
+    label: Frame Length (ms)
+    dtype: int
+    default: '100'
+    hide: ${ flmode.hide_flen }
 -   id: paprmode
     label: PAPR mode
     dtype: enum

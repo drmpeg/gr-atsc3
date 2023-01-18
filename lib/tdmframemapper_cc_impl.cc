@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     tdmframemapper_cc::sptr
-    tdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<tdmframemapper_cc_impl>(
-        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocksmax1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocksmax2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, paprmode, l1bmode, l1dmode);
+        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocksmax1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocksmax2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("tdmframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -42,6 +42,7 @@ namespace gr {
       int sbs_data_cells;
       int papr_cells;
       int plp_size_total;
+      int Nextra;
 
       l1detailinit[0][0] = &L1_Signalling[0].l1detail_data[0][0];
       l1detailinit[0][1] = &L1_Signalling[0].l1detail_data[0][1];
@@ -159,7 +160,15 @@ namespace gr {
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
       l1basicinit->papr_reduction = paprmode;
-      l1basicinit->frame_length_mode = FLM_SYMBOL_ALIGNED;
+      l1basicinit->frame_length_mode = flmode;
+      if (flmode == FLM_SYMBOL_ALIGNED) {
+        l1basicinit->time_offset = 0;
+        l1basicinit->additional_samples = 0; /* always 0 */
+      }
+      else {
+        l1basicinit->frame_length = flen / 5;
+        l1basicinit->excess_samples_per_symbol = 0;
+      }
       l1basicinit->time_offset = 0;
       l1basicinit->additional_samples = 0; /* always 0 */
       l1basicinit->num_subframes = NUM_SUBFRAMES - 1;
@@ -972,6 +981,8 @@ namespace gr {
       if (paprmode != PAPR_TR) {
         papr_cells = 0;
       }
+      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples + gisamples) - numpayloadsyms * (fftsamples + gisamples);
+      l1basicinit->excess_samples_per_symbol = Nextra / numpayloadsyms;
       frame_samples = ((fftsamples + gisamples) * (numpayloadsyms + numpreamblesyms)) + BOOTSTRAP_SAMPLES;
       frame_symbols[0] = first_preamble_cells;
       total_preamble_cells = 0;

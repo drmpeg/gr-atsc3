@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(ldmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(2e7256de92d05b382785bb1591f9974e)                     */
+/* BINDTOOL_HEADER_FILE_HASH(ac53766c57718548f3ce9ba8787ad2ef)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -60,6 +60,8 @@ void bind_ldmframemapper_cc(py::module& m)
            py::arg("tifecblocksmax"),
            py::arg("tifecblocks"),
            py::arg("cred"),
+           py::arg("flmode"),
+           py::arg("flen"),
            py::arg("paprmode"),
            py::arg("l1bmode"),
            py::arg("l1dmode"),

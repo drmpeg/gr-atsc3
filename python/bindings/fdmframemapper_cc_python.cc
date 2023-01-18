@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(fdmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(05e2d8787678e5b76211aa0924706bc8)                     */
+/* BINDTOOL_HEADER_FILE_HASH(8a30938a74fe95cc1afae8934b4c3dd0)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -63,6 +63,8 @@ void bind_fdmframemapper_cc(py::module& m)
            py::arg("firstsbs"),
            py::arg("fimode"),
            py::arg("cred"),
+           py::arg("flmode"),
+           py::arg("flen"),
            py::arg("paprmode"),
            py::arg("l1bmode"),
            py::arg("l1dmode"),
