@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(pilotgenerator_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(83686824c4ec9d8ecd3c3a155bc8ab67)                     */
+/* BINDTOOL_HEADER_FILE_HASH(2dccb02479efcb4bb827a059ae57f9f7)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -44,8 +44,12 @@ void bind_pilotgenerator_cc(py::module& m)
            py::arg("pilotpattern"),
            py::arg("pilotboost"),
            py::arg("firstsbs"),
+           py::arg("lastsbs"),
            py::arg("cred"),
+           py::arg("misomode"),
            py::arg("paprmode"),
+           py::arg("outputmode"),
+           py::arg("fftlength"),
            py::arg("vlength"),
            D(pilotgenerator_cc,make)
         )

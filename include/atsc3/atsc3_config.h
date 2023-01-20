@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -268,6 +268,11 @@ namespace gr {
       LDM_LEVEL_250DB,
     };
 
+    enum atsc3_pilotgenerator_mode_t {
+      PILOTGENERATOR_FREQ = 0,
+      PILOTGENERATOR_TIME,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -297,5 +302,6 @@ typedef gr::atsc3::atsc3_time_interleaver_mode_t atsc3_time_interleaver_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_depth_t atsc3_time_interleaver_depth_t;
 typedef gr::atsc3::atsc3_plp_fec_mode_t atsc3_plp_fec_mode_t;
 typedef gr::atsc3::atsc3_ldm_injection_level_t atsc3_ldm_injection_level_t;
+typedef gr::atsc3::atsc3_pilotgenerator_mode_t atsc3_pilotgenerator_mode_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

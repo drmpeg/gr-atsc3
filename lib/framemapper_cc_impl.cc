@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_first_sbs_t lastsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, fecmode, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, tiblocks, tifecblocksmax, tifecblocks, cred, flmode, flen, tifmode, paprmode, l1bmode, l1dmode);
+        framesize, rate, fecmode, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, lastsbs, fimode, timode, tidepth, tiblocks, tifecblocksmax, tifecblocks, cred, flmode, flen, tifmode, misomode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_first_sbs_t lastsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -233,7 +233,7 @@ namespace gr {
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
-      l1basicinit->first_sub_miso = MISO_OFF;
+      l1basicinit->first_sub_miso = misomode;
       l1basicinit->first_sub_fft_size = fftsize;
       l1basicinit->first_sub_reduced_carriers = cred;
       l1basicinit->first_sub_guard_interval = guardinterval;
@@ -241,7 +241,7 @@ namespace gr {
       l1basicinit->first_sub_scattered_pilot_pattern = pilotpattern;
       l1basicinit->first_sub_scattered_pilot_boost = pilotboost;
       l1basicinit->first_sub_sbs_first = firstsbs;
-      l1basicinit->first_sub_sbs_last = SBS_ON;
+      l1basicinit->first_sub_sbs_last = lastsbs;
       l1basicinit->reserved = 0xffffffffffff;
 
       l1detailinit[0][0]->version = 0;
@@ -965,7 +965,7 @@ namespace gr {
         frame_symbols[n] = (preamble_cells - papr_cells);
         total_preamble_cells += (preamble_cells - papr_cells);
       }
-      if (l1basicinit->first_sub_sbs_first == SBS_ON) {
+      if (firstsbs) {
         frame_symbols[numpreamblesyms] = (sbs_cells - papr_cells);
         for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = (data_cells - papr_cells);
@@ -976,12 +976,27 @@ namespace gr {
           frame_symbols[n + numpreamblesyms] = (data_cells - papr_cells);
         }
       }
-      frame_symbols[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
-      if (firstsbs) {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+      if (lastsbs) {
+        frame_symbols[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
       }
       else {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        frame_symbols[numpreamblesyms + numpayloadsyms - 1] = (data_cells - papr_cells);
+      }
+      if (firstsbs) {
+        if (lastsbs) {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+        }
+        else {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 1);
+        }
+      }
+      else {
+        if (lastsbs) {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        }
+        else {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms) * (data_cells - papr_cells));
+        }
       }
       total_cells = totalcells;
       l1detailinit[0][0]->sbs_null_cells = sbsnullcells = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
@@ -2022,9 +2037,11 @@ namespace gr {
           l1detail[offset_bits++] = l1detailinit[i][0]->subframe_multiplex;
         }
         l1detail[offset_bits++] = l1detailinit[i][0]->frequency_interleaver;
-        bits = l1detailinit[i][0]->sbs_null_cells;
-        for (int n = 12; n >= 0; n--) {
-          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        if (l1basicinit->first_sub_sbs_first == SBS_ON || l1basicinit->first_sub_sbs_last == SBS_ON) {
+          bits = l1detailinit[i][0]->sbs_null_cells;
+          for (int n = 12; n >= 0; n--) {
+            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+          }
         }
         bits = l1detailinit[i][0]->num_plp;
         for (int n = 5; n >= 0; n--) {

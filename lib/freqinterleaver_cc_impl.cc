@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     freqinterleaver_cc::sptr
-    freqinterleaver_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode)
+    freqinterleaver_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_first_sbs_t lastsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode)
     {
       return gnuradio::make_block_sptr<freqinterleaver_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, firstsbs, mode, cred, paprmode);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, firstsbs, lastsbs, mode, cred, paprmode);
     }
 
 
     /*
      * The private constructor
      */
-    freqinterleaver_cc_impl::freqinterleaver_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode)
+    freqinterleaver_cc_impl::freqinterleaver_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_first_sbs_t firstsbs, atsc3_first_sbs_t lastsbs, atsc3_frequency_interleaver_t mode, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode)
       : gr::sync_block("freqinterleaver_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -531,16 +531,21 @@ namespace gr {
       }
       if (firstsbs == TRUE) {
         frame_symbols[numpreamblesyms] = SBS_SYMBOL;
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = DATA_SYMBOL;
         }
       }
       else {
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 1; n++) {
           frame_symbols[n + numpreamblesyms] = DATA_SYMBOL;
         }
       }
-      frame_symbols[numpreamblesyms + numpayloadsyms - 1] = SBS_SYMBOL;
+      if (lastsbs) {
+        frame_symbols[numpreamblesyms + numpayloadsyms - 1] = SBS_SYMBOL;
+      }
+      else {
+        frame_symbols[numpreamblesyms + numpayloadsyms - 1] = DATA_SYMBOL;
+      }
 
       frame_cells[0] = first_preamble_cells;
       total_preamble_cells = 0;
@@ -550,16 +555,21 @@ namespace gr {
       }
       if (firstsbs == TRUE) {
         frame_cells[numpreamblesyms] = sbs_cells - papr_cells;
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_cells[n + numpreamblesyms + 1] = (data_cells - papr_cells);
         }
       }
       else {
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 1; n++) {
           frame_cells[n + numpreamblesyms] = (data_cells - papr_cells);
         }
       }
-      frame_cells[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
+      if (lastsbs) {
+        frame_cells[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
+      }
+      else {
+        frame_cells[numpreamblesyms + numpayloadsyms - 1] = (data_cells - papr_cells);
+      }
 
       HevenFP.resize(symbols);
       HoddFP.resize(symbols);
@@ -585,10 +595,20 @@ namespace gr {
         first_preamble_cells = 0;
       }
       if (firstsbs) {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+        if (lastsbs) {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+        }
+        else {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 1);
+        }
       }
       else {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        if (lastsbs) {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        }
+        else {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms) * (data_cells - papr_cells));
+        }
       }
       output_cells = totalcells;
       printf("output cells = %d\n", totalcells);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(225b841fc7779d3d05ed6a6f9f3e3555)                     */
+/* BINDTOOL_HEADER_FILE_HASH(d934ef1c20b5d790b1212c271d5cd4ce)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -339,6 +339,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_ldm_injection_level_t>();
+    py::enum_<::gr::atsc3::atsc3_pilotgenerator_mode_t>(m,"atsc3_pilotgenerator_mode_t")
+        .value("PILOTGENERATOR_FREQ", ::gr::atsc3::atsc3_pilotgenerator_mode_t::PILOTGENERATOR_FREQ) // 0
+        .value("PILOTGENERATOR_TIME", ::gr::atsc3::atsc3_pilotgenerator_mode_t::PILOTGENERATOR_TIME) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_pilotgenerator_mode_t>();
 
 
 

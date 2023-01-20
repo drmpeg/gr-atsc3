@@ -45,9 +45,13 @@ templates:
           ${pilotboost16.val},
           % endif
           ${firstsbs.val},
+          ${lastsbs.val},
           ${cred.val},
+          ${misomode.val},
           ${paprmode.val},
-          ${fftsize.vlength})
+          ${outputmode.val},
+          ${fftsize.vlength},
+          ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_FREQ' else 1})
 
 parameters:
 -   id: fftsize
@@ -231,6 +235,14 @@ parameters:
     option_labels: [Disabled, Enabled]
     option_attributes:
         val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+-   id: lastsbs
+    label: Last SBS insertion
+    dtype: enum
+    options: [SBS_OFF, SBS_ON]
+    option_labels: [Disabled, Enabled]
+    option_attributes:
+        val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+    default: SBS_ON
 -   id: cred
     label: Reduced Carriers
     dtype: enum
@@ -238,6 +250,14 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: misomode
+    label: MISO mode
+    dtype: enum
+    options: [MISO_OFF, MISO_64, MISO_256]
+    option_labels: [Disabled, 64 coefficients, 256 coefficients]
+    option_attributes:
+        val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
+    default: MISO_OFF
 -   id: paprmode
     label: PAPR mode
     dtype: enum
@@ -245,6 +265,14 @@ parameters:
     option_labels: [Disabled, Tone Reservation]
     option_attributes:
         val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
+-   id: outputmode
+    label: Output Mode
+    dtype: enum
+    options: [PILOTGENERATOR_FREQ, PILOTGENERATOR_TIME]
+    option_labels: ['Frequency', 'Time']
+    option_attributes:
+        val: [atsc3.PILOTGENERATOR_FREQ, atsc3.PILOTGENERATOR_TIME]
+    default: PILOTGENERATOR_FREQ
 
 inputs:
 -   domain: stream
@@ -253,6 +281,6 @@ inputs:
 outputs:
 -   domain: stream
     dtype: complex
-    vlen: ${fftsize.vlength}
+    vlen: ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_FREQ' else 1}
 
 file_format: 1

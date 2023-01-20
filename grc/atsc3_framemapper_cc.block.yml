@@ -53,6 +53,7 @@ templates:
           ${pilotboost16.val},
           % endif
           ${firstsbs.val},
+          ${lastsbs.val},
           ${fimode.val},
           ${timode.val},
           ${tidepth.val},
@@ -63,6 +64,7 @@ templates:
           ${flmode.val},
           ${flen},
           ${tifmode.val},
+          ${misomode.val},
           ${paprmode.val},
           ${l1bmode.val},
           ${l1dmode.val})
@@ -288,6 +290,14 @@ parameters:
     option_labels: [Disabled, Enabled]
     option_attributes:
         val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+-   id: lastsbs
+    label: Last SBS insertion
+    dtype: enum
+    options: [SBS_OFF, SBS_ON]
+    option_labels: [Disabled, Enabled]
+    option_attributes:
+        val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+    default: SBS_ON
 -   id: fimode
     label: Frequency Interleaver
     dtype: enum
@@ -359,6 +369,14 @@ parameters:
         val: [atsc3.TIF_NOT_INCLUDED, atsc3.TIF_MS_PRECISION, atsc3.TIF_US_PRECISION, atsc3.TIF_NS_PRECISION]
         hide_tif: [part, none, none, none]
     hide: ${ tifmode.hide_tif }
+-   id: misomode
+    label: MISO mode
+    dtype: enum
+    options: [MISO_OFF, MISO_64, MISO_256]
+    option_labels: [Disabled, 64 coefficients, 256 coefficients]
+    option_attributes:
+        val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
+    default: MISO_OFF
 -   id: paprmode
     label: PAPR mode
     dtype: enum

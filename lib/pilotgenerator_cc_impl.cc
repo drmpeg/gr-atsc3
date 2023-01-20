@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -15,22 +15,23 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     pilotgenerator_cc::sptr
-    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, unsigned int vlength)
+    pilotgenerator_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_first_sbs_t lastsbs, atsc3_reduced_carriers_t cred, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_pilotgenerator_mode_t outputmode, unsigned int fftlength, unsigned int vlength)
     {
       return gnuradio::make_block_sptr<pilotgenerator_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, cred, paprmode, vlength);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, lastsbs, cred, misomode, paprmode, outputmode, fftlength, vlength);
     }
 
 
     /*
      * The private constructor
      */
-    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, unsigned int vlength)
+    pilotgenerator_cc_impl::pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_first_sbs_t lastsbs, atsc3_reduced_carriers_t cred, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_pilotgenerator_mode_t outputmode, unsigned int fftlength, unsigned int vlength)
       : gr::block("pilotgenerator_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type) * vlength)),
-        ofdm_fft(vlength, 1),
-        ofdm_fft_size(vlength)
+        ofdm_fft(fftlength, 1),
+        miso_fft(fftlength, 1),
+        ofdm_fft_size(fftlength)
     {
       double power, preamble_power, scattered_power;
       double preamble_ifft_power, data_ifft_power;
@@ -45,6 +46,8 @@ namespace gr {
       fft_size = fftsize;
       pilot_pattern = pilotpattern;
       papr_mode = paprmode;
+      miso_mode = misomode;
+      output_mode = outputmode;
       cred_coeff = cred;
       symbols = numpreamblesyms + numpayloadsyms;
       preamble_symbols = numpreamblesyms;
@@ -886,16 +889,21 @@ namespace gr {
       }
       if (firstsbs == TRUE) {
         frame_symbols[numpreamblesyms] = SBS_SYMBOL;
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = DATA_SYMBOL;
         }
       }
       else {
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 1; n++) {
           frame_symbols[n + numpreamblesyms] = DATA_SYMBOL;
         }
       }
-      frame_symbols[numpreamblesyms + numpayloadsyms - 1] = SBS_SYMBOL;
+      if (lastsbs) {
+        frame_symbols[numpreamblesyms + numpayloadsyms - 1] = SBS_SYMBOL;
+      }
+      else {
+        frame_symbols[numpreamblesyms + numpayloadsyms - 1] = DATA_SYMBOL;
+      }
       data_carrier_map.resize(symbols);
       for (std::vector<std::vector<int>>::size_type i = 0; i != data_carrier_map.size(); i++) {
         data_carrier_map[i].resize(max_carriers);
@@ -905,10 +913,20 @@ namespace gr {
         first_preamble_cells = 0;
       }
       if (firstsbs) {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+        if (lastsbs) {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+        }
+        else {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 1);
+        }
       }
       else {
-        totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        if (lastsbs) {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        }
+        else {
+          totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms) * (data_cells - papr_cells));
+        }
       }
       input_cells = totalcells;
       printf("input cells = %d\n", input_cells);
@@ -916,7 +934,13 @@ namespace gr {
       first_preamble_normalization = 1.0 / std::sqrt((first_preamble_ifft_power * ((double)preamble_carriers / (double)max_carriers) - 1.98));
       preamble_normalization = 1.0 / std::sqrt(preamble_ifft_power);
       data_normalization = 1.0 / std::sqrt(data_ifft_power);
-      set_output_multiple(symbols);
+      if (outputmode == PILOTGENERATOR_FREQ) {
+        insertion_items = symbols;
+      }
+      else {
+        insertion_items = ((carriers * (symbols - 1)) + preamble_carriers);
+      }
+      set_output_multiple(insertion_items);
     }
 
     /*
@@ -929,7 +953,7 @@ namespace gr {
     void
     pilotgenerator_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = input_cells * (noutput_items / symbols);
+      ninput_items_required[0] = input_cells * (noutput_items / insertion_items);
     }
 
     void
@@ -1517,8 +1541,12 @@ namespace gr {
       int left_nulls, right_nulls;
       float normalization;
       gr_complex* dst;
+      gr_complex* src;
+      float angle;
+      gr_complex temp;
+      int miso_nulls = (ofdm_fft_size - 64) / 2;
 
-      for (int i = 0; i < noutput_items; i += symbols) {
+      for (int i = 0; i < noutput_items; i += insertion_items) {
         for (int j = 0; j < symbols; j++) {
           if (frame_symbols[j] == PREAMBLE_SYMBOL) {
             if (j == 0) {
@@ -1529,8 +1557,8 @@ namespace gr {
               preamblecarriers = carriers;
               normalization = preamble_normalization;
             }
-            left_nulls = ((ofdm_fft_size - preamblecarriers) / 2) + 1;
-            right_nulls = (ofdm_fft_size - preamblecarriers) / 2;
+            left_nulls = !output_mode ? ((ofdm_fft_size - preamblecarriers) / 2) + 1 : 0;
+            right_nulls = !output_mode ? (ofdm_fft_size - preamblecarriers) / 2 : 0;
             for (int n = 0; n < left_nulls; n++) {
               *out++ = zero;
             }
@@ -1554,8 +1582,8 @@ namespace gr {
           }
           else {
             normalization = data_normalization;
-            left_nulls = ((ofdm_fft_size - carriers) / 2) + 1;
-            right_nulls = (ofdm_fft_size - carriers) / 2;
+            left_nulls = !output_mode ? ((ofdm_fft_size - carriers) / 2) + 1 : 0;
+            right_nulls = !output_mode ? (ofdm_fft_size - carriers) / 2 : 0;
             for (int n = 0; n < left_nulls; n++) {
               *out++ = zero;
             }
@@ -1577,18 +1605,37 @@ namespace gr {
               *out++ = zero;
             }
           }
-          out -= ofdm_fft_size;
-#if 0
-          if (equalization_enable == EQUALIZATION_ON) {
-              volk_32fc_x2_multiply_32fc(out, out, inverse_sinc, ofdm_fft_size);
+          if (miso_mode == MISO_64) {
+            if (frame_symbols[j] != PREAMBLE_SYMBOL) {
+              dst = miso_fft.get_inbuf();
+//              std::fill_n(&dst[0], miso_nulls, 0);
+              memcpy(&dst[0], &miso_coefficients_64[32], sizeof(gr_complex) * 32);
+              memcpy(&dst[32], &miso_coefficients_64[0], sizeof(gr_complex) * 32);
+              std::fill_n(&dst[64], miso_nulls * 2, 0);
+              miso_fft.execute();
+              src = miso_fft.get_outbuf();
+              out -= carriers;
+              for (int n = 0; n < carriers; n++) {
+                angle = std::arg(src[n]);
+                temp = std::exp(gr_complexd(0.0, angle));
+                *out++ *= temp;
+              }
+            }
           }
+          if (output_mode == PILOTGENERATOR_FREQ) {
+            out -= ofdm_fft_size;
+#if 0
+            if (equalization_enable == EQUALIZATION_ON) {
+              volk_32fc_x2_multiply_32fc(out, out, inverse_sinc, ofdm_fft_size);
+            }
 #endif
-          dst = ofdm_fft.get_inbuf();
-          memcpy(&dst[ofdm_fft_size / 2], &out[0], sizeof(gr_complex) * ofdm_fft_size / 2);
-          memcpy(&dst[0], &out[ofdm_fft_size / 2], sizeof(gr_complex) * ofdm_fft_size / 2);
-          ofdm_fft.execute();
-          volk_32fc_s32fc_multiply_32fc(out, ofdm_fft.get_outbuf(), normalization, ofdm_fft_size);
-          out += ofdm_fft_size;
+            dst = ofdm_fft.get_inbuf();
+            memcpy(&dst[ofdm_fft_size / 2], &out[0], sizeof(gr_complex) * ofdm_fft_size / 2);
+            memcpy(&dst[0], &out[ofdm_fft_size / 2], sizeof(gr_complex) * ofdm_fft_size / 2);
+            ofdm_fft.execute();
+            volk_32fc_s32fc_multiply_32fc(out, ofdm_fft.get_outbuf(), normalization, ofdm_fft_size);
+            out += ofdm_fft_size;
+          }
         }
       }
 
@@ -1998,6 +2045,31 @@ namespace gr {
       {26304, 25936, 25574, 25208, 24844},
       {26592, 26220, 25854, 25484, 25116},
       {26592, 26220, 25854, 25484, 25116}
+    };
+
+    const gr_complex pilotgenerator_cc_impl::miso_coefficients_64[64] = {
+      gr_complex(-0.0082, 0.0031), gr_complex( 0.0041, 0.0092), gr_complex(-0.0192, 0.0795),
+      gr_complex(-0.0321, 0.0025), gr_complex(-0.0234, 0.0615), gr_complex(-0.0257, 0.0544),
+      gr_complex(-0.0599, 0.0362), gr_complex(-0.0472, 0.0203), gr_complex( 0.0925, 0.0460),
+      gr_complex( 0.0217, 0.0165), gr_complex(-0.1060, 0.0672), gr_complex( 0.0356, 0.0135),
+      gr_complex(-0.0765, 0.0388), gr_complex(-0.1158, 0.1144), gr_complex( 0.0197, 0.1516),
+      gr_complex(-0.0359, 0.0376), gr_complex(-0.0932, 0.0818), gr_complex(-0.0454, 0.1093),
+      gr_complex( 0.0692, 0.0114), gr_complex(-0.0801, 0.0271), gr_complex(-0.1156, 0.0505),
+      gr_complex( 0.2071, 0.0987), gr_complex( 0.0217, 0.1298), gr_complex( 0.0305, 0.1189),
+      gr_complex( 0.1325, 0.1816), gr_complex( 0.0220, 0.1673), gr_complex( 0.2034, 0.1647),
+      gr_complex( 0.1139, 0.0092), gr_complex(-0.0485, 0.2120), gr_complex( 0.0006, 0.0205),
+      gr_complex(-0.0667, 0.0071), gr_complex(-0.2077, 0.2282), gr_complex(-0.1265, 0.0798),
+      gr_complex( 0.0276, 0.1123), gr_complex(-0.0043, 0.1419), gr_complex( 0.0147, 0.0002),
+      gr_complex( 0.0066, 0.0353), gr_complex(-0.1775, 0.1532), gr_complex(-0.0491, 0.0762),
+      gr_complex(-0.1185, 0.1370), gr_complex( 0.1381, 0.1197), gr_complex( 0.0402, 0.1385),
+      gr_complex(-0.0414, 0.0215), gr_complex( 0.0425, 0.2408), gr_complex( 0.0778, 0.1461),
+      gr_complex(-0.2283, 0.0223), gr_complex( 0.0196, 0.0578), gr_complex(-0.0309, 0.1078),
+      gr_complex( 0.0340, 0.0156), gr_complex( 0.0431, 0.0505), gr_complex(-0.0656, 0.1008),
+      gr_complex( 0.0719, 0.1280), gr_complex(-0.0367, 0.0387), gr_complex( 0.0549, 0.0875),
+      gr_complex(-0.0199, 0.0339), gr_complex( 0.0247, 0.0080), gr_complex(-0.0482, 0.0159),
+      gr_complex( 0.0474, 0.0310), gr_complex(-0.0262, 0.0055), gr_complex(-0.0185, 0.0061),
+      gr_complex( 0.0547, 0.0236), gr_complex(-0.0084, 0.0174), gr_complex( 0.0030, 0.0153),
+      gr_complex(-0.0339, 0.0449)
     };
 
   } /* namespace atsc3 */

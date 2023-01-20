@@ -12,6 +12,7 @@ templates:
           ${guardinterval.val},
           ${pilotpattern.val},
           ${firstsbs.val},
+          ${lastsbs.val},
           ${mode.val},
           ${cred.val},
           ${paprmode.val})
@@ -53,6 +54,14 @@ parameters:
     option_labels: [Disabled, Enabled]
     option_attributes:
         val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+-   id: lastsbs
+    label: Last SBS insertion
+    dtype: enum
+    options: [SBS_OFF, SBS_ON]
+    option_labels: [Disabled, Enabled]
+    option_attributes:
+        val: [atsc3.SBS_OFF, atsc3.SBS_ON]
+    default: SBS_ON
 -   id: mode
     label: Interleave Mode
     dtype: enum
