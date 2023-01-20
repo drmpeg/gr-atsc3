@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -884,14 +884,14 @@ namespace gr {
         frame_symbols[n] = PREAMBLE_SYMBOL;
         total_preamble_cells += (preamble_cells - papr_cells);
       }
-      if (firstsbs == TRUE) {
+      if (firstsbs == SBS_ON) {
         frame_symbols[numpreamblesyms] = SBS_SYMBOL;
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = DATA_SYMBOL;
         }
       }
       else {
-        for (int n = 0; n < numpayloadsyms; n++) {
+        for (int n = 0; n < numpayloadsyms - 1; n++) {
           frame_symbols[n + numpreamblesyms] = DATA_SYMBOL;
         }
       }
@@ -904,7 +904,7 @@ namespace gr {
       if (numpreamblesyms == 0) {
         first_preamble_cells = 0;
       }
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {

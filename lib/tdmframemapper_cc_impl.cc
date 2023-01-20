@@ -990,7 +990,7 @@ namespace gr {
         frame_symbols[n] = (preamble_cells - papr_cells);
         total_preamble_cells += (preamble_cells - papr_cells);
       }
-      if (l1basicinit->first_sub_sbs_first == SBS_ON) {
+      if (firstsbs == SBS_ON) {
         frame_symbols[numpreamblesyms] = (sbs_cells - papr_cells);
         for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = (data_cells - papr_cells);
@@ -1002,7 +1002,7 @@ namespace gr {
         }
       }
       frame_symbols[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
@@ -1011,7 +1011,7 @@ namespace gr {
       total_cells = totalcells;
       l1detailinit[0][0]->sbs_null_cells = sbsnullcells = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("total cells = %d\n", totalcells);
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         printf("SBS null cells = %d\n", sbsnullcells * 2);
         plp_size_total = totalcells - l1cells - (2 * sbsnullcells);
         printf("PLP size total = %d\n", plp_size_total);
@@ -2457,7 +2457,7 @@ namespace gr {
         memcpy(&out[indexout], &in[indexin_timeint], sizeof(gr_complex) * datacells);
         indexin_timeint += datacells;
         indexout += datacells;
-        if (first_sbs) {
+        if (first_sbs == SBS_ON) {
           for (int n = 0; n < left_nulls; n++) {
             out[indexout++] = zero;
           }
