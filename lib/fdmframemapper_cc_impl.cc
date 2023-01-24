@@ -43,7 +43,7 @@ namespace gr {
       int papr_cells;
       int plp_size_total;
       int datacells, splitcells;
-      int subslices = numpayloadsyms - (firstsbs ? 2 : 1);
+      int subslices = numpayloadsyms - (firstsbs == SBS_ON ? 2 : 1);
       int Nextra;
 
       l1detailinit[0][0] = &L1_Signalling[0].l1detail_data[0][0];
@@ -994,7 +994,7 @@ namespace gr {
         frame_symbols[n] = (preamble_cells - papr_cells);
         total_preamble_cells += (preamble_cells - papr_cells);
       }
-      if (l1basicinit->first_sub_sbs_first == SBS_ON) {
+      if (firstsbs == SBS_ON) {
         frame_symbols[numpreamblesyms] = (sbs_cells - papr_cells);
         for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = (data_cells - papr_cells);
@@ -1006,7 +1006,7 @@ namespace gr {
         }
       }
       frame_symbols[numpreamblesyms + numpayloadsyms - 1] = (sbs_cells - papr_cells);
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
@@ -1015,7 +1015,7 @@ namespace gr {
       total_cells = totalcells;
       l1detailinit[0][0]->sbs_null_cells = sbsnullcells = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("total cells = %d\n", totalcells);
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         printf("SBS null cells = %d\n", sbsnullcells * 2);
         plp_size_total = totalcells - l1cells - (2 * sbsnullcells);
         printf("PLP size total = %d\n", plp_size_total);
@@ -1085,7 +1085,7 @@ namespace gr {
       }
       datacells -= l1cells;
       plp_offset = datacells;
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         plp_offset += frame_symbols[preamble_syms] - sbsnullcells;
       }
       l1detailinit[0][0]->plp_start = plp_offset;
@@ -2488,7 +2488,7 @@ namespace gr {
         infreqdisp[0] = &time_interleaver[0][0];
         infreqdisp[1] = &time_interleaver[1][0];
         outfreqdisp = &freq_disperser[plp_offset];
-        for (int n = 0; n < symbols - preamble_syms - (first_sbs ? 2 : 1) - 1; n++) {
+        for (int n = 0; n < symbols - preamble_syms - (first_sbs == SBS_ON ? 2 : 1) - 1; n++) {
           memcpy(outfreqdisp, infreqdisp[0], sizeof(gr_complex) * slice_size[0]);
           infreqdisp[0] += slice_size[0];
           outfreqdisp += slice_size[0];
@@ -2533,7 +2533,7 @@ namespace gr {
         memcpy(&out[indexout], &in[indexin_timeint], sizeof(gr_complex) * datacells);
         indexin_timeint += datacells;
         indexout += datacells;
-        if (first_sbs) {
+        if (first_sbs == SBS_ON) {
           for (int n = 0; n < left_nulls; n++) {
             out[indexout++] = zero;
           }

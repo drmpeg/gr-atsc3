@@ -1037,7 +1037,7 @@ namespace gr {
         frame_symbols[0][n] = (preamble_cells - papr_cells);
         total_preamble_cells += (preamble_cells - papr_cells);
       }
-      if (l1basicinit->first_sub_sbs_first == SBS_ON) {
+      if (firstsbs == SBS_ON) {
         frame_symbols[0][numpreamblesyms] = (sbs_cells - papr_cells);
         for (int n = 0; n < numpayloadsyms1st - 2; n++) {
           frame_symbols[0][n + numpreamblesyms + 1] = (data_cells - papr_cells);
@@ -1049,7 +1049,7 @@ namespace gr {
         }
       }
       frame_symbols[0][numpreamblesyms + numpayloadsyms1st - 1] = (sbs_cells - papr_cells);
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         totalcells[0] = first_preamble_cells + total_preamble_cells + ((numpayloadsyms1st - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
@@ -1058,7 +1058,7 @@ namespace gr {
       total_cells[0] = totalcells[0];
       l1detailinit[0][0]->sbs_null_cells = sbsnullcells[0] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("PLP0 total cells = %d\n", totalcells[0]);
-      if (firstsbs) {
+      if (firstsbs == SBS_ON) {
         printf("PLP0 SBS null cells = %d\n", sbsnullcells[0] * 2);
         plp_size_total[0] = totalcells[0] - l1cells - (2 * sbsnullcells[0]);
       }
@@ -1685,7 +1685,7 @@ namespace gr {
         }
       }
       frame_symbols[1][numpayloadsyms2nd - 1] = (sbs_cells - papr_cells);
-      if (first_sbs[1]) {
+      if (first_sbs[1] == SBS_ON) {
         totalcells[1] = ((numpayloadsyms2nd - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
@@ -1694,7 +1694,7 @@ namespace gr {
       total_cells[1] = totalcells[1];
       l1detailinit[1][0]->sbs_null_cells = sbsnullcells[1] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
       printf("PLP1 total cells = %d\n", totalcells[1]);
-      if (first_sbs[1]) {
+      if (first_sbs[1] == SBS_ON) {
         printf("PLP1 SBS null cells = %d\n", sbsnullcells[1] * 2);
         plp_size_total[1] = totalcells[1] - (2 * sbsnullcells[1]);
       }
@@ -3563,7 +3563,7 @@ namespace gr {
             indexin_timeint[subframe] += datacells;
             indexout[subframe] += datacells;
           }
-          if (first_sbs[subframe]) {
+          if (first_sbs[subframe] == SBS_ON) {
             for (int n = 0; n < left_nulls; n++) {
               out[indexout[subframe]++] = zero;
             }
