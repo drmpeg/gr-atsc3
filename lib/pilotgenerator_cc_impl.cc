@@ -887,7 +887,7 @@ namespace gr {
         frame_symbols[n] = PREAMBLE_SYMBOL;
         total_preamble_cells += (preamble_cells - papr_cells);
       }
-      if (firstsbs == TRUE) {
+      if (firstsbs == SBS_ON) {
         frame_symbols[numpreamblesyms] = SBS_SYMBOL;
         for (int n = 0; n < numpayloadsyms - 2; n++) {
           frame_symbols[n + numpreamblesyms + 1] = DATA_SYMBOL;
@@ -898,7 +898,7 @@ namespace gr {
           frame_symbols[n + numpreamblesyms] = DATA_SYMBOL;
         }
       }
-      if (lastsbs) {
+      if (lastsbs == SBS_ON) {
         frame_symbols[numpreamblesyms + numpayloadsyms - 1] = SBS_SYMBOL;
       }
       else {
@@ -912,8 +912,8 @@ namespace gr {
       if (numpreamblesyms == 0) {
         first_preamble_cells = 0;
       }
-      if (firstsbs) {
-        if (lastsbs) {
+      if (firstsbs == SBS_ON) {
+        if (lastsbs == SBS_ON) {
           totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
         }
         else {
@@ -921,7 +921,7 @@ namespace gr {
         }
       }
       else {
-        if (lastsbs) {
+        if (lastsbs == SBS_ON) {
           totalcells = first_preamble_cells + total_preamble_cells + ((numpayloadsyms - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
         }
         else {
