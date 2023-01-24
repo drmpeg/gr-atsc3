@@ -93,6 +93,7 @@ namespace gr {
       const static int sbs_cells_table_16K[16][5];
       const static int sbs_cells_table_32K[16][5];
       const static gr_complex miso_coefficients_64[64];
+      const static float miso_angle[6913];
 
      public:
       pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_first_sbs_t lastsbs, atsc3_reduced_carriers_t cred, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_pilotgenerator_mode_t outputmode, unsigned int fftlength, unsigned int vlength);
