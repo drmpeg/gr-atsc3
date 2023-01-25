@@ -51,7 +51,7 @@ templates:
           ${paprmode.val},
           ${outputmode.val},
           ${fftsize.vlength},
-          ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_FREQ' else 1})
+          ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_TIME' else 1})
 
 parameters:
 -   id: fftsize
@@ -268,11 +268,11 @@ parameters:
 -   id: outputmode
     label: Output Mode
     dtype: enum
-    options: [PILOTGENERATOR_FREQ, PILOTGENERATOR_TIME]
-    option_labels: ['Frequency', 'Time']
+    options: [PILOTGENERATOR_TIME, PILOTGENERATOR_FREQ]
+    option_labels: ['Time', 'Frequency']
     option_attributes:
-        val: [atsc3.PILOTGENERATOR_FREQ, atsc3.PILOTGENERATOR_TIME]
-    default: PILOTGENERATOR_FREQ
+        val: [atsc3.PILOTGENERATOR_TIME, atsc3.PILOTGENERATOR_FREQ]
+    default: PILOTGENERATOR_TIME
 
 inputs:
 -   domain: stream
@@ -281,6 +281,6 @@ inputs:
 outputs:
 -   domain: stream
     dtype: complex
-    vlen: ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_FREQ' else 1}
+    vlen: ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_TIME' else 1}
 
 file_format: 1

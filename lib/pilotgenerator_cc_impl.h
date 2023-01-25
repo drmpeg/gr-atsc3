@@ -58,6 +58,7 @@ namespace gr {
       gr_complex pr_bpsk[2];
       gr_complex sp_bpsk[2];
       gr_complex cp_bpsk[2];
+      gr_complex unfold[8192];
       int prbs[MAX_CARRIERS];
       int frame_symbols[4352];
       std::vector<std::vector<int>> data_carrier_map;
@@ -92,7 +93,15 @@ namespace gr {
       const static int sbs_cells_table_8K[16][5];
       const static int sbs_cells_table_16K[16][5];
       const static int sbs_cells_table_32K[16][5];
-      const static gr_complex miso_coefficients_64[64];
+      const static gr_complex miso_coefficients_64_1_2[64];
+      const static gr_complex miso_coefficients_64_2_2[64];
+      const static gr_complex miso_coefficients_64_1_3[64];
+      const static gr_complex miso_coefficients_64_2_3[64];
+      const static gr_complex miso_coefficients_64_3_3[64];
+      const static gr_complex miso_coefficients_64_1_4[64];
+      const static gr_complex miso_coefficients_64_2_4[64];
+      const static gr_complex miso_coefficients_64_3_4[64];
+      const static gr_complex miso_coefficients_64_4_4[64];
       const static float miso_angle[6913];
 
      public:
