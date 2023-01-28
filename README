@@ -57,13 +57,12 @@ Features not implemented:
 3) Channel bonding
 4) L1-Detail segmentation
 5) L1-Detail additional parity
-6) MISO
-7) MIMO
-8) ACE PAPR reduction
-9) Low Level Signaling (LLS)
-10) Baseband frame counter
-11) Transmitter Identification (TxID)
-12) IP packet input
+6) MIMO
+7) ACE PAPR reduction
+8) Low Level Signaling (LLS)
+9) Baseband frame counter
+10) Transmitter Identification (TxID)
+11) IP packet input
 
 Build instructions:
 
