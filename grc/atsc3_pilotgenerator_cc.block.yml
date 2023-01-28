@@ -46,8 +46,12 @@ templates:
           % endif
           ${firstsbs.val},
           ${cred.val},
+          ${misomode.val},
+          ${misotxid.val},
           ${paprmode.val},
-          ${fftsize.vlength})
+          ${outputmode.val},
+          ${fftsize.vlength},
+          ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_TIME' else 1})
 
 parameters:
 -   id: fftsize
@@ -238,6 +242,24 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: misomode
+    label: MISO mode
+    dtype: enum
+    options: [MISO_OFF, MISO_64, MISO_256]
+    option_labels: [Disabled, 64 coefficients, 256 coefficients]
+    option_attributes:
+        val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
+        hide_misotxid: [all, none, none]
+    default: MISO_OFF
+-   id: misotxid
+    label: MISO transmitter
+    dtype: enum
+    options: [MISO_TX_1_OF_2, MISO_TX_2_OF_2, MISO_TX_1_OF_3, MISO_TX_2_OF_3, MISO_TX_3_OF_3, MISO_TX_1_OF_4, MISO_TX_2_OF_4, MISO_TX_3_OF_4, MISO_TX_4_OF_4]
+    option_labels: [Transmitter 1 of 2, Transmitter 2 of 2, Transmitter 1 of 3, Transmitter 2 of 3, Transmitter 3 of 3, Transmitter 1 of 4, Transmitter 2 of 4, Transmitter 3 of 4, Transmitter 4 of 4]
+    option_attributes:
+        val: [atsc3.MISO_TX_1_OF_2, atsc3.MISO_TX_2_OF_2, atsc3.MISO_TX_1_OF_3, atsc3.MISO_TX_2_OF_3, atsc3.MISO_TX_3_OF_3, atsc3.MISO_TX_1_OF_4, atsc3.MISO_TX_2_OF_4, atsc3.MISO_TX_3_OF_4, atsc3.MISO_TX_4_OF_4]
+    default: MISO_TX_1_OF_2
+    hide: ${ misomode.hide_misotxid }
 -   id: paprmode
     label: PAPR mode
     dtype: enum
@@ -245,6 +267,14 @@ parameters:
     option_labels: [Disabled, Tone Reservation]
     option_attributes:
         val: [atsc3.PAPR_OFF, atsc3.PAPR_TR]
+-   id: outputmode
+    label: Output Mode
+    dtype: enum
+    options: [PILOTGENERATOR_TIME, PILOTGENERATOR_FREQ]
+    option_labels: ['Time', 'Frequency']
+    option_attributes:
+        val: [atsc3.PILOTGENERATOR_TIME, atsc3.PILOTGENERATOR_FREQ]
+    default: PILOTGENERATOR_TIME
 
 inputs:
 -   domain: stream
@@ -253,6 +283,6 @@ inputs:
 outputs:
 -   domain: stream
     dtype: complex
-    vlen: ${fftsize.vlength}
+    vlen: ${fftsize.vlength if str(outputmode) == 'PILOTGENERATOR_TIME' else 1}
 
 file_format: 1

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -91,6 +91,18 @@ namespace gr {
       MISO_OFF = 0,
       MISO_64,
       MISO_256,
+    };
+
+    enum atsc3_miso_tx_t {
+      MISO_TX_1_OF_2 = 0,
+      MISO_TX_2_OF_2,
+      MISO_TX_1_OF_3,
+      MISO_TX_2_OF_3,
+      MISO_TX_3_OF_3,
+      MISO_TX_1_OF_4,
+      MISO_TX_2_OF_4,
+      MISO_TX_3_OF_4,
+      MISO_TX_4_OF_4,
     };
 
     enum atsc3_fftsize_t {
@@ -268,6 +280,11 @@ namespace gr {
       LDM_LEVEL_250DB,
     };
 
+    enum atsc3_pilotgenerator_mode_t {
+      PILOTGENERATOR_FREQ = 0,
+      PILOTGENERATOR_TIME,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -281,6 +298,7 @@ typedef gr::atsc3::atsc3_papr_t atsc3_papr_t;
 typedef gr::atsc3::atsc3_frame_length_mode_t atsc3_frame_length_mode_t;
 typedef gr::atsc3::atsc3_additional_parity_mode_t atsc3_additional_parity_mode_t;
 typedef gr::atsc3::atsc3_miso_t atsc3_miso_t;
+typedef gr::atsc3::atsc3_miso_tx_t atsc3_miso_tx_t;
 typedef gr::atsc3::atsc3_fftsize_t atsc3_fftsize_t;
 typedef gr::atsc3::atsc3_pilotpattern_t atsc3_pilotpattern_t;
 typedef gr::atsc3::atsc3_reduced_carriers_t atsc3_reduced_carriers_t;
@@ -297,5 +315,6 @@ typedef gr::atsc3::atsc3_time_interleaver_mode_t atsc3_time_interleaver_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_depth_t atsc3_time_interleaver_depth_t;
 typedef gr::atsc3::atsc3_plp_fec_mode_t atsc3_plp_fec_mode_t;
 typedef gr::atsc3::atsc3_ldm_injection_level_t atsc3_ldm_injection_level_t;
+typedef gr::atsc3::atsc3_pilotgenerator_mode_t atsc3_pilotgenerator_mode_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

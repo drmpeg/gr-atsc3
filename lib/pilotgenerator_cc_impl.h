@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -12,6 +12,7 @@
 #include "atsc3_defines.h"
 #include <gnuradio/fft/fft.h>
 #include <vector>
+#include <complex>
 
 #define MAX_CARRIERS 27649
 
@@ -38,6 +39,8 @@ namespace gr {
       int fft_size;
       int pilot_pattern;
       int papr_mode;
+      int miso_mode;
+      int output_mode;
       int cred_coeff;
       int symbols;
       int carriers;
@@ -48,6 +51,8 @@ namespace gr {
       int dx;
       int dy;
       int input_cells;
+      int miso_size;
+      int insertion_items;
       float first_preamble_normalization;
       float preamble_normalization;
       float data_normalization;
@@ -61,7 +66,11 @@ namespace gr {
       void init_pilots(void);
 
       fft::fft_complex_rev ofdm_fft;
+      fft::fft_complex_fwd miso_fft;
       int ofdm_fft_size;
+
+      const gr_complex *miso_coefficients;
+      std::vector<gr_complex> miso_rotation;
 
       const static int carriers_table[3][5];
       const static int preamble_dx_table[32];
@@ -87,9 +96,27 @@ namespace gr {
       const static int sbs_cells_table_8K[16][5];
       const static int sbs_cells_table_16K[16][5];
       const static int sbs_cells_table_32K[16][5];
+      const static gr_complex miso_coefficients_64_1_2[64];
+      const static gr_complex miso_coefficients_64_2_2[64];
+      const static gr_complex miso_coefficients_64_1_3[64];
+      const static gr_complex miso_coefficients_64_2_3[64];
+      const static gr_complex miso_coefficients_64_3_3[64];
+      const static gr_complex miso_coefficients_64_1_4[64];
+      const static gr_complex miso_coefficients_64_2_4[64];
+      const static gr_complex miso_coefficients_64_3_4[64];
+      const static gr_complex miso_coefficients_64_4_4[64];
+      const static gr_complex miso_coefficients_256_1_2[256];
+      const static gr_complex miso_coefficients_256_2_2[256];
+      const static gr_complex miso_coefficients_256_1_3[256];
+      const static gr_complex miso_coefficients_256_2_3[256];
+      const static gr_complex miso_coefficients_256_3_3[256];
+      const static gr_complex miso_coefficients_256_1_4[256];
+      const static gr_complex miso_coefficients_256_2_4[256];
+      const static gr_complex miso_coefficients_256_3_4[256];
+      const static gr_complex miso_coefficients_256_4_4[256];
 
      public:
-      pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_papr_t paprmode, unsigned int vlength);
+      pilotgenerator_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_reduced_carriers_t cred, atsc3_miso_t misomode, atsc3_miso_tx_t misotxid, atsc3_papr_t paprmode, atsc3_pilotgenerator_mode_t outputmode, unsigned int fftlength, unsigned int vlength);
       ~pilotgenerator_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

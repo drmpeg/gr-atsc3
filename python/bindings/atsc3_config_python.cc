@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(225b841fc7779d3d05ed6a6f9f3e3555)                     */
+/* BINDTOOL_HEADER_FILE_HASH(6e2bed7095435d924125a3a02611ee15)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -132,6 +132,20 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_miso_t>();
+    py::enum_<::gr::atsc3::atsc3_miso_tx_t>(m,"atsc3_miso_tx_t")
+        .value("MISO_TX_1_OF_2", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_1_OF_2) // 0
+        .value("MISO_TX_2_OF_2", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_2_OF_2) // 1
+        .value("MISO_TX_1_OF_3", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_1_OF_3) // 2
+        .value("MISO_TX_2_OF_3", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_2_OF_3) // 3
+        .value("MISO_TX_3_OF_3", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_3_OF_3) // 4
+        .value("MISO_TX_1_OF_4", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_1_OF_4) // 5
+        .value("MISO_TX_2_OF_4", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_2_OF_4) // 6
+        .value("MISO_TX_3_OF_4", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_3_OF_4) // 7
+        .value("MISO_TX_4_OF_4", ::gr::atsc3::atsc3_miso_tx_t::MISO_TX_4_OF_4) // 8
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_miso_tx_t>();
     py::enum_<::gr::atsc3::atsc3_fftsize_t>(m,"atsc3_fftsize_t")
         .value("FFTSIZE_8K", ::gr::atsc3::atsc3_fftsize_t::FFTSIZE_8K) // 0
         .value("FFTSIZE_16K", ::gr::atsc3::atsc3_fftsize_t::FFTSIZE_16K) // 1
@@ -339,6 +353,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_ldm_injection_level_t>();
+    py::enum_<::gr::atsc3::atsc3_pilotgenerator_mode_t>(m,"atsc3_pilotgenerator_mode_t")
+        .value("PILOTGENERATOR_FREQ", ::gr::atsc3::atsc3_pilotgenerator_mode_t::PILOTGENERATOR_FREQ) // 0
+        .value("PILOTGENERATOR_TIME", ::gr::atsc3::atsc3_pilotgenerator_mode_t::PILOTGENERATOR_TIME) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_pilotgenerator_mode_t>();
 
 
 
