@@ -36,7 +36,7 @@ parameters:
     dtype: int
     default: '2'
 -   id: guardinterval
-    label: Guard Interval samples
+    label: Guard Interval Samples
     dtype: enum
     options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
@@ -50,7 +50,7 @@ parameters:
     option_attributes:
         val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
 -   id: firstsbs
-    label: First SBS insertion
+    label: First SBS Insertion
     dtype: enum
     options: [SBS_OFF, SBS_ON]
     option_labels: [Disabled, Enabled]
@@ -64,7 +64,7 @@ parameters:
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
 -   id: paprmode
-    label: PAPR mode
+    label: PAPR Mode
     dtype: enum
     options: [PAPR_OFF, PAPR_TR]
     option_labels: [Disabled, Tone Reservation]

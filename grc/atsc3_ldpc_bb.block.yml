@@ -8,14 +8,14 @@ templates:
 
 parameters:
 -   id: framesize
-    label: FECFRAME size
+    label: FECFRAME Size
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
     option_attributes:
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
 -   id: rate
-    label: Code rate
+    label: Code Rate
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]

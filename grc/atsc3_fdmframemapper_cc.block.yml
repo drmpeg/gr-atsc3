@@ -80,7 +80,7 @@ templates:
 
 parameters:
 -   id: framesize1st
-    label: FECFRAME size 1st
+    label: FECFRAME Size 1st
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
@@ -89,14 +89,14 @@ parameters:
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
 -   id: rate1st
-    label: Code rate 1st
+    label: Code Rate 1st
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
 -   id: fecmode1st
-    label: PLP FEC mode 1st
+    label: PLP FEC Mode 1st
     dtype: enum
     default: 'PLP_FEC_BCH'
     options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
@@ -128,22 +128,22 @@ parameters:
         hide_tiblocks: [all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
 -   id: tiblocks1st
-    label: TI blocks 1st
+    label: TI Blocks 1st
     dtype: int
     default: '2'
     hide: ${ timode1st.hide_tiblocks }
 -   id: tifecblocksmax1st
-    label: TI FEC blocks max 1st
+    label: TI FEC Blocks Max 1st
     dtype: int
     default: '14'
     hide: ${ timode1st.hide_tiblocks }
 -   id: tifecblocks1st
-    label: TI FEC blocks 1st
+    label: TI FEC Blocks 1st
     dtype: int
     default: '14'
     hide: ${ timode1st.hide_tiblocks }
 -   id: framesize2nd
-    label: FECFRAME size 2nd
+    label: FECFRAME Size 2nd
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
@@ -152,14 +152,14 @@ parameters:
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
 -   id: rate2nd
-    label: Code rate 2nd
+    label: Code Rate 2nd
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
 -   id: fecmode2nd
-    label: PLP FEC mode 2nd
+    label: PLP FEC Mode 2nd
     dtype: enum
     default: 'PLP_FEC_BCH'
     options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
@@ -191,22 +191,22 @@ parameters:
         hide_tiblocks: [all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
 -   id: tiblocks2nd
-    label: TI blocks 2nd
+    label: TI Blocks 2nd
     dtype: int
     default: '2'
     hide: ${ timode2nd.hide_tiblocks }
 -   id: tifecblocksmax2nd
-    label: TI FEC blocks max 2nd
+    label: TI FEC Blocks Max 2nd
     dtype: int
     default: '44'
     hide: ${ timode2nd.hide_tiblocks }
 -   id: tifecblocks2nd
-    label: TI FEC blocks 2nd
+    label: TI FEC Blocks 2nd
     dtype: int
     default: '44'
     hide: ${ timode2nd.hide_tiblocks }
 -   id: plpsplit
-    label: PLP 0/1 size ratio
+    label: PLP 0/1 Size Ratio
     dtype: float
     default: '0.5'
 -   id: fftsize
@@ -225,7 +225,7 @@ parameters:
     dtype: int
     default: '2'
 -   id: guardinterval
-    label: Guard Interval samples
+    label: Guard Interval Samples
     dtype: enum
     options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
@@ -383,7 +383,7 @@ parameters:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
     hide: ${ pilotpattern.hide_boost16 }
 -   id: firstsbs
-    label: First SBS insertion
+    label: First SBS Insertion
     dtype: enum
     options: [SBS_OFF, SBS_ON]
     option_labels: [Disabled, Enabled]
@@ -418,7 +418,7 @@ parameters:
     default: '100'
     hide: ${ flmode.hide_flen }
 -   id: paprmode
-    label: PAPR mode
+    label: PAPR Mode
     dtype: enum
     options: [PAPR_OFF, PAPR_TR]
     option_labels: [Disabled, Tone Reservation]

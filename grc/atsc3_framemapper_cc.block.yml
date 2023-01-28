@@ -70,7 +70,7 @@ templates:
 
 parameters:
 -   id: framesize
-    label: FECFRAME size
+    label: FECFRAME Size
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
@@ -79,14 +79,14 @@ parameters:
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
 -   id: rate
-    label: Code rate
+    label: Code Rate
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
 -   id: fecmode
-    label: PLP FEC mode
+    label: PLP FEC Mode
     dtype: enum
     default: 'PLP_FEC_BCH'
     options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
@@ -125,7 +125,7 @@ parameters:
     dtype: int
     default: '2'
 -   id: guardinterval
-    label: Guard Interval samples
+    label: Guard Interval Samples
     dtype: enum
     options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
@@ -283,7 +283,7 @@ parameters:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
     hide: ${ pilotpattern.hide_boost16 }
 -   id: firstsbs
-    label: First SBS insertion
+    label: First SBS Insertion
     dtype: enum
     options: [SBS_OFF, SBS_ON]
     option_labels: [Disabled, Enabled]
@@ -315,17 +315,17 @@ parameters:
     default: 'TI_DEPTH_1024'
     hide: ${ timode.hide_tidepth }
 -   id: tiblocks
-    label: TI blocks
+    label: TI Blocks
     dtype: int
     default: '2'
     hide: ${ timode.hide_tiblocks }
 -   id: tifecblocksmax
-    label: TI FEC blocks max
+    label: TI FEC Blocks Max
     dtype: int
     default: '14'
     hide: ${ timode.hide_tiblocks }
 -   id: tifecblocks
-    label: TI FEC blocks
+    label: TI FEC Blocks
     dtype: int
     default: '14'
     hide: ${ timode.hide_tiblocks }
@@ -361,7 +361,7 @@ parameters:
         hide_tif: [part, none, none, none]
     hide: ${ tifmode.hide_tif }
 -   id: misomode
-    label: MISO mode
+    label: MISO Mode
     dtype: enum
     options: [MISO_OFF, MISO_64, MISO_256]
     option_labels: [Disabled, 64 coefficients, 256 coefficients]
@@ -369,7 +369,7 @@ parameters:
         val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
     default: MISO_OFF
 -   id: paprmode
-    label: PAPR mode
+    label: PAPR Mode
     dtype: enum
     options: [PAPR_OFF, PAPR_TR]
     option_labels: [Disabled, Tone Reservation]
