@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(ldmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(ac53766c57718548f3ce9ba8787ad2ef)                     */
+/* BINDTOOL_HEADER_FILE_HASH(8f716561775a7a1cd998ebf910d94207)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -62,6 +62,7 @@ void bind_ldmframemapper_cc(py::module& m)
            py::arg("cred"),
            py::arg("flmode"),
            py::arg("flen"),
+           py::arg("misomode"),
            py::arg("paprmode"),
            py::arg("l1bmode"),
            py::arg("l1dmode"),

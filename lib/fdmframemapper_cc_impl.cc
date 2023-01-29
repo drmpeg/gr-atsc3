@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     fdmframemapper_cc::sptr
-    fdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    fdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<fdmframemapper_cc_impl>(
-        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocksmax1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocksmax2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, paprmode, l1bmode, l1dmode);
+        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocksmax1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocksmax2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    fdmframemapper_cc_impl::fdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    fdmframemapper_cc_impl::fdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("fdmframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -194,7 +194,7 @@ namespace gr {
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
-      l1basicinit->first_sub_miso = MISO_OFF;
+      l1basicinit->first_sub_miso = misomode;
       l1basicinit->first_sub_fft_size = fftsize;
       l1basicinit->first_sub_reduced_carriers = cred;
       l1basicinit->first_sub_guard_interval = guardinterval;
@@ -1886,9 +1886,11 @@ namespace gr {
           l1detail[offset_bits++] = l1detailinit[i][0]->subframe_multiplex;
         }
         l1detail[offset_bits++] = l1detailinit[i][0]->frequency_interleaver;
-        bits = l1detailinit[i][0]->sbs_null_cells;
-        for (int n = 12; n >= 0; n--) {
-          l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+        if (l1basicinit->first_sub_sbs_first == SBS_ON || l1basicinit->first_sub_sbs_last == SBS_ON) {
+          bits = l1detailinit[i][0]->sbs_null_cells;
+          for (int n = 12; n >= 0; n--) {
+            l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+          }
         }
         bits = l1detailinit[i][0]->num_plp;
         for (int n = 5; n >= 0; n--) {

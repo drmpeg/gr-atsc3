@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(subframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(3be8f36f618cf79f0bd515d0666b45ee)                     */
+/* BINDTOOL_HEADER_FILE_HASH(be311921212676c26bdcbf1085a596c0)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -55,6 +55,7 @@ void bind_subframemapper_cc(py::module& m)
            py::arg("tifecblocksmax1st"),
            py::arg("tifecblocks1st"),
            py::arg("cred1st"),
+           py::arg("misomode1st"),
            py::arg("framesize2nd"),
            py::arg("rate2nd"),
            py::arg("fecmode2nd"),
@@ -71,6 +72,7 @@ void bind_subframemapper_cc(py::module& m)
            py::arg("tifecblocksmax2nd"),
            py::arg("tifecblocks2nd"),
            py::arg("cred2nd"),
+           py::arg("misomode2nd"),
            py::arg("paprmode"),
            py::arg("l1bmode"),
            py::arg("l1dmode"),

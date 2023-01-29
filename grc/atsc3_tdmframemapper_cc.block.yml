@@ -74,6 +74,7 @@ templates:
           ${cred.val},
           ${flmode.val},
           ${flen},
+          ${misomode.val},
           ${paprmode.val},
           ${l1bmode.val},
           ${l1dmode.val})
@@ -417,6 +418,14 @@ parameters:
     dtype: int
     default: '100'
     hide: ${ flmode.hide_flen }
+-   id: misomode
+    label: MISO Mode
+    dtype: enum
+    options: [MISO_OFF, MISO_64, MISO_256]
+    option_labels: [Disabled, 64 coefficients, 256 coefficients]
+    option_attributes:
+        val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
+    default: MISO_OFF
 -   id: paprmode
     label: PAPR Mode
     dtype: enum

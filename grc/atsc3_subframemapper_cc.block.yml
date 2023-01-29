@@ -60,6 +60,7 @@ templates:
           ${tifecblocksmax1st},
           ${tifecblocks1st},
           ${cred1st.val},
+          ${misomode1st.val},
           ${framesize2nd.val},
           ${rate2nd.val},
           ${fecmode2nd.val},
@@ -112,6 +113,7 @@ templates:
           ${tifecblocksmax2nd},
           ${tifecblocks2nd},
           ${cred2nd.val},
+          ${misomode2nd.val},
           ${paprmode.val},
           ${l1bmode.val},
           ${l1dmode.val})
@@ -384,6 +386,14 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: misomode1st
+    label: MISO Mode 1st
+    dtype: enum
+    options: [MISO_OFF, MISO_64, MISO_256]
+    option_labels: [Disabled, 64 coefficients, 256 coefficients]
+    option_attributes:
+        val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
+    default: MISO_OFF
 -   id: framesize2nd
     label: FECFRAME Size 2nd
     dtype: enum
@@ -640,6 +650,14 @@ parameters:
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
+-   id: misomode2nd
+    label: MISO Mode 2nd
+    dtype: enum
+    options: [MISO_OFF, MISO_64, MISO_256]
+    option_labels: [Disabled, 64 coefficients, 256 coefficients]
+    option_attributes:
+        val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
+    default: MISO_OFF
 -   id: paprmode
     label: PAPR Mode
     dtype: enum
