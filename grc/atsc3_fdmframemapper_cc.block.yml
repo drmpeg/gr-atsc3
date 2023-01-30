@@ -210,6 +210,7 @@ parameters:
     label: PLP 0/1 Size Ratio
     dtype: float
     default: '0.5'
+    hide: ${ ('none' if str(timode1st) == str(timode2nd) == 'TI_MODE_OFF' else 'all') }
 -   id: fftsize
     label: FFT Size
     dtype: enum
