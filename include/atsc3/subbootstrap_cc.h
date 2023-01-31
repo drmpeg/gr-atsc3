@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2022 Ron Economos.
+ * Copyright 2022,2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
