@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(tdmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(4daeb1cf0cde5363fe856070b62d8c17)                     */
+/* BINDTOOL_HEADER_FILE_HASH(6f193167a04dd593f5f5d369fa5aa8ef)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -37,22 +37,22 @@ void bind_tdmframemapper_cc(py::module& m)
         std::shared_ptr<tdmframemapper_cc>>(m, "tdmframemapper_cc", D(tdmframemapper_cc))
 
         .def(py::init(&tdmframemapper_cc::make),
-           py::arg("framesize1st"),
-           py::arg("rate1st"),
-           py::arg("fecmode1st"),
-           py::arg("constellation1st"),
-           py::arg("timode1st"),
-           py::arg("tiblocks1st"),
-           py::arg("tifecblocksmax1st"),
-           py::arg("tifecblocks1st"),
-           py::arg("framesize2nd"),
-           py::arg("rate2nd"),
-           py::arg("fecmode2nd"),
-           py::arg("constellation2nd"),
-           py::arg("timode2nd"),
-           py::arg("tiblocks2nd"),
-           py::arg("tifecblocksmax2nd"),
-           py::arg("tifecblocks2nd"),
+           py::arg("framesizeplp0"),
+           py::arg("rateplp0"),
+           py::arg("fecmodeplp0"),
+           py::arg("constellationplp0"),
+           py::arg("timodeplp0"),
+           py::arg("tiblocksplp0"),
+           py::arg("tifecblocksmaxplp0"),
+           py::arg("tifecblocksplp0"),
+           py::arg("framesizeplp1"),
+           py::arg("rateplp1"),
+           py::arg("fecmodeplp1"),
+           py::arg("constellationplp1"),
+           py::arg("timodeplp1"),
+           py::arg("tiblocksplp1"),
+           py::arg("tifecblocksmaxplp1"),
+           py::arg("tifecblocksplp1"),
            py::arg("plpsplit"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),

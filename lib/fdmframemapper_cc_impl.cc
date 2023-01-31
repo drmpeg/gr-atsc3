@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     fdmframemapper_cc::sptr
-    fdmframemapper_cc::make(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    fdmframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<fdmframemapper_cc_impl>(
-        framesize1st, rate1st, fecmode1st, constellation1st, timode1st, tiblocks1st, tifecblocksmax1st, tifecblocks1st, framesize2nd, rate2nd, fecmode2nd, constellation2nd, timode2nd, tiblocks2nd, tifecblocksmax2nd, tifecblocks2nd, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
+        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, timodeplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, timodeplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    fdmframemapper_cc_impl::fdmframemapper_cc_impl(atsc3_framesize_t framesize1st, atsc3_code_rate_t rate1st, atsc3_plp_fec_mode_t fecmode1st, atsc3_constellation_t constellation1st, atsc3_time_interleaver_mode_t timode1st, int tiblocks1st, int tifecblocksmax1st, int tifecblocks1st, atsc3_framesize_t framesize2nd, atsc3_code_rate_t rate2nd, atsc3_plp_fec_mode_t fecmode2nd, atsc3_constellation_t constellation2nd, atsc3_time_interleaver_mode_t timode2nd, int tiblocks2nd, int tifecblocksmax2nd, int tifecblocks2nd, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    fdmframemapper_cc_impl::fdmframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("fdmframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -182,10 +182,10 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      if (timode1st == TI_MODE_OFF && timode2nd == TI_MODE_OFF) {
+      if (timodeplp0 == TI_MODE_OFF && timodeplp1 == TI_MODE_OFF) {
         l1basicinit->L1_Detail_size_bytes = 40;
       }
-      else if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
+      else if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == TI_MODE_HYBRID) {
         l1basicinit->L1_Detail_size_bytes = 43;
       }
       else {
@@ -214,8 +214,8 @@ namespace gr {
       l1detailinit[0][0]->plp_layer = 0;
       l1detailinit[0][0]->plp_start = 0;
       l1detailinit[0][0]->plp_scrambler_type = 0;
-      if (framesize1st == FECFRAME_SHORT) {
-        switch (constellation1st) {
+      if (framesizeplp0 == FECFRAME_SHORT) {
+        switch (constellationplp0) {
           case MOD_QPSK:
             fec_cells[0] = 8100;
             break;
@@ -232,7 +232,7 @@ namespace gr {
             fec_cells[0] = 0;
             break;
         }
-        switch (fecmode1st) {
+        switch (fecmodeplp0) {
           case PLP_FEC_NONE:
             l1detailinit[0][0]->plp_fec_type = FEC_TYPE_ONLY_16K;
             break;
@@ -248,7 +248,7 @@ namespace gr {
         }
       }
       else {
-        switch (constellation1st) {
+        switch (constellationplp0) {
           case MOD_QPSK:
             fec_cells[0] = 32400;
             break;
@@ -271,7 +271,7 @@ namespace gr {
             fec_cells[0] = 0;
             break;
         }
-        switch (fecmode1st) {
+        switch (fecmodeplp0) {
           case PLP_FEC_NONE:
             l1detailinit[0][0]->plp_fec_type = FEC_TYPE_ONLY_64K;
             break;
@@ -286,14 +286,14 @@ namespace gr {
             break;
         }
       }
-      l1detailinit[0][0]->plp_mod = constellation1st;
-      l1detailinit[0][0]->plp_cod = rate1st;
-      l1detailinit[0][0]->plp_TI_mode = timode1st;
+      l1detailinit[0][0]->plp_mod = constellationplp0;
+      l1detailinit[0][0]->plp_cod = rateplp0;
+      l1detailinit[0][0]->plp_TI_mode = timodeplp0;
       l1detailinit[0][0]->plp_TI_extended_interleaving = FALSE;
       l1detailinit[0][0]->plp_HTI_inter_subframe = FALSE;
-      l1detailinit[0][0]->plp_HTI_num_ti_blocks = tiblocks1st - 1;
-      l1detailinit[0][0]->plp_HTI_num_fec_blocks_max = tifecblocksmax1st - 1;
-      l1detailinit[0][0]->plp_HTI_num_fec_blocks = tifecblocks1st - 1;
+      l1detailinit[0][0]->plp_HTI_num_ti_blocks = tiblocksplp0 - 1;
+      l1detailinit[0][0]->plp_HTI_num_fec_blocks_max = tifecblocksmaxplp0 - 1;
+      l1detailinit[0][0]->plp_HTI_num_fec_blocks = tifecblocksplp0 - 1;
       l1detailinit[0][0]->plp_HTI_cell_interleaver = TRUE;
       l1detailinit[0][0]->plp_type = 1;
       l1detailinit[0][0]->plp_num_subslices = subslices - 1;
@@ -303,8 +303,8 @@ namespace gr {
       l1detailinit[0][1]->plp_layer = 0;
       l1detailinit[0][1]->plp_start = 0;
       l1detailinit[0][1]->plp_scrambler_type = 0;
-      if (framesize2nd == FECFRAME_SHORT) {
-        switch (constellation2nd) {
+      if (framesizeplp1 == FECFRAME_SHORT) {
+        switch (constellationplp1) {
           case MOD_QPSK:
             fec_cells[1] = 8100;
             break;
@@ -321,7 +321,7 @@ namespace gr {
             fec_cells[1] = 0;
             break;
         }
-        switch (fecmode2nd) {
+        switch (fecmodeplp1) {
           case PLP_FEC_NONE:
             l1detailinit[0][1]->plp_fec_type = FEC_TYPE_ONLY_16K;
             break;
@@ -337,7 +337,7 @@ namespace gr {
         }
       }
       else {
-        switch (constellation2nd) {
+        switch (constellationplp1) {
           case MOD_QPSK:
             fec_cells[1] = 32400;
             break;
@@ -360,7 +360,7 @@ namespace gr {
             fec_cells[1] = 0;
             break;
         }
-        switch (fecmode2nd) {
+        switch (fecmodeplp1) {
           case PLP_FEC_NONE:
             l1detailinit[0][1]->plp_fec_type = FEC_TYPE_ONLY_64K;
             break;
@@ -375,14 +375,14 @@ namespace gr {
             break;
         }
       }
-      l1detailinit[0][1]->plp_mod = constellation2nd;
-      l1detailinit[0][1]->plp_cod = rate2nd;
-      l1detailinit[0][1]->plp_TI_mode = timode2nd;
+      l1detailinit[0][1]->plp_mod = constellationplp1;
+      l1detailinit[0][1]->plp_cod = rateplp1;
+      l1detailinit[0][1]->plp_TI_mode = timodeplp1;
       l1detailinit[0][1]->plp_TI_extended_interleaving = FALSE;
       l1detailinit[0][1]->plp_HTI_inter_subframe = FALSE;
-      l1detailinit[0][1]->plp_HTI_num_ti_blocks = tiblocks2nd - 1;
-      l1detailinit[0][1]->plp_HTI_num_fec_blocks_max = tifecblocksmax2nd - 1;
-      l1detailinit[0][1]->plp_HTI_num_fec_blocks = tifecblocks2nd - 1;
+      l1detailinit[0][1]->plp_HTI_num_ti_blocks = tiblocksplp1 - 1;
+      l1detailinit[0][1]->plp_HTI_num_fec_blocks_max = tifecblocksmaxplp1 - 1;
+      l1detailinit[0][1]->plp_HTI_num_fec_blocks = tifecblocksplp1 - 1;
       l1detailinit[0][1]->plp_HTI_cell_interleaver = TRUE;
       l1detailinit[0][1]->plp_type = 1;
       l1detailinit[0][1]->plp_num_subslices = subslices - 1;
@@ -1025,9 +1025,9 @@ namespace gr {
         plp_size_total = totalcells - l1cells - sbsnullcells;
         printf("PLP size total = %d\n", plp_size_total);
       }
-      if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_HYBRID) {
-        plp_size[0] = tifecblocks1st * fec_cells[0];
-        plp_size[1] = tifecblocks2nd * fec_cells[1];
+      if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == TI_MODE_HYBRID) {
+        plp_size[0] = tifecblocksplp0 * fec_cells[0];
+        plp_size[1] = tifecblocksplp1 * fec_cells[1];
         slice_size[0] = (plp_size[0] / subslices) + (plp_size[0] % subslices != 0);
         slice_size[1] = (plp_size[1] / subslices) + (plp_size[1] % subslices != 0);
         slice_last_size[0] = plp_size[0] - (slice_size[0] * (subslices - 1));
@@ -1035,8 +1035,8 @@ namespace gr {
         slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
         printf("unused FDM carriers = %d\n", slice_unused_size);
       }
-      else if (timode1st == TI_MODE_HYBRID && timode2nd == TI_MODE_OFF) {
-        plp_size[0] = tifecblocks1st * fec_cells[0];
+      else if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == TI_MODE_OFF) {
+        plp_size[0] = tifecblocksplp0 * fec_cells[0];
         plp_size[1] = plp_size_total - plp_size[0];
         plp_size[1] = (plp_size[1] / fec_cells[1]) * fec_cells[1];
         slice_size[0] = (plp_size[0] / subslices) + (plp_size[0] % subslices != 0);
@@ -1048,8 +1048,8 @@ namespace gr {
         slice_last_size[1] = plp_size[1] - (slice_size[1] * (subslices - 1));
         slice_unused_size = data_cells - papr_cells - slice_size[0] - slice_size[1];
       }
-      else if (timode1st == TI_MODE_OFF && timode2nd == TI_MODE_HYBRID) {
-        plp_size[1] = tifecblocks2nd * fec_cells[1];
+      else if (timodeplp0 == TI_MODE_OFF && timodeplp1 == TI_MODE_HYBRID) {
+        plp_size[1] = tifecblocksplp1 * fec_cells[1];
         plp_size[0] = plp_size_total - plp_size[1];
         plp_size[0] = (plp_size[0] / fec_cells[0]) * fec_cells[0];
         slice_size[0] = (plp_size[0] / subslices) + (plp_size[0] % subslices != 0);
@@ -1093,14 +1093,14 @@ namespace gr {
       l1detailinit[0][0]->plp_subslice_interval = data_cells - papr_cells;
       l1detailinit[0][1]->plp_subslice_interval = data_cells - papr_cells;
 
-      ti_mode[0] = timode1st;
-      ti_mode[1] = timode2nd;
-      ti_blocks[0] = tiblocks1st;
-      ti_blocks[1] = tiblocks2nd;
-      ti_fecblocks[0] = tifecblocks1st;
-      ti_fecblocks[1] = tifecblocks2nd;
-      ti_fecblocks_max[0] = tifecblocksmax1st;
-      ti_fecblocks_max[1] = tifecblocksmax2nd;
+      ti_mode[0] = timodeplp0;
+      ti_mode[1] = timodeplp1;
+      ti_blocks[0] = tiblocksplp0;
+      ti_blocks[1] = tiblocksplp1;
+      ti_fecblocks[0] = tifecblocksplp0;
+      ti_fecblocks[1] = tifecblocksplp1;
+      ti_fecblocks_max[0] = tifecblocksmaxplp0;
+      ti_fecblocks_max[1] = tifecblocksmaxplp1;
       time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[0]);
       if (time_interleaver[0] == NULL) {
         GR_LOG_FATAL(d_logger, "FDM Frame Mapper, cannot allocate memory for time_interleaver 0.");

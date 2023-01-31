@@ -4,60 +4,60 @@ category: '[ATSC3.0]'
 
 templates:
   imports: import atsc3
-  make: atsc3.subbootstrap_cc(${fftsize1st.val}, ${numpayloadsyms1st}, ${numpreamblesyms}, ${guardinterval1st.val}, ${pilotpattern1st.val}, ${fftsize2nd.val}, ${numpayloadsyms2nd}, ${guardinterval2nd.val}, ${pilotpattern2nd.val}, ${frameinterval.val}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val}, ${vclip})
+  make: atsc3.subbootstrap_cc(${fftsizeplp0.val}, ${numpayloadsymsplp0}, ${numpreamblesyms}, ${guardintervalplp0.val}, ${pilotpatternplp0.val}, ${fftsizeplp1.val}, ${numpayloadsymsplp1}, ${guardintervalplp1.val}, ${pilotpatternplp1.val}, ${frameinterval.val}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val}, ${vclip})
 
 parameters:
--   id: fftsize1st
-    label: FFT Size 1st
+-   id: fftsizeplp0
+    label: FFT Size PLP0
     dtype: enum
     options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
     option_labels: [8K, 16K, 32K]
     option_attributes:
         val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
         vlength: [8192, 16384, 32768]
--   id: numpayloadsyms1st
-    label: Number of Payload Symbols 1st
+-   id: numpayloadsymsplp0
+    label: Number of Payload Symbols PLP0
     dtype: int
     default: '72'
 -   id: numpreamblesyms
     label: Number of Preamble Symbols
     dtype: int
     default: '2'
--   id: guardinterval1st
-    label: Guard Interval Samples 1st
+-   id: guardintervalplp0
+    label: Guard Interval Samples PLP0
     dtype: enum
     options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
     option_attributes:
         val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
--   id: pilotpattern1st
-    label: Pilot Pattern 1st
+-   id: pilotpatternplp0
+    label: Pilot Pattern PLP0
     dtype: enum
     options: [PILOT_SP3_2, PILOT_SP3_4, PILOT_SP4_2, PILOT_SP4_4, PILOT_SP6_2, PILOT_SP6_4, PILOT_SP8_2, PILOT_SP8_4, PILOT_SP12_2, PILOT_SP12_4, PILOT_SP16_2, PILOT_SP16_4, PILOT_SP24_2, PILOT_SP24_4, PILOT_SP32_2, PILOT_SP32_4]
     option_labels: [SP3_2, SP3_4, SP4_2, SP4_4, SP6_2, SP6_4, SP8_2, SP8_4, SP12_2, SP12_4, SP16_2, SP16_4, SP24_2, SP24_4, SP32_2, SP32_4]
     option_attributes:
         val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
--   id: fftsize2nd
-    label: FFT Size 2nd
+-   id: fftsizeplp1
+    label: FFT Size PLP1
     dtype: enum
     options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
     option_labels: [8K, 16K, 32K]
     option_attributes:
         val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
         vlength: [8192, 16384, 32768]
--   id: numpayloadsyms2nd
-    label: Number of Payload Symbols 2nd
+-   id: numpayloadsymsplp1
+    label: Number of Payload Symbols PLP1
     dtype: int
     default: '72'
--   id: guardinterval2nd
-    label: Guard Interval Samples 2nd
+-   id: guardintervalplp1
+    label: Guard Interval Samples PLP1
     dtype: enum
     options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
     option_attributes:
         val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
--   id: pilotpattern2nd
-    label: Pilot Pattern 2nd
+-   id: pilotpatternplp1
+    label: Pilot Pattern PLP1
     dtype: enum
     options: [PILOT_SP3_2, PILOT_SP3_4, PILOT_SP4_2, PILOT_SP4_4, PILOT_SP6_2, PILOT_SP6_4, PILOT_SP8_2, PILOT_SP8_4, PILOT_SP12_2, PILOT_SP12_4, PILOT_SP16_2, PILOT_SP16_4, PILOT_SP24_2, PILOT_SP24_4, PILOT_SP32_2, PILOT_SP32_4]
     option_labels: [SP3_2, SP3_4, SP4_2, SP4_4, SP6_2, SP6_4, SP8_2, SP8_4, SP12_2, SP12_4, SP16_2, SP16_4, SP24_2, SP24_4, SP32_2, SP32_4]

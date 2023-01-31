@@ -6,30 +6,30 @@ templates:
   imports: import atsc3
   make: |-
       atsc3.fdmframemapper_cc(
-          ${framesize1st.val},
-          ${rate1st.val},
-          ${fecmode1st.val},
-          % if str(framesize1st) == 'FECFRAME_NORMAL':
+          ${framesizeplp0.val},
+          ${rateplp0.val},
+          ${fecmodeplp0.val},
+          % if str(framesizeplp0) == 'FECFRAME_NORMAL':
           ${constellation1.val},
           % else:
           ${constellation2.val},
           % endif
-          ${timode1st.val},
-          ${tiblocks1st},
-          ${tifecblocksmax1st},
-          ${tifecblocks1st},
-          ${framesize2nd.val},
-          ${rate2nd.val},
-          ${fecmode2nd.val},
-          % if str(framesize2nd) == 'FECFRAME_NORMAL':
+          ${timodeplp0.val},
+          ${tiblocksplp0},
+          ${tifecblocksmaxplp0},
+          ${tifecblocksplp0},
+          ${framesizeplp1.val},
+          ${rateplp1.val},
+          ${fecmodeplp1.val},
+          % if str(framesizeplp1) == 'FECFRAME_NORMAL':
           ${constellation3.val},
           % else:
           ${constellation4.val},
           % endif
-          ${timode2nd.val},
-          ${tiblocks2nd},
-          ${tifecblocksmax2nd},
-          ${tifecblocks2nd},
+          ${timodeplp1.val},
+          ${tiblocksplp1},
+          ${tifecblocksmaxplp1},
+          ${tifecblocksplp1},
           ${plpsplit},
           ${fftsize.val},
           ${numpayloadsyms},
@@ -80,8 +80,8 @@ templates:
           ${l1dmode.val})
 
 parameters:
--   id: framesize1st
-    label: FECFRAME Size 1st
+-   id: framesizeplp0
+    label: FECFRAME Size PLP0
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
@@ -89,15 +89,15 @@ parameters:
         hide_constellation1: [none, all]
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
--   id: rate1st
-    label: Code Rate 1st
+-   id: rateplp0
+    label: Code Rate PLP0
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
--   id: fecmode1st
-    label: PLP FEC Mode 1st
+-   id: fecmodeplp0
+    label: PLP FEC Mode PLP0
     dtype: enum
     default: 'PLP_FEC_BCH'
     options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
@@ -105,46 +105,46 @@ parameters:
     option_attributes:
         val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
 -   id: constellation1
-    label: Constellation 1st
+    label: Constellation PLP0
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM, MOD_1024QAM, MOD_4096QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM, 4096QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM, atsc3.MOD_1024QAM, atsc3.MOD_4096QAM]
-    hide: ${ framesize1st.hide_constellation1 }
+    hide: ${ framesizeplp0.hide_constellation1 }
 -   id: constellation2
-    label: Constellation 1st
+    label: Constellation PLP0
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
-    hide: ${ framesize1st.hide_constellation2 }
--   id: timode1st
-    label: Time Interleaver Mode 1st
+    hide: ${ framesizeplp0.hide_constellation2 }
+-   id: timodeplp0
+    label: Time Interleaver Mode PLP0
     dtype: enum
     options: [TI_MODE_OFF, TI_MODE_HYBRID]
     option_labels: [Disabled, Hybrid]
     option_attributes:
         hide_tiblocks: [all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
--   id: tiblocks1st
-    label: TI Blocks 1st
+-   id: tiblocksplp0
+    label: TI Blocks PLP0
     dtype: int
     default: '2'
-    hide: ${ timode1st.hide_tiblocks }
--   id: tifecblocksmax1st
-    label: TI FEC Blocks Max 1st
+    hide: ${ timodeplp0.hide_tiblocks }
+-   id: tifecblocksmaxplp0
+    label: TI FEC Blocks Max PLP0
     dtype: int
     default: '14'
-    hide: ${ timode1st.hide_tiblocks }
--   id: tifecblocks1st
-    label: TI FEC Blocks 1st
+    hide: ${ timodeplp0.hide_tiblocks }
+-   id: tifecblocksplp0
+    label: TI FEC Blocks PLP0
     dtype: int
     default: '14'
-    hide: ${ timode1st.hide_tiblocks }
--   id: framesize2nd
-    label: FECFRAME Size 2nd
+    hide: ${ timodeplp0.hide_tiblocks }
+-   id: framesizeplp1
+    label: FECFRAME Size PLP1
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
     option_labels: [Normal, Short]
@@ -152,15 +152,15 @@ parameters:
         hide_constellation1: [none, all]
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
--   id: rate2nd
-    label: Code Rate 2nd
+-   id: rateplp1
+    label: Code Rate PLP1
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
--   id: fecmode2nd
-    label: PLP FEC Mode 2nd
+-   id: fecmodeplp1
+    label: PLP FEC Mode PLP1
     dtype: enum
     default: 'PLP_FEC_BCH'
     options: [PLP_FEC_NONE, PLP_FEC_CRC32, PLP_FEC_BCH]
@@ -168,49 +168,49 @@ parameters:
     option_attributes:
         val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
 -   id: constellation3
-    label: Constellation 2nd
+    label: Constellation PLP1
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM, MOD_1024QAM, MOD_4096QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM, 4096QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM, atsc3.MOD_1024QAM, atsc3.MOD_4096QAM]
-    hide: ${ framesize2nd.hide_constellation1 }
+    hide: ${ framesizeplp1.hide_constellation1 }
 -   id: constellation4
-    label: Constellation 2nd
+    label: Constellation PLP1
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
-    hide: ${ framesize2nd.hide_constellation2 }
--   id: timode2nd
-    label: Time Interleaver Mode 2nd
+    hide: ${ framesizeplp1.hide_constellation2 }
+-   id: timodeplp1
+    label: Time Interleaver Mode PLP1
     dtype: enum
     options: [TI_MODE_OFF, TI_MODE_HYBRID]
     option_labels: [Disabled, Hybrid]
     option_attributes:
         hide_tiblocks: [all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
--   id: tiblocks2nd
-    label: TI Blocks 2nd
+-   id: tiblocksplp1
+    label: TI Blocks PLP1
     dtype: int
     default: '2'
-    hide: ${ timode2nd.hide_tiblocks }
--   id: tifecblocksmax2nd
-    label: TI FEC Blocks Max 2nd
+    hide: ${ timodeplp1.hide_tiblocks }
+-   id: tifecblocksmaxplp1
+    label: TI FEC Blocks Max PLP1
     dtype: int
     default: '44'
-    hide: ${ timode2nd.hide_tiblocks }
--   id: tifecblocks2nd
-    label: TI FEC Blocks 2nd
+    hide: ${ timodeplp1.hide_tiblocks }
+-   id: tifecblocksplp1
+    label: TI FEC Blocks PLP1
     dtype: int
     default: '44'
-    hide: ${ timode2nd.hide_tiblocks }
+    hide: ${ timodeplp1.hide_tiblocks }
 -   id: plpsplit
     label: PLP 0/1 Size Ratio
     dtype: float
     default: '0.5'
-    hide: ${ ('none' if str(timode1st) == str(timode2nd) == 'TI_MODE_OFF' else 'all') }
+    hide: ${ ('none' if str(timodeplp0) == str(timodeplp1) == 'TI_MODE_OFF' else 'all') }
 -   id: fftsize
     label: FFT Size
     dtype: enum
