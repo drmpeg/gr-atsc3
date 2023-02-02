@@ -75,7 +75,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 92.0]
+    coordinate: [304, 100.0]
     rotation: 0
     state: enabled
 - name: atsc3_alpbbheader_bb_0
@@ -92,7 +92,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [688, 36.0]
+    coordinate: [656, 36.0]
     rotation: 0
     state: true
 - name: atsc3_alpbbheader_bb_0_0
@@ -109,7 +109,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [688, 148.0]
+    coordinate: [656, 148.0]
     rotation: 0
     state: true
 - name: atsc3_bbscrambler_bb_0
@@ -127,7 +127,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [944, 28.0]
+    coordinate: [880, 28.0]
     rotation: 0
     state: true
 - name: atsc3_bbscrambler_bb_0_0
@@ -145,7 +145,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [944, 140.0]
+    coordinate: [888, 140.0]
     rotation: 0
     state: true
 - name: atsc3_bch_bb_0
@@ -163,7 +163,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1192, 28.0]
+    coordinate: [1128, 28.0]
     rotation: 0
     state: true
 - name: atsc3_bch_bb_0_0
@@ -181,7 +181,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1192, 140.0]
+    coordinate: [1136, 140.0]
     rotation: 0
     state: true
 - name: atsc3_bootstrap_cc_0
@@ -191,6 +191,8 @@ blocks:
     alias: ''
     comment: ''
     fftsize: FFTSIZE_16K
+    flen: '100'
+    flmode: FLM_SYMBOL_ALIGNED
     frameinterval: MTTN_250
     guardinterval: GI_4_768
     l1bmode: L1_FEC_MODE_1
@@ -206,7 +208,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1160, 380.0]
+    coordinate: [1104, 380.0]
     rotation: 0
     state: true
 - name: atsc3_freqinterleaver_cc_0
@@ -230,7 +232,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [336, 380.0]
+    coordinate: [344, 396.0]
     rotation: 0
     state: true
 - name: atsc3_interleaver_bb_0
@@ -249,7 +251,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [944, 220.0]
+    coordinate: [888, 220.0]
     rotation: 180
     state: true
 - name: atsc3_interleaver_bb_0_0
@@ -268,7 +270,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [944, 300.0]
+    coordinate: [888, 300.0]
     rotation: 180
     state: true
 - name: atsc3_ldmcombiner_cc_0
@@ -303,6 +305,8 @@ blocks:
     fftsize: FFTSIZE_16K
     fimode: FREQ_ALL_SYMBOLS
     firstsbs: SBS_ON
+    flen: '100'
+    flmode: FLM_SYMBOL_ALIGNED
     framesize_core: FECFRAME_NORMAL
     framesize_enh: FECFRAME_NORMAL
     guardinterval: GI_4_768
@@ -311,6 +315,7 @@ blocks:
     level: LDM_LEVEL_40DB
     maxoutbuf: '0'
     minoutbuf: '0'
+    misomode: MISO_OFF
     numpayloadsyms: '108'
     numpreamblesyms: '1'
     paprmode: PAPR_OFF
@@ -333,7 +338,10 @@ blocks:
     pilotpattern: PILOT_SP8_2
     rate_core: C7_15
     rate_enh: C10_15
+    tiblocks: '2'
     tidepth: TI_DEPTH_1024
+    tifecblocks: '14'
+    tifecblocksmax: '14'
     timode: TI_MODE_CONVOLUTIONAL
   states:
     bus_sink: false
@@ -356,7 +364,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1184, 228.0]
+    coordinate: [1128, 228.0]
     rotation: 180
     state: true
 - name: atsc3_ldpc_bb_0_0
@@ -373,7 +381,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1184, 308.0]
+    coordinate: [1128, 308.0]
     rotation: 180
     state: true
 - name: atsc3_modulator_bc_0
@@ -392,7 +400,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [688, 220.0]
+    coordinate: [656, 220.0]
     rotation: 180
     state: true
 - name: atsc3_modulator_bc_0_0
@@ -411,7 +419,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [688, 300.0]
+    coordinate: [656, 300.0]
     rotation: 180
     state: true
 - name: atsc3_pilotgenerator_cc_0
@@ -426,8 +434,11 @@ blocks:
     guardinterval: GI_4_768
     maxoutbuf: '0'
     minoutbuf: '0'
+    misomode: MISO_OFF
+    misotxid: MISO_TX_1_OF_2
     numpayloadsyms: '108'
     numpreamblesyms: '1'
+    outputmode: PILOTGENERATOR_TIME
     paprmode: PAPR_OFF
     pilotboost1: SPB_0
     pilotboost10: SPB_0
@@ -512,7 +523,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1224, 564.0]
+    coordinate: [1184, 572.0]
     rotation: 180
     state: enabled
 - name: digital_ofdm_cyclic_prefixer_0
@@ -531,7 +542,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [912, 428.0]
+    coordinate: [888, 380.0]
     rotation: 0
     state: enabled
 - name: uhd_usrp_sink_0_0
@@ -808,7 +819,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [904, 508.0]
+    coordinate: [872, 476.0]
     rotation: 180
     state: enabled
 - name: virtual_sink_0
@@ -821,7 +832,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [64, 508.0]
+    coordinate: [64, 540.0]
     rotation: 0
     state: true
 - name: virtual_source_0
@@ -834,7 +845,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [176, 508.0]
+    coordinate: [176, 540.0]
     rotation: 0
     state: true
 
@@ -864,4 +875,4 @@ connections:
 
 metadata:
   file_format: 1
-  grc_version: v3.11.0.0git-154-g9734aaee
+  grc_version: v3.10.0.0-350-gab2ee30f

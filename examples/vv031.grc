@@ -23,6 +23,7 @@ options:
     sizing_mode: fixed
     thread_safe_setters: ''
     title: ATSC 3.0 transmitter
+    window_size: (1000,1000)
   states:
     bus_sink: false
     bus_source: false
@@ -41,7 +42,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 76.0]
+    coordinate: [288, 12.0]
     rotation: 0
     state: enabled
 - name: samp_rate
@@ -91,7 +92,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [552, 36.0]
+    coordinate: [624, 36.0]
     rotation: 0
     state: true
 - name: atsc3_bbscrambler_bb_0
@@ -109,7 +110,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [832, 28.0]
+    coordinate: [856, 28.0]
     rotation: 0
     state: true
 - name: atsc3_bch_bb_0
@@ -137,6 +138,8 @@ blocks:
     alias: ''
     comment: ''
     fftsize: FFTSIZE_8K
+    flen: '100'
+    flmode: FLM_SYMBOL_ALIGNED
     frameinterval: MTTN_100
     guardinterval: GI_5_1024
     l1bmode: L1_FEC_MODE_1
@@ -168,12 +171,15 @@ blocks:
     fftsize: FFTSIZE_8K
     fimode: FREQ_PREAMBLE_ONLY
     firstsbs: SBS_OFF
+    flen: '100'
+    flmode: FLM_SYMBOL_ALIGNED
     framesize: FECFRAME_NORMAL
     guardinterval: GI_5_1024
     l1bmode: L1_FEC_MODE_1
     l1dmode: L1_FEC_MODE_1
     maxoutbuf: '0'
     minoutbuf: '0'
+    misomode: MISO_OFF
     numpayloadsyms: '72'
     numpreamblesyms: '2'
     paprmode: PAPR_OFF
@@ -195,13 +201,17 @@ blocks:
     pilotboost9: SPB_0
     pilotpattern: PILOT_SP3_4
     rate: C9_15
+    tiblocks: '2'
     tidepth: TI_DEPTH_512
+    tifecblocks: '14'
+    tifecblocksmax: '14'
+    tifmode: TIF_NOT_INCLUDED
     timode: TI_MODE_OFF
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 116.0]
+    coordinate: [176, 92.0]
     rotation: 180
     state: true
 - name: atsc3_freqinterleaver_cc_0
@@ -225,7 +235,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [64, 428.0]
+    coordinate: [144, 444.0]
     rotation: 0
     state: enabled
 - name: atsc3_interleaver_bb_0
@@ -295,8 +305,11 @@ blocks:
     guardinterval: GI_5_1024
     maxoutbuf: '0'
     minoutbuf: '0'
+    misomode: MISO_OFF
+    misotxid: MISO_TX_1_OF_2
     numpayloadsyms: '72'
     numpreamblesyms: '2'
+    outputmode: PILOTGENERATOR_TIME
     paprmode: PAPR_OFF
     pilotboost1: SPB_0
     pilotboost10: SPB_0
@@ -319,7 +332,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [368, 428.0]
+    coordinate: [424, 428.0]
     rotation: 0
     state: true
 - name: blocks_file_source_0
@@ -341,7 +354,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 12.0]
+    coordinate: [416, 12.0]
     rotation: 0
     state: true
 - name: blocks_multiply_const_xx_0
@@ -359,7 +372,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1228.0, 352]
+    coordinate: [1228.0, 400]
     rotation: 270
     state: true
 - name: digital_ofdm_cyclic_prefixer_0
@@ -378,7 +391,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [680, 476.0]
+    coordinate: [712, 492.0]
     rotation: 0
     state: true
 - name: uhd_usrp_sink_0_0
@@ -629,7 +642,7 @@ blocks:
     num_mboards: '1'
     otw: ''
     samp_rate: samp_rate
-    sd_spec0: A:B
+    sd_spec0: ''
     sd_spec1: ''
     sd_spec2: ''
     sd_spec3: ''
@@ -655,7 +668,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [968, 436.0]
+    coordinate: [952, 484.0]
     rotation: 180
     state: enabled
 - name: virtual_sink_0
@@ -668,8 +681,8 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [64, 252.0]
-    rotation: 180
+    coordinate: [12.0, 312]
+    rotation: 270
     state: true
 - name: virtual_source_0
   id: virtual_source
@@ -681,8 +694,8 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [64, 356.0]
-    rotation: 180
+    coordinate: [68.0, 312]
+    rotation: 270
     state: true
 
 connections:
@@ -703,3 +716,4 @@ connections:
 
 metadata:
   file_format: 1
+  grc_version: v3.10.0.0-350-gab2ee30f
