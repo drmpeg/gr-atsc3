@@ -1280,7 +1280,7 @@ namespace gr {
         insertion_items = total_frame_items + ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
       }
       interpolated_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation) / decimation);
-      skipped_items = interpolated_items + ((symbol_size[0] + guard_interval[0]) * numpreamblesyms);
+      skipped_items = interpolated_items + symbol_size[0] + guard_interval[0];
       set_output_multiple(insertion_items);
     }
 
