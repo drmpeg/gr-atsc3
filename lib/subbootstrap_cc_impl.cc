@@ -1279,6 +1279,8 @@ namespace gr {
       else {
         insertion_items = total_frame_items + ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
       }
+      interpolated_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation) / decimation);
+      skipped_items = interpolated_items + ((symbol_size[0] + guard_interval[0]) * numpreamblesyms);
       set_output_multiple(insertion_items);
     }
 
@@ -1445,7 +1447,6 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin[NUM_SUBFRAMES] = {0, 0};
       gr_complex* level;
-      int skipped_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation()) / decimation()) + (symbol_size[0] + guard_interval[0]);
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
         if (ninput_items[0] < frame_items[0]) {
@@ -1456,8 +1457,8 @@ namespace gr {
         }
         level = out;
         if (output_mode) {
-          memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8);
-          out += ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8;
+          memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * interpolated_items);
+          out += interpolated_items;
         }
         else {
           memcpy(out, &bootstrap_symbol[0], sizeof(gr_complex) * (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);

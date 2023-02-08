@@ -34,6 +34,8 @@ namespace gr {
       int guard_interval[NUM_SUBFRAMES];
       int frame_items[NUM_SUBFRAMES];
       int insertion_items;
+      int interpolated_items;
+      int skipped_items;
       int pnseq[ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2)];
       gr_complex zcseq[ZADOFF_CHU_LENGTH];
       gr_complex bootstrap_freq[BOOTSTRAP_FFT_SIZE];

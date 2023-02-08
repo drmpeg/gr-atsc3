@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -33,6 +33,8 @@ namespace gr {
       int guard_interval;
       int frame_items;
       int insertion_items;
+      int interpolated_items;
+      int skipped_items;
       int pnseq[ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2)];
       gr_complex zcseq[ZADOFF_CHU_LENGTH];
       gr_complex bootstrap_freq[BOOTSTRAP_FFT_SIZE];

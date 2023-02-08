@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -1229,6 +1229,8 @@ namespace gr {
       else {
         insertion_items = frame_items + ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
       }
+      interpolated_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation) / decimation);
+      skipped_items = interpolated_items + ((symbol_size + guard_interval) * numpreamblesyms);
       set_output_multiple(insertion_items);
     }
 
@@ -1393,13 +1395,12 @@ namespace gr {
       auto out = static_cast<output_type*>(output_items[0]);
       int indexin = 0;
       gr_complex* level;
-      int skipped_items = ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation()) / decimation()) + (symbol_size + guard_interval);
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
         level = out;
         if (output_mode) {
-          memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8);
-          out += ((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8;
+          memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * interpolated_items);
+          out += interpolated_items;
         }
         else {
           memcpy(out, &bootstrap_symbol[0], sizeof(gr_complex) * (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
