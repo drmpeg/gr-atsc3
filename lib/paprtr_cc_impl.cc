@@ -422,7 +422,12 @@ namespace gr {
           for (int j = 0; j < symbols; j++) {
             init_pilots(j);
             valid = FALSE;
-            if (j != 0) {
+            if (j == 0 && preamble_symbols > 0) {
+              memcpy(out, in, sizeof(gr_complex) * papr_fft_size);
+              in = in + papr_fft_size;
+              out = out + papr_fft_size;
+            }
+            else {
               index = 0;
               std::fill_n(&ones_freq[index], left_nulls, 0);
               index = left_nulls;
@@ -514,11 +519,6 @@ namespace gr {
                 std::copy(std::begin(rNew), std::end(rNew), std::begin(r));
               }
               volk_32f_x2_add_32f((float*)out, (float*)in, (float*)c.data(), papr_fft_size * 2);
-              in = in + papr_fft_size;
-              out = out + papr_fft_size;
-            }
-            else {
-              memcpy(out, in, sizeof(gr_complex) * papr_fft_size);
               in = in + papr_fft_size;
               out = out + papr_fft_size;
             }
