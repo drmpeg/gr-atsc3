@@ -1449,12 +1449,6 @@ namespace gr {
       gr_complex* level;
 
       for (int i = 0; i < noutput_items; i += insertion_items) {
-        if (ninput_items[0] < frame_items[0]) {
-          printf("Not enough input[0] items!\n");
-        }
-        if (ninput_items[1] < frame_items[1]) {
-          printf("Not enough input[1] items!\n");
-        }
         level = out;
         if (output_mode) {
           memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * interpolated_items);
