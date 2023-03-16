@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(cyclicprefixer_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(55a090c4fb5d2c334630e16f1f8dcd5a)                     */
+/* BINDTOOL_HEADER_FILE_HASH(4348b26ca17bec68da16929bb1bb53f0)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -37,10 +37,15 @@ void bind_cyclicprefixer_cc(py::module& m)
         std::shared_ptr<cyclicprefixer_cc>>(m, "cyclicprefixer_cc", D(cyclicprefixer_cc))
 
         .def(py::init(&cyclicprefixer_cc::make),
+           py::arg("submode"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),
            py::arg("guardinterval"),
+           py::arg("altfftsize"),
+           py::arg("altnumpayloadsyms"),
+           py::arg("altnumpreamblesyms"),
+           py::arg("altguardinterval"),
            py::arg("flmode"),
            py::arg("flen"),
            py::arg("vlength"),

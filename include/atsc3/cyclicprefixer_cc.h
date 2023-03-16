@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2022 Ron Economos.
+ * Copyright 2022,2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -33,7 +33,7 @@ namespace gr {
        * class. atsc3::cyclicprefixer_cc::make is the public interface for
        * creating new instances.
        */
-      static sptr make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_frame_length_mode_t flmode, int flen, unsigned int vlength);
+      static sptr make(atsc3_cyclicprefixer_mode_t submode, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_fftsize_t altfftsize, int altnumpayloadsyms, int altnumpreamblesyms, atsc3_guardinterval_t altguardinterval, atsc3_frame_length_mode_t flmode, int flen, unsigned int vlength);
     };
 
   } // namespace atsc3

@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     subbootstrap_cc::sptr
-    subbootstrap_cc::make(atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    subbootstrap_cc::make(atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
     {
       return gnuradio::make_block_sptr<subbootstrap_cc_impl>(
-        fftsizeplp0, numpayloadsymsplp0, numpreamblesyms, guardintervalplp0, pilotpatternplp0, fftsizeplp1, numpayloadsymsplp1, guardintervalplp1, pilotpatternplp1, frameinterval, l1bmode, outputmode, showlevels, vclip);
+        fftsizeplp0, numpayloadsymsplp0, numpreamblesyms, guardintervalplp0, pilotpatternplp0, fftsizeplp1, numpayloadsymsplp1, guardintervalplp1, pilotpatternplp1, frameinterval, flmode, flen, l1bmode, outputmode, showlevels, vclip);
     }
 
 
     /*
      * The private constructor
      */
-    subbootstrap_cc_impl::subbootstrap_cc_impl(atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_min_time_to_next_t frameinterval, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    subbootstrap_cc_impl::subbootstrap_cc_impl(atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
       : gr::block("subbootstrap_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -55,6 +55,7 @@ namespace gr {
       int relative_cyclic_shift;
       int absolute_cyclic_shift;
       int preamble_structure;
+      int Nextra, Nfinal;
       gr_complex phase_shift;
       gr_complex zero = gr_complex(0.0, 0.0);
       gr_complex* dst;
@@ -1270,8 +1271,17 @@ namespace gr {
         }
       }
 
-      frame_items[0] = (symbols[0] * symbol_size[0]) + (symbols[0] * guard_interval[0]);
-      frame_items[1] = (symbols[1] * symbol_size[1]) + (symbols[1] * guard_interval[1]);
+      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (symbol_size[0] + guard_interval[0]) - ((numpayloadsymsplp0 * (symbol_size[0] + guard_interval[0])) + (numpayloadsymsplp1 * (symbol_size[1] + guard_interval[1])));
+      Nfinal = Nextra % (numpayloadsymsplp0 + numpayloadsymsplp1);
+      Nextra = Nextra / (numpayloadsymsplp0 + numpayloadsymsplp1);
+      if (flmode == FLM_SYMBOL_ALIGNED) {
+        frame_items[0] = (symbols[0] * symbol_size[0]) + (symbols[0] * guard_interval[0]);
+        frame_items[1] = (symbols[1] * symbol_size[1]) + (symbols[1] * guard_interval[1]);
+      }
+      else {
+        frame_items[0] = (symbols[0] * symbol_size[0]) + (numpreamblesyms * guard_interval[0]) + (numpayloadsymsplp0 * (guard_interval[0] + Nextra));
+        frame_items[1] = (symbols[1] * symbol_size[1]) + (numpayloadsymsplp1 * (guard_interval[1] + Nextra)) + Nfinal;
+      }
       total_frame_items = frame_items[0] + frame_items[1];
       if (outputmode) {
         insertion_items = total_frame_items + ((((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS) * interpolation) / decimation);

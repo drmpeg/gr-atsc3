@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(6e2bed7095435d924125a3a02611ee15)                     */
+/* BINDTOOL_HEADER_FILE_HASH(b0be038f88c3ec79d5b0585c0f4d93ae)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -360,6 +360,14 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_pilotgenerator_mode_t>();
+    py::enum_<::gr::atsc3::atsc3_cyclicprefixer_mode_t>(m,"atsc3_cyclicprefixer_mode_t")
+        .value("CYCLICPREFIXER_SINGLE_SUBFRAME", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_SINGLE_SUBFRAME) // 0
+        .value("CYCLICPREFIXER_DUAL_SUBFRAME_PLP0", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_DUAL_SUBFRAME_PLP0) // 1
+        .value("CYCLICPREFIXER_DUAL_SUBFRAME_PLP1", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_DUAL_SUBFRAME_PLP1) // 2
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_cyclicprefixer_mode_t>();
 
 
 

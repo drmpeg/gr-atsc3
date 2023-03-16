@@ -114,6 +114,8 @@ templates:
           ${tifecblocksplp1},
           ${credplp1.val},
           ${misomodeplp1.val},
+          ${flmode.val},
+          ${flen},
           ${paprmode.val},
           ${l1bmode.val},
           ${l1dmode.val})
@@ -658,6 +660,20 @@ parameters:
     option_attributes:
         val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
     default: MISO_OFF
+-   id: flmode
+    label: Frame Length Mode
+    dtype: enum
+    default: FLM_SYMBOL_ALIGNED
+    options: [FLM_TIME_ALIGNED, FLM_SYMBOL_ALIGNED]
+    option_labels: [Time Aligned, Symbol Aligned]
+    option_attributes:
+        hide_flen: [none, all]
+        val: [atsc3.FLM_TIME_ALIGNED, atsc3.FLM_SYMBOL_ALIGNED]
+-   id: flen
+    label: Frame Length (ms)
+    dtype: int
+    default: '100'
+    hide: ${ flmode.hide_flen }
 -   id: paprmode
     label: PAPR Mode
     dtype: enum
