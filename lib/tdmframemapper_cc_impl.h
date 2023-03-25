@@ -182,8 +182,8 @@ namespace gr {
       int ti_fecblocks[NUM_PLPS];
       int ti_fecblocks_max[NUM_PLPS];
       int Nfec_ti_max[NUM_PLPS];
-      gr_complex *time_interleaver;
-      gr_complex *hybrid_time_interleaver[NUM_PLPS];
+      std::vector<gr_complex> time_interleaver;
+      std::vector<gr_complex> hybrid_time_interleaver[NUM_PLPS];
       std::vector<std::vector<std::vector<int>>> HtimeLr[NUM_PLPS];
       std::vector<std::vector<int>> HtimePr[NUM_PLPS];
       std::vector<std::vector<int>> HtimeTBI[NUM_PLPS];

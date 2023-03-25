@@ -1926,11 +1926,7 @@ namespace gr {
             break;
         }
       }
-      time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total[0]);
-      if (time_interleaver[0] == NULL) {
-        GR_LOG_FATAL(d_logger, "Frame Mapper, cannot allocate memory for time_interleaver 0.");
-        throw std::bad_alloc();
-      }
+      time_interleaver[0].resize(plp_size_total[0]);
 
       switch(tidepthplp1) {
         case TI_DEPTH_512:
@@ -2132,24 +2128,10 @@ namespace gr {
             break;
         }
       }
-      time_interleaver[1] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total[1]);
-      if (time_interleaver[1] == NULL) {
-        GR_LOG_FATAL(d_logger, "Sub Frame Mapper, cannot allocate memory for time_interleaver 1.");
-        throw std::bad_alloc();
-      }
-      hybrid_time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[0]);
-      if (hybrid_time_interleaver[0] == NULL) {
-        GR_LOG_FATAL(d_logger, "Sub-Frame Mapper, cannot allocate memory for hybrid_time_interleaver 0.");
-        throw std::bad_alloc();
-      }
-      hybrid_time_interleaver[1] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[1]);
-      if (hybrid_time_interleaver[1] == NULL) {
-        GR_LOG_FATAL(d_logger, "Sub-Frame Mapper, cannot allocate memory for hybrid_time_interleaver 1.");
-        throw std::bad_alloc();
-      }
-
+      time_interleaver[1].resize(plp_size_total[1]);
       for (int subframe = 0; subframe < NUM_SUBFRAMES; subframe++) {
         if (ti_mode[subframe] == TI_MODE_HYBRID) {
+          hybrid_time_interleaver[subframe].resize(plp_size[subframe]);
           Nfec_ti_max[subframe] = (ti_fecblocks_max[subframe] / ti_blocks[subframe]) + (ti_fecblocks_max[subframe] % ti_blocks[subframe] != 0);
           HtimeLr[subframe].resize(ti_blocks[subframe]);
           for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[subframe].size(); x++) {
@@ -2206,10 +2188,6 @@ namespace gr {
      */
     subframemapper_cc_impl::~subframemapper_cc_impl()
     {
-      free(hybrid_time_interleaver[1]);
-      free(hybrid_time_interleaver[0]);
-      free(time_interleaver[1]);
-      free(time_interleaver[0]);
     }
 
     void

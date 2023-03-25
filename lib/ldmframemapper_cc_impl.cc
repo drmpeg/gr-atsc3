@@ -1230,17 +1230,9 @@ namespace gr {
             break;
         }
       }
-      time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total);
-      if (time_interleaver == NULL) {
-        GR_LOG_FATAL(d_logger, "LDM Frame Mapper, cannot allocate memory for time_interleaver.");
-        throw std::bad_alloc();
-      }
-      hybrid_time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size);
-      if (hybrid_time_interleaver == NULL) {
-        GR_LOG_FATAL(d_logger, "LDM Frame Mapper, cannot allocate memory for hybrid_time_interleaver.");
-        throw std::bad_alloc();
-      }
+      time_interleaver.resize(plp_size_total);
       if (ti_mode == TI_MODE_HYBRID) {
+        hybrid_time_interleaver.resize(plp_size);
         Nfec_ti_max = (ti_fecblocks_max / ti_blocks) + (ti_fecblocks_max % ti_blocks != 0);
         HtimeLr.resize(ti_blocks);
         for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr.size(); x++) {
@@ -1293,8 +1285,6 @@ namespace gr {
      */
     ldmframemapper_cc_impl::~ldmframemapper_cc_impl()
     {
-      free(hybrid_time_interleaver);
-      free(time_interleaver);
     }
 
     void

@@ -1054,24 +1054,10 @@ namespace gr {
       ti_fecblocks[1] = tifecblocksplp1;
       ti_fecblocks_max[0] = tifecblocksmaxplp0;
       ti_fecblocks_max[1] = tifecblocksmaxplp1;
-      time_interleaver = (gr_complex*)malloc(sizeof(gr_complex) * plp_size_total);
-      if (time_interleaver == NULL) {
-        GR_LOG_FATAL(d_logger, "TDM Frame Mapper, cannot allocate memory for time_interleaver.");
-        throw std::bad_alloc();
-      }
-      hybrid_time_interleaver[0] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[0]);
-      if (hybrid_time_interleaver[0] == NULL) {
-        GR_LOG_FATAL(d_logger, "TDM Frame Mapper, cannot allocate memory for hybrid_time_interleaver 0.");
-        throw std::bad_alloc();
-      }
-      hybrid_time_interleaver[1] = (gr_complex*)malloc(sizeof(gr_complex) * plp_size[1]);
-      if (hybrid_time_interleaver[1] == NULL) {
-        GR_LOG_FATAL(d_logger, "TDM Frame Mapper, cannot allocate memory for hybrid_time_interleaver 1.");
-        throw std::bad_alloc();
-      }
-
+      time_interleaver.resize(plp_size_total);
       for (int plp = 0; plp < NUM_PLPS; plp++) {
         if (ti_mode[plp] == TI_MODE_HYBRID) {
+          hybrid_time_interleaver[plp].resize(plp_size[plp]);
           Nfec_ti_max[plp] = (ti_fecblocks_max[plp] / ti_blocks[plp]) + (ti_fecblocks_max[plp] % ti_blocks[plp] != 0);
           HtimeLr[plp].resize(ti_blocks[plp]);
           for (std::vector<std::vector<int>>::size_type x = 0; x != HtimeLr[plp].size(); x++) {
@@ -1125,9 +1111,6 @@ namespace gr {
      */
     tdmframemapper_cc_impl::~tdmframemapper_cc_impl()
     {
-      free(hybrid_time_interleaver[1]);
-      free(hybrid_time_interleaver[0]);
-      free(time_interleaver);
     }
 
     void

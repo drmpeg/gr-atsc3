@@ -194,8 +194,8 @@ namespace gr {
       gr_complex ti_16qam[16];
       gr_complex ti_64qam[64];
       gr_complex ti_256qam[256];
-      gr_complex *time_interleaver;
-      gr_complex *hybrid_time_interleaver;
+      std::vector<gr_complex> time_interleaver;
+      std::vector<gr_complex> hybrid_time_interleaver;
       std::vector<std::vector<std::vector<int>>> HtimeLr;
       std::vector<std::vector<int>> HtimePr;
       std::vector<std::vector<int>> HtimeTBI;
