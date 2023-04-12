@@ -59,6 +59,7 @@ templates:
           ${tiblocks},
           ${tifecblocksmax},
           ${tifecblocks},
+          ${llsmode.val},
           ${cred.val},
           ${flmode.val},
           ${flen},
@@ -329,6 +330,14 @@ parameters:
     dtype: int
     default: '14'
     hide: ${ timode.hide_tiblocks }
+-   id: llsmode
+    label: LLS Insertion
+    dtype: enum
+    options: [LLS_OFF, LLS_ON]
+    option_labels: [Disabled, Enable]
+    option_attributes:
+        val: [atsc3.LLS_OFF, atsc3.LLS_ON]
+    default: LLS_OFF
 -   id: cred
     label: Reduced Carriers
     dtype: enum

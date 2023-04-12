@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(b0be038f88c3ec79d5b0585c0f4d93ae)                     */
+/* BINDTOOL_HEADER_FILE_HASH(c2ba7ecbdc9b254de0b488370b586602)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -368,6 +368,13 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_cyclicprefixer_mode_t>();
+    py::enum_<::gr::atsc3::atsc3_lls_insertion_mode_t>(m,"atsc3_lls_insertion_mode_t")
+        .value("LLS_OFF", ::gr::atsc3::atsc3_lls_insertion_mode_t::LLS_OFF) // 0
+        .value("LLS_ON", ::gr::atsc3::atsc3_lls_insertion_mode_t::LLS_ON) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_lls_insertion_mode_t>();
 
 
 

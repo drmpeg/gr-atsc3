@@ -291,6 +291,11 @@ namespace gr {
       CYCLICPREFIXER_DUAL_SUBFRAME_PLP1,
     };
 
+    enum atsc3_lls_insertion_mode_t {
+      LLS_OFF = 0,
+      LLS_ON,
+    };
+
   } // namespace atsc3
 } // namespace gr
 
@@ -323,5 +328,6 @@ typedef gr::atsc3::atsc3_plp_fec_mode_t atsc3_plp_fec_mode_t;
 typedef gr::atsc3::atsc3_ldm_injection_level_t atsc3_ldm_injection_level_t;
 typedef gr::atsc3::atsc3_pilotgenerator_mode_t atsc3_pilotgenerator_mode_t;
 typedef gr::atsc3::atsc3_cyclicprefixer_mode_t atsc3_cyclicprefixer_mode_t;
+typedef gr::atsc3::atsc3_lls_insertion_mode_t atsc3_lls_insertion_mode_t;
 
 #endif /* INCLUDED_ATSC3_CONFIG_H */

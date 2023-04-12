@@ -39,7 +39,7 @@ if(NOT atsc3_sources)
 endif(NOT atsc3_sources)
 
 add_library(gnuradio-atsc3 SHARED ${atsc3_sources})
-target_link_libraries(gnuradio-atsc3 gnuradio::gnuradio-runtime gnuradio::gnuradio-fft gnuradio::gnuradio-filter gnuradio::gnuradio-blocks)
+target_link_libraries(gnuradio-atsc3 gnuradio::gnuradio-runtime gnuradio::gnuradio-fft gnuradio::gnuradio-filter gnuradio::gnuradio-blocks ZLIB::ZLIB)
 target_include_directories(gnuradio-atsc3
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>

@@ -33,7 +33,7 @@ namespace gr {
        * class. atsc3::alpbbheader_bb::make is the public interface for
        * creating new instances.
        */
-      static sptr make(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
+      static sptr make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_lls_insertion_mode_t llsmode);
     };
 
   } // namespace atsc3

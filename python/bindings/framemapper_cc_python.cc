@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(framemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(edd4218b2f69be7c60f1aadd46e0e1a1)                     */
+/* BINDTOOL_HEADER_FILE_HASH(22df518423cd3f1e61408dac9c5ae7de)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -54,6 +54,7 @@ void bind_framemapper_cc(py::module& m)
            py::arg("tiblocks"),
            py::arg("tifecblocksmax"),
            py::arg("tifecblocks"),
+           py::arg("llsmode"),
            py::arg("cred"),
            py::arg("flmode"),
            py::arg("flen"),

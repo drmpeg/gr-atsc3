@@ -75,6 +75,7 @@ ENDIF()
 ########################################################################
 find_package(Gnuradio "3.9" REQUIRED)
 find_package(Gnuradio COMPONENTS fft filter blocks)
+find_package(ZLIB)
 include(GrVersion)
 
 include(GrPlatform) #define LIB_SUFFIX

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(alpbbheader_bb.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(185597b4c82d529fb09e591643574b6d)                     */
+/* BINDTOOL_HEADER_FILE_HASH(23566ac8129ed43e8b2f18ded77b8184)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -39,6 +39,7 @@ void bind_alpbbheader_bb(py::module& m)
         .def(py::init(&alpbbheader_bb::make),
            py::arg("framesize"),
            py::arg("rate"),
+           py::arg("llsmode"),
            D(alpbbheader_bb,make)
         )
         
