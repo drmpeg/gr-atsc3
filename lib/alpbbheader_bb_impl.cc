@@ -11,6 +11,7 @@
 #define NUM_PACKETS 4
 #define LONG_EXTENSION_BYTES 2
 #define LLS_HEADER_LENGTH 4
+#define MPEG_PKT_LENGTH 188
 
 namespace gr {
   namespace atsc3 {
@@ -313,8 +314,8 @@ namespace gr {
               produced += 8;
               if (total == NUM_PACKETS) {
                 offset = (NUM_PACKETS - 2) - segments;
-                length = (total * 187) + (offset);
-                length = length - lls_length - 2;
+                length = (total * (MPEG_PKT_LENGTH - 1)) + (offset);
+                length = length - lls_length - LONG_EXTENSION_BYTES;
                 bits = (bbcount >> 5) & 0xfc;
                 bits |= 0x2; /* OFI = long extension mode */
                 sendbits(bits, out);
@@ -354,8 +355,8 @@ namespace gr {
                 if ((in[1] == 0x1f) && (in[2] == 0xff)) {
                   stuffing++;
                   total++;
-                  in += 188;
-                  consumed += 188;
+                  in += MPEG_PKT_LENGTH;
+                  consumed += MPEG_PKT_LENGTH;
                   if (stuffing > 1) {
                     j--;
                   }
@@ -374,12 +375,12 @@ namespace gr {
                     stuffing = 0;
                     segments++;
                     in++;
-                    pcount += 189;
+                    pcount += (MPEG_PKT_LENGTH + 1);
                   }
                   else {
                     bits = 0xe2; /* one TS packet per ALP packet */
                     in++;
-                    pcount += 188;
+                    pcount += MPEG_PKT_LENGTH;
                   }
                 }
               }
@@ -393,7 +394,7 @@ namespace gr {
                   stuffing = 0;
                   segments++;
                   in++;
-                  pcount += 189;
+                  pcount += (MPEG_PKT_LENGTH + 1);
                 }
                 else {
                   if (send == TRUE && (j < ((kbch / 8) - (lls_length + 2)))) {
@@ -420,7 +421,7 @@ namespace gr {
                   else {
                     bits = 0xe2;
                     in++;
-                    pcount += 188;
+                    pcount += MPEG_PKT_LENGTH;
                   }
                 }
               }
@@ -428,7 +429,7 @@ namespace gr {
             else {
               bits = *in++;
             }
-            count = (count + 1) % 188;
+            count = (count + 1) % MPEG_PKT_LENGTH;
             consumed++;
             sendbits(bits, out);
             out += 8;
