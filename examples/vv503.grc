@@ -85,6 +85,7 @@ blocks:
     alias: ''
     comment: ''
     framesize: FECFRAME_NORMAL
+    llsmode: LLS_OFF
     maxoutbuf: '0'
     minoutbuf: '0'
     rate: C9_15
@@ -92,7 +93,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [632, 36.0]
+    coordinate: [632, 28.0]
     rotation: 0
     state: true
 - name: atsc3_alpbbheader_bb_0_0
@@ -102,6 +103,7 @@ blocks:
     alias: ''
     comment: ''
     framesize: FECFRAME_NORMAL
+    llsmode: LLS_OFF
     maxoutbuf: '0'
     minoutbuf: '0'
     rate: C9_15
@@ -109,7 +111,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [632, 148.0]
+    coordinate: [632, 140.0]
     rotation: 0
     state: true
 - name: atsc3_bbscrambler_bb_0
@@ -410,6 +412,8 @@ blocks:
     guardinterval: GI_5_1024
     l1bmode: L1_FEC_MODE_1
     l1dmode: L1_FEC_MODE_1
+    llsmodeplp0: LLS_OFF
+    llsmodeplp1: LLS_OFF
     maxoutbuf: '0'
     minoutbuf: '0'
     misomode: MISO_OFF
@@ -861,4 +865,4 @@ connections:
 
 metadata:
   file_format: 1
-  grc_version: v3.10.0.0-350-gab2ee30f
+  grc_version: v3.11.0.0git-402-g54d199a2
