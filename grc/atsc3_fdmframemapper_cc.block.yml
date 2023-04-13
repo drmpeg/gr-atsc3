@@ -18,6 +18,7 @@ templates:
           ${tiblocksplp0},
           ${tifecblocksmaxplp0},
           ${tifecblocksplp0},
+          ${llsmodeplp0.val},
           ${framesizeplp1.val},
           ${rateplp1.val},
           ${fecmodeplp1.val},
@@ -31,6 +32,7 @@ templates:
           ${tifecblocksmaxplp1},
           ${tifecblocksplp1},
           ${plpsplit},
+          ${llsmodeplp1.val},
           ${fftsize.val},
           ${numpayloadsyms},
           ${numpreamblesyms},
@@ -143,6 +145,14 @@ parameters:
     dtype: int
     default: '14'
     hide: ${ timodeplp0.hide_tiblocks }
+-   id: llsmodeplp0
+    label: LLS Insertion PLP0
+    dtype: enum
+    options: [LLS_OFF, LLS_ON]
+    option_labels: [Disabled, Enabled]
+    option_attributes:
+        val: [atsc3.LLS_OFF, atsc3.LLS_ON]
+    default: LLS_OFF
 -   id: framesizeplp1
     label: FECFRAME Size PLP1
     dtype: enum
@@ -211,6 +221,14 @@ parameters:
     dtype: float
     default: '0.5'
     hide: ${ ('none' if str(timodeplp0) == str(timodeplp1) == 'TI_MODE_OFF' else 'all') }
+-   id: llsmodeplp1
+    label: LLS Insertion PLP1
+    dtype: enum
+    options: [LLS_OFF, LLS_ON]
+    option_labels: [Disabled, Enabled]
+    option_attributes:
+        val: [atsc3.LLS_OFF, atsc3.LLS_ON]
+    default: LLS_OFF
 -   id: fftsize
     label: FFT Size
     dtype: enum

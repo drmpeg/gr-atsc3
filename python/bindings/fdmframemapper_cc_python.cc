@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(fdmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(502ef8ce5c3add72a1735277479ae027)                     */
+/* BINDTOOL_HEADER_FILE_HASH(f840cd3ca73b1a3f4c054c70040ad666)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -45,6 +45,7 @@ void bind_fdmframemapper_cc(py::module& m)
            py::arg("tiblocksplp0"),
            py::arg("tifecblocksmaxplp0"),
            py::arg("tifecblocksplp0"),
+           py::arg("llsmodeplp0"),
            py::arg("framesizeplp1"),
            py::arg("rateplp1"),
            py::arg("fecmodeplp1"),
@@ -54,6 +55,7 @@ void bind_fdmframemapper_cc(py::module& m)
            py::arg("tifecblocksmaxplp1"),
            py::arg("tifecblocksplp1"),
            py::arg("plpsplit"),
+           py::arg("llsmodeplp1"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),
            py::arg("numpreamblesyms"),

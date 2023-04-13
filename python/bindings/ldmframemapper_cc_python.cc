@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(ldmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(8f716561775a7a1cd998ebf910d94207)                     */
+/* BINDTOOL_HEADER_FILE_HASH(a612b92fd95ef0f9c7d7ccdd60d9e3fc)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,10 +41,12 @@ void bind_ldmframemapper_cc(py::module& m)
            py::arg("rate_core"),
            py::arg("fecmode_core"),
            py::arg("constellation_core"),
+           py::arg("llsmode_core"),
            py::arg("framesize_enh"),
            py::arg("rate_enh"),
            py::arg("fecmode_enh"),
            py::arg("constellation_enh"),
+           py::arg("llsmode_enh"),
            py::arg("level"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),

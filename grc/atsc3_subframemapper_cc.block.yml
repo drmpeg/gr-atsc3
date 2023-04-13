@@ -59,6 +59,7 @@ templates:
           ${tiblocksplp0},
           ${tifecblocksmaxplp0},
           ${tifecblocksplp0},
+          ${llsmodeplp0.val},
           ${credplp0.val},
           ${misomodeplp0.val},
           ${framesizeplp1.val},
@@ -112,6 +113,7 @@ templates:
           ${tiblocksplp1},
           ${tifecblocksmaxplp1},
           ${tifecblocksplp1},
+          ${llsmodeplp1.val},
           ${credplp1.val},
           ${misomodeplp1.val},
           ${flmode.val},
@@ -381,6 +383,14 @@ parameters:
     dtype: int
     default: '14'
     hide: ${ timodeplp0.hide_tiblocks }
+-   id: llsmodeplp0
+    label: LLS Insertion PLP0
+    dtype: enum
+    options: [LLS_OFF, LLS_ON]
+    option_labels: [Disabled, Enabled]
+    option_attributes:
+        val: [atsc3.LLS_OFF, atsc3.LLS_ON]
+    default: LLS_OFF
 -   id: credplp0
     label: Reduced Carriers PLP0
     dtype: enum
@@ -645,6 +655,14 @@ parameters:
     dtype: int
     default: '44'
     hide: ${ timodeplp1.hide_tiblocks }
+-   id: llsmodeplp1
+    label: LLS Insertion PLP1
+    dtype: enum
+    options: [LLS_OFF, LLS_ON]
+    option_labels: [Disabled, Enabled]
+    option_attributes:
+        val: [atsc3.LLS_OFF, atsc3.LLS_ON]
+    default: LLS_OFF
 -   id: credplp1
     label: Reduced Carriers PLP1
     dtype: enum

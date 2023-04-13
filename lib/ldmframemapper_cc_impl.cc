@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     ldmframemapper_cc::sptr
-    ldmframemapper_cc::make(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    ldmframemapper_cc::make(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_lls_insertion_mode_t llsmode_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_lls_insertion_mode_t llsmode_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<ldmframemapper_cc_impl>(
-        framesize_core, rate_core, fecmode_core, constellation_core, framesize_enh, rate_enh, fecmode_enh, constellation_enh, level, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, tiblocks, tifecblocksmax, tifecblocks, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
+        framesize_core, rate_core, fecmode_core, constellation_core, llsmode_core, framesize_enh, rate_enh, fecmode_enh, constellation_enh, llsmode_enh, level, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, tiblocks, tifecblocksmax, tifecblocks, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    ldmframemapper_cc_impl::ldmframemapper_cc_impl(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    ldmframemapper_cc_impl::ldmframemapper_cc_impl(atsc3_framesize_t framesize_core, atsc3_code_rate_t rate_core, atsc3_plp_fec_mode_t fecmode_core, atsc3_constellation_t constellation_core, atsc3_lls_insertion_mode_t llsmode_core, atsc3_framesize_t framesize_enh, atsc3_code_rate_t rate_enh, atsc3_plp_fec_mode_t fecmode_enh, atsc3_constellation_t constellation_enh, atsc3_lls_insertion_mode_t llsmode_enh, atsc3_ldm_injection_level_t level, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("ldmframemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -158,7 +158,12 @@ namespace gr {
 
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
-      l1basicinit->lls_flag = FALSE;
+      if (llsmode_core == LLS_ON || llsmode_enh == LLS_ON) {
+        l1basicinit->lls_flag = TRUE;
+      }
+      else {
+        l1basicinit->lls_flag = FALSE;
+      }
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
       l1basicinit->papr_reduction = paprmode;
@@ -210,7 +215,12 @@ namespace gr {
       l1detailinit[0][0]->frequency_interleaver = fimode;
       l1detailinit[0][0]->num_plp = NUM_PLPS - 1;
       l1detailinit[0][0]->plp_id = 0;
-      l1detailinit[0][0]->plp_lls_flag = FALSE;
+      if (llsmode_core == LLS_ON) {
+        l1detailinit[0][0]->plp_lls_flag = TRUE;
+      }
+      else {
+        l1detailinit[0][0]->plp_lls_flag = FALSE;
+      }
       l1detailinit[0][0]->plp_layer = 0;
       l1detailinit[0][0]->plp_start = 0;
       l1detailinit[0][0]->plp_scrambler_type = 0;
@@ -299,7 +309,12 @@ namespace gr {
       l1detailinit[0][0]->plp_CTI_depth = tidepth;
 
       l1detailinit[0][1]->plp_id = 1;
-      l1detailinit[0][1]->plp_lls_flag = FALSE;
+      if (llsmode_enh == LLS_ON) {
+        l1detailinit[0][1]->plp_lls_flag = TRUE;
+      }
+      else {
+        l1detailinit[0][1]->plp_lls_flag = FALSE;
+      }
       l1detailinit[0][1]->plp_layer = 1;
       l1detailinit[0][1]->plp_start = 0;
       l1detailinit[0][1]->plp_scrambler_type = 0;

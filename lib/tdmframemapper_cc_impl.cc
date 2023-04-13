@@ -14,17 +14,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     tdmframemapper_cc::sptr
-    tdmframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<tdmframemapper_cc_impl>(
-        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, timodeplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, timodeplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, plpsplit, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
+        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, timodeplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, llsmodeplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, timodeplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, plpsplit, llsmodeplp1, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("tdmframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -156,7 +156,12 @@ namespace gr {
 
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
-      l1basicinit->lls_flag = FALSE;
+      if (llsmodeplp0 == LLS_ON || llsmodeplp1 == LLS_ON) {
+        l1basicinit->lls_flag = TRUE;
+      }
+      else {
+        l1basicinit->lls_flag = FALSE;
+      }
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
       l1basicinit->papr_reduction = paprmode;
@@ -208,7 +213,12 @@ namespace gr {
       l1detailinit[0][0]->frequency_interleaver = fimode;
       l1detailinit[0][0]->num_plp = NUM_PLPS - 1;
       l1detailinit[0][0]->plp_id = 0;
-      l1detailinit[0][0]->plp_lls_flag = FALSE;
+      if (llsmodeplp0 == LLS_ON) {
+        l1detailinit[0][0]->plp_lls_flag = TRUE;
+      }
+      else {
+        l1detailinit[0][0]->plp_lls_flag = FALSE;
+      }
       l1detailinit[0][0]->plp_layer = 0;
       l1detailinit[0][0]->plp_start = 0;
       l1detailinit[0][0]->plp_scrambler_type = 0;
@@ -296,7 +306,12 @@ namespace gr {
       l1detailinit[0][0]->plp_type = 0;
 
       l1detailinit[0][1]->plp_id = 1;
-      l1detailinit[0][1]->plp_lls_flag = FALSE;
+      if (llsmodeplp1 == LLS_ON) {
+        l1detailinit[0][1]->plp_lls_flag = TRUE;
+      }
+      else {
+        l1detailinit[0][1]->plp_lls_flag = FALSE;
+      }
       l1detailinit[0][1]->plp_layer = 0;
       l1detailinit[0][1]->plp_start = 0;
       l1detailinit[0][1]->plp_scrambler_type = 0;

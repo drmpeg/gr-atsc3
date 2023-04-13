@@ -15,17 +15,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     subframemapper_cc::sptr
-    subframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_scattered_pilot_boost_t pilotboostplp0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodeplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_reduced_carriers_t credplp0, atsc3_miso_t misomodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_scattered_pilot_boost_t pilotboostplp1, atsc3_frequency_interleaver_t fimodeplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, atsc3_reduced_carriers_t credplp1, atsc3_miso_t misomodeplp1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_scattered_pilot_boost_t pilotboostplp0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodeplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_reduced_carriers_t credplp0, atsc3_miso_t misomodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_scattered_pilot_boost_t pilotboostplp1, atsc3_frequency_interleaver_t fimodeplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_reduced_carriers_t credplp1, atsc3_miso_t misomodeplp1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<subframemapper_cc_impl>(
-        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, fftsizeplp0, numpayloadsymsplp0, numpreamblesyms, guardintervalplp0, pilotpatternplp0, pilotboostplp0, firstsbs, fimodeplp0, timodeplp0, tidepthplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, credplp0, misomodeplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, fftsizeplp1, numpayloadsymsplp1, guardintervalplp1, pilotpatternplp1, pilotboostplp1, fimodeplp1, timodeplp1, tidepthplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, credplp1, misomodeplp1, flmode, flen, paprmode, l1bmode, l1dmode);
+        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, fftsizeplp0, numpayloadsymsplp0, numpreamblesyms, guardintervalplp0, pilotpatternplp0, pilotboostplp0, firstsbs, fimodeplp0, timodeplp0, tidepthplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, llsmodeplp0, credplp0, misomodeplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, fftsizeplp1, numpayloadsymsplp1, guardintervalplp1, pilotpatternplp1, pilotboostplp1, fimodeplp1, timodeplp1, tidepthplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, llsmodeplp1, credplp1, misomodeplp1, flmode, flen, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_scattered_pilot_boost_t pilotboostplp0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodeplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_reduced_carriers_t credplp0, atsc3_miso_t misomodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_scattered_pilot_boost_t pilotboostplp1, atsc3_frequency_interleaver_t fimodeplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, atsc3_reduced_carriers_t credplp1, atsc3_miso_t misomodeplp1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_scattered_pilot_boost_t pilotboostplp0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodeplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_reduced_carriers_t credplp0, atsc3_miso_t misomodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_scattered_pilot_boost_t pilotboostplp1, atsc3_frequency_interleaver_t fimodeplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_reduced_carriers_t credplp1, atsc3_miso_t misomodeplp1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("subframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(2, 2, sizeof(output_type)))
@@ -163,7 +163,12 @@ namespace gr {
 
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
-      l1basicinit->lls_flag = FALSE;
+      if (llsmodeplp0 == LLS_ON || llsmodeplp1 == LLS_ON) {
+        l1basicinit->lls_flag = TRUE;
+      }
+      else {
+        l1basicinit->lls_flag = FALSE;
+      }
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
       l1basicinit->papr_reduction = paprmode;
@@ -225,7 +230,12 @@ namespace gr {
       l1detailinit[0][0]->frequency_interleaver = fimodeplp0;
       l1detailinit[0][0]->num_plp = NUM_PLPS - 1;
       l1detailinit[0][0]->plp_id = 0;
-      l1detailinit[0][0]->plp_lls_flag = FALSE;
+      if (llsmodeplp0 == LLS_ON) {
+        l1detailinit[0][0]->plp_lls_flag = TRUE;
+      }
+      else {
+        l1detailinit[0][0]->plp_lls_flag = FALSE;
+      }
       l1detailinit[0][0]->plp_layer = 0;
       l1detailinit[0][0]->plp_start = 0;
       l1detailinit[0][0]->plp_scrambler_type = 0;
@@ -340,7 +350,12 @@ namespace gr {
       l1detailinit[1][0]->frequency_interleaver = fimodeplp1;
       l1detailinit[1][0]->num_plp = NUM_PLPS - 1;
       l1detailinit[1][0]->plp_id = 1;
-      l1detailinit[1][0]->plp_lls_flag = FALSE;
+      if (llsmodeplp1 == LLS_ON) {
+        l1detailinit[1][0]->plp_lls_flag = TRUE;
+      }
+      else {
+        l1detailinit[1][0]->plp_lls_flag = FALSE;
+      }
       l1detailinit[1][0]->plp_layer = 0;
       l1detailinit[1][0]->plp_start = 0;
       l1detailinit[1][0]->plp_scrambler_type = 0;
