@@ -288,11 +288,12 @@ namespace gr {
       unsigned char bits;
       struct timespec tai;
       long long delta;
-      int pcount = 2;
+      int pcount;
       int length, offset;
 
       if (ninput_items[0] > (noutput_items / 2)) {
         for (int i = 0; i < noutput_items; i += kbch) {
+          pcount = 2;
           clock_gettime(CLOCK_TAI, &tai);
           if (tai.tv_sec > tai_last.tv_sec) {
             delta = (tai.tv_nsec + (1000000000 * (tai.tv_sec - tai_last.tv_sec))) - tai_last.tv_nsec;
@@ -437,8 +438,8 @@ namespace gr {
 skip:
             asm("nop");
           }
+          bbcount += pcount - (kbch / 8);
         }
-        bbcount += pcount - (kbch / 8);
       }
       if (produced != noutput_items) {
         if (produced != 0) {
