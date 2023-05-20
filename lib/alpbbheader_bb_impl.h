@@ -27,12 +27,16 @@ namespace gr {
       int kbch;
       int count;
       int bbcount;
-      int stuffing;
+      int packets;
       int total;
       int segments;
       int dnp;
-      int send;
+      int trigger;
       int lls_mode;
+      int lls_send;
+      int lls_count;
+      int lls_index;
+      int remainder;
       struct timespec tai_last;
       unsigned char llsgz[1024];
       unsigned char llstemp[1024];

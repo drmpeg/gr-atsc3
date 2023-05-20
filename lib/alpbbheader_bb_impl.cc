@@ -11,6 +11,7 @@
 #define NUM_PACKETS 4
 #define LONG_EXTENSION_BYTES 2
 #define LLS_HEADER_LENGTH 4
+#define ALP_HEADER_LENGTH 2
 #define MPEG_PKT_LENGTH 188
 
 namespace gr {
@@ -76,11 +77,14 @@ namespace gr {
 
       count = 0;
       bbcount = 0;
-      stuffing = 0;
+      packets = 0;
       total = 0;
       segments = 0;
       dnp = FALSE;
-      send = FALSE;
+      trigger = FALSE;
+      lls_send = FALSE;
+      lls_count = 0;
+      remainder = 0;
       lls_mode = llsmode;
       if (framesize == FECFRAME_NORMAL) {
         switch (rate) {
@@ -289,7 +293,7 @@ namespace gr {
       struct timespec tai;
       long long delta;
       int pcount;
-      int length, offset;
+      int stuffing, offset;
 
       if (ninput_items[0] > (noutput_items / 2)) {
         for (int i = 0; i < noutput_items; i += kbch) {
@@ -308,38 +312,80 @@ namespace gr {
             }
           }
           for (int j = 0; j < (int)((kbch - 16) / 8); j++) {
-            if (j == 0) {
+            if (j == 0 && lls_count != lls_length + ALP_HEADER_LENGTH) {
               bits = (bbcount & 0x7f) | 0x80;
               sendbits(bits, out);
               out += 8;
               produced += 8;
               if (total == NUM_PACKETS) {
                 offset = (NUM_PACKETS - 2) - segments;
-                length = (total * (MPEG_PKT_LENGTH - 1)) + (offset);
-                length = length - lls_length - LONG_EXTENSION_BYTES;
+                stuffing = (total * (MPEG_PKT_LENGTH - 1)) + (offset);
+                stuffing = stuffing - lls_length - LONG_EXTENSION_BYTES;
+                if (stuffing > (kbch / 8) - LONG_EXTENSION_BYTES - 3) {
+                  remainder = stuffing - (kbch / 8) + 3;
+                  stuffing = (kbch / 8) - LONG_EXTENSION_BYTES - 3;
+                }
+                else {
+                  remainder = 0;
+                }
                 bits = (bbcount >> 5) & 0xfc;
                 bits |= 0x2; /* OFI = long extension mode */
                 sendbits(bits, out);
                 out += 8;
                 produced += 8;
-                bits = (length & 0x1f) | 0xe0; /* EXT_TYPE = all padding */
+                bits = (stuffing & 0x1f) | 0xe0; /* EXT_TYPE = all padding */
                 sendbits(bits, out);
                 out += 8;
                 produced += 8;
-                bits = length >> 5;
+                bits = stuffing >> 5;
                 sendbits(bits, out);
                 out += 8;
                 produced += 8;
-                for (int n = 0; n < length; n++) {
+                for (int n = 0; n < stuffing; n++) {
                   sendbits(0, out);
                   out += 8;
                   produced += 8;
                 }
-                pcount += (length) + LONG_EXTENSION_BYTES;
-                j += (length) + LONG_EXTENSION_BYTES;
+                pcount += (stuffing) + LONG_EXTENSION_BYTES;
+                j += (stuffing) + LONG_EXTENSION_BYTES;
                 total = 0;
                 segments = 0;
-                send = TRUE;
+                if (remainder == 0) {
+                  trigger = TRUE;
+                }
+              }
+              else if (remainder) {
+                if (remainder > (kbch / 8) - LONG_EXTENSION_BYTES - 3) {
+                  remainder = remainder - (kbch / 8) + 3;
+                  stuffing = (kbch / 8) - LONG_EXTENSION_BYTES - 3;
+                }
+                else {
+                  stuffing = remainder;
+                  remainder = 0;
+                }
+                bits = (bbcount >> 5) & 0xfc;
+                bits |= 0x2; /* OFI = long extension mode */
+                sendbits(bits, out);
+                out += 8;
+                produced += 8;
+                bits = (stuffing & 0x1f) | 0xe0; /* EXT_TYPE = all padding */
+                sendbits(bits, out);
+                out += 8;
+                produced += 8;
+                bits = stuffing >> 5;
+                sendbits(bits, out);
+                out += 8;
+                produced += 8;
+                for (int n = 0; n < stuffing; n++) {
+                  sendbits(0, out);
+                  out += 8;
+                  produced += 8;
+                }
+                pcount += (stuffing) + LONG_EXTENSION_BYTES;
+                j += (stuffing) + LONG_EXTENSION_BYTES;
+                if (remainder == 0) {
+                  trigger = TRUE;
+                }
               }
               else {
                 bits = (bbcount >> 5) & 0xfc;
@@ -348,95 +394,100 @@ namespace gr {
                 produced += 8;
               }
             }
-            if (count == 0) {
-              if (*in != 0x47) {
-                GR_LOG_WARN(d_logger, "Transport Stream sync error!");
+            if (lls_send == TRUE) {
+              lls_count--;
+              if (lls_count == 0) {
+                lls_send = FALSE;
               }
-              if (dnp == TRUE && j < (kbch / 8) - 3) {
-                if ((in[1] == 0x1f) && (in[2] == 0xff)) {
-                  stuffing++;
-                  total++;
-                  in += MPEG_PKT_LENGTH;
-                  consumed += MPEG_PKT_LENGTH;
-                  if (stuffing > 1) {
-                    j--;
+              bits = llstemp[lls_index++];
+              sendbits(bits, out);
+              out += 8;
+              produced += 8;
+            }
+            else {
+              if (count == 0) {
+                if (*in != 0x47) {
+                  GR_LOG_WARN(d_logger, "Transport Stream sync error!");
+                }
+                if (dnp == TRUE && j < (kbch / 8) - 3) {
+                  if ((in[1] == 0x1f) && (in[2] == 0xff)) {
+                    packets++;
+                    total++;
+                    in += MPEG_PKT_LENGTH;
+                    consumed += MPEG_PKT_LENGTH;
+                    if (packets > 1) {
+                      j--;
+                    }
+                    if (total == NUM_PACKETS) {
+                      dnp = FALSE;
+                    }
+                    goto skip;
                   }
-                  if (total == NUM_PACKETS) {
-                    dnp = FALSE;
+                  else {
+                    if (packets != 0) {
+                      bits = 0xe3; /* AHF - Additional Header Flag*/
+                      sendbits(bits, out);
+                      out += 8;
+                      produced += 8;
+                      bits = packets; /* DNP - Deleted Null Packets */
+                      packets = 0;
+                      segments++;
+                      in++;
+                      pcount += (MPEG_PKT_LENGTH + 1);
+                    }
+                    else {
+                      bits = 0xe2; /* one TS packet per ALP packet */
+                      in++;
+                      pcount += MPEG_PKT_LENGTH;
+                    }
                   }
-                  goto skip;
                 }
                 else {
-                  if (stuffing != 0) {
-                    bits = 0xe3; /* AHF - Additional Header Flag*/
+                  if (packets != 0) {
+                    bits = 0xe3;
                     sendbits(bits, out);
                     out += 8;
                     produced += 8;
-                    bits = stuffing; /* DNP - Deleted Null Packets */
-                    stuffing = 0;
+                    bits = packets;
+                    packets = 0;
                     segments++;
                     in++;
                     pcount += (MPEG_PKT_LENGTH + 1);
                   }
                   else {
-                    bits = 0xe2; /* one TS packet per ALP packet */
-                    in++;
-                    pcount += MPEG_PKT_LENGTH;
+                    if (trigger == TRUE) {
+                      trigger = FALSE;
+                      bits = 0 | ((lls_length >> 8) & 0x7);
+                      llstemp[0] = bits;
+                      bits = lls_length & 0xff;
+                      llstemp[1] = bits;
+                      sendlls(&llstemp[2]);
+                      lls_count = lls_length + ALP_HEADER_LENGTH;
+                      lls_index = 0;
+                      lls_send = TRUE;
+                      pcount += lls_length + ALP_HEADER_LENGTH;
+                      j--;
+                      goto skip;
+                    }
+                    else {
+                      bits = 0xe2;
+                      in++;
+                      pcount += MPEG_PKT_LENGTH;
+                    }
                   }
                 }
               }
               else {
-                if (stuffing != 0) {
-                  bits = 0xe3;
-                  sendbits(bits, out);
-                  out += 8;
-                  produced += 8;
-                  bits = stuffing;
-                  stuffing = 0;
-                  segments++;
-                  in++;
-                  pcount += (MPEG_PKT_LENGTH + 1);
-                }
-                else {
-                  if (send == TRUE && (j < ((kbch / 8) - (lls_length + 2)))) {
-                    send = FALSE;
-                    bits = 0 | ((lls_length >> 8) & 0x7);
-                    sendbits(bits, out);
-                    out += 8;
-                    produced += 8;
-                    bits = lls_length & 0xff;
-                    sendbits(bits, out);
-                    out += 8;
-                    produced += 8;
-                    sendlls(&llstemp[0]);
-                    for (int n = 0; n < lls_length; n++) {
-                      bits = llstemp[n];
-                      sendbits(bits, out);
-                      out += 8;
-                      produced += 8;
-                    }
-                    pcount += lls_length + 2;
-                    j += lls_length + 1;
-                    goto skip;
-                  }
-                  else {
-                    bits = 0xe2;
-                    in++;
-                    pcount += MPEG_PKT_LENGTH;
-                  }
-                }
+                bits = *in++;
               }
-            }
-            else {
-              bits = *in++;
-            }
-            count = (count + 1) % MPEG_PKT_LENGTH;
-            consumed++;
-            sendbits(bits, out);
-            out += 8;
-            produced += 8;
+              count = (count + 1) % MPEG_PKT_LENGTH;
+              consumed++;
+              sendbits(bits, out);
+              out += 8;
+              produced += 8;
 skip:
-            asm("nop");
+              asm("nop");
+            }
           }
           bbcount += pcount - (kbch / 8);
         }
