@@ -724,4 +724,9 @@ outputs:
     dtype: complex
     multiplicity: '2'
 
+asserts:
+- ${ (flen % 5) == 0}
+- ${ flen >= 50}
+- ${ flen <= 5000}
+
 file_format: 1
