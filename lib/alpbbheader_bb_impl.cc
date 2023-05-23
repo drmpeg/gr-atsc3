@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -20,17 +20,17 @@ namespace gr {
     using input_type = unsigned char;
     using output_type = unsigned char;
     alpbbheader_bb::sptr
-    alpbbheader_bb::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_lls_insertion_mode_t llsmode)
+    alpbbheader_bb::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_lls_insertion_mode_t llsmode, atsc3_lls_service_count_t llscount)
     {
       return gnuradio::make_block_sptr<alpbbheader_bb_impl>(
-        framesize, rate, llsmode);
+        framesize, rate, llsmode, llscount);
     }
 
 
     /*
      * The private constructor
      */
-    alpbbheader_bb_impl::alpbbheader_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_lls_insertion_mode_t llsmode)
+    alpbbheader_bb_impl::alpbbheader_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_lls_insertion_mode_t llsmode, atsc3_lls_service_count_t llscount)
       : gr::block("alpbbheader_bb",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -48,12 +48,20 @@ namespace gr {
       offset += strlen(xml);
       memcpy(&lls[offset], &SLT[0], strlen(SLT));
       offset += strlen(SLT);
-      memcpy(&lls[offset], &Service[0], strlen(Service));
-      offset += strlen(Service);
-      memcpy(&lls[offset], &BroadcastSvcSignaling[0], strlen(BroadcastSvcSignaling));
-      offset += strlen(BroadcastSvcSignaling);
+      memcpy(&lls[offset], &Service1[0], strlen(Service1));
+      offset += strlen(Service1);
+      memcpy(&lls[offset], &BroadcastSvcSignaling1[0], strlen(BroadcastSvcSignaling1));
+      offset += strlen(BroadcastSvcSignaling1);
       memcpy(&lls[offset], &Service_end[0], strlen(Service_end));
       offset += strlen(Service_end);
+      if (llscount == LLS_TWO_SERVICE) {
+        memcpy(&lls[offset], &Service2[0], strlen(Service2));
+        offset += strlen(Service2);
+        memcpy(&lls[offset], &BroadcastSvcSignaling2[0], strlen(BroadcastSvcSignaling2));
+        offset += strlen(BroadcastSvcSignaling2);
+        memcpy(&lls[offset], &Service_end[0], strlen(Service_end));
+        offset += strlen(Service_end);
+      }
       memcpy(&lls[offset], &SLT_end[0], strlen(SLT_end));
       offset += strlen(SLT_end);
 
@@ -312,7 +320,7 @@ namespace gr {
             }
           }
           for (int j = 0; j < (int)((kbch - 16) / 8); j++) {
-            if (j == 0 && lls_count != lls_length + ALP_HEADER_LENGTH) {
+            if (j == 0) {
               bits = (bbcount & 0x7f) | 0x80;
               sendbits(bits, out);
               out += 8;
@@ -455,7 +463,7 @@ namespace gr {
                     pcount += (MPEG_PKT_LENGTH + 1);
                   }
                   else {
-                    if (trigger == TRUE) {
+                    if (trigger == TRUE && j != 0) {
                       trigger = FALSE;
                       bits = 0 | ((lls_length >> 8) & 0x7);
                       llstemp[0] = bits;
@@ -508,8 +516,10 @@ skip:
 
     const char alpbbheader_bb_impl::xml[] = {"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"};
     const char alpbbheader_bb_impl::SLT[] = {"<SLT bsid=\"8086\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/SLT/1.0/ SLT-1.0-20211209.xsd\">\n"};
-    const char alpbbheader_bb_impl::Service[] = {"    <Service globalServiceID=\"urn:atsc:serviceid:drmpeg\" majorChannelNo=\"37\" minorChannelNo=\"1\" serviceCategory=\"1\" serviceId=\"73\" shortServiceName=\"W6RZ-DT\" sltSvcSeqNum=\"0\">\n"};
-    const char alpbbheader_bb_impl::BroadcastSvcSignaling[] = {"        <BroadcastSvcSignaling slsDestinationIpAddress=\"239.255.37.1\" slsDestinationUdpPort=\"8000\" slsMajorProtocolVersion=\"0\" slsMinorProtocolVersion=\"0\" slsProtocol=\"1\" slsSourceIpAddress=\"44.4.15.9\"/>\n"};
+    const char alpbbheader_bb_impl::Service1[] = {"    <Service globalServiceID=\"urn:atsc:serviceid:drmpeg_ts_1\" majorChannelNo=\"37\" minorChannelNo=\"1\" serviceCategory=\"1\" serviceId=\"73\" shortServiceName=\"W6RZ-DT\" sltSvcSeqNum=\"0\">\n"};
+    const char alpbbheader_bb_impl::BroadcastSvcSignaling1[] = {"        <BroadcastSvcSignaling slsDestinationIpAddress=\"239.255.37.1\" slsDestinationUdpPort=\"8000\" slsMajorProtocolVersion=\"0\" slsMinorProtocolVersion=\"0\" slsProtocol=\"1\" slsSourceIpAddress=\"44.4.15.9\"/>\n"};
+    const char alpbbheader_bb_impl::Service2[] = {"    <Service globalServiceID=\"urn:atsc:serviceid:drmpeg_ts_2\" majorChannelNo=\"37\" minorChannelNo=\"2\" serviceCategory=\"1\" serviceId=\"88\" shortServiceName=\"W6RZ-DT\" sltSvcSeqNum=\"0\">\n"};
+    const char alpbbheader_bb_impl::BroadcastSvcSignaling2[] = {"        <BroadcastSvcSignaling slsDestinationIpAddress=\"239.255.37.2\" slsDestinationUdpPort=\"8000\" slsMajorProtocolVersion=\"0\" slsMinorProtocolVersion=\"0\" slsProtocol=\"1\" slsSourceIpAddress=\"44.4.15.9\"/>\n"};
     const char alpbbheader_bb_impl::Service_end[] = {"    </Service>\n"};
     const char alpbbheader_bb_impl::SLT_end[] = {"</SLT>\n"};
 

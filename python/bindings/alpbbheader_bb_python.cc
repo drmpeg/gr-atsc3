@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(alpbbheader_bb.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(23566ac8129ed43e8b2f18ded77b8184)                     */
+/* BINDTOOL_HEADER_FILE_HASH(ecc826681ab36e1629cf1b9c5f9b4942)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -40,6 +40,7 @@ void bind_alpbbheader_bb(py::module& m)
            py::arg("framesize"),
            py::arg("rate"),
            py::arg("llsmode"),
+           py::arg("llscount"),
            D(alpbbheader_bb,make)
         )
         

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021 Ron Economos.
+ * Copyright 2021-2023 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -51,13 +51,15 @@ namespace gr {
 
       const static char xml[];
       const static char SLT[];
-      const static char Service[];
-      const static char BroadcastSvcSignaling[];
+      const static char Service1[];
+      const static char BroadcastSvcSignaling1[];
+      const static char Service2[];
+      const static char BroadcastSvcSignaling2[];
       const static char Service_end[];
       const static char SLT_end[];
 
      public:
-      alpbbheader_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_lls_insertion_mode_t llsmode);
+      alpbbheader_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_lls_insertion_mode_t llsmode, atsc3_lls_service_count_t llscount);
       ~alpbbheader_bb_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

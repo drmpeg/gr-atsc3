@@ -4,7 +4,7 @@ category: '[ATSC3.0]'
 
 templates:
   imports: import atsc3
-  make: atsc3.alpbbheader_bb(${framesize.val}, ${rate.val}, ${llsmode.val})
+  make: atsc3.alpbbheader_bb(${framesize.val}, ${rate.val}, ${llsmode.val}, ${llscount.val})
 
 parameters:
 -   id: framesize
@@ -27,8 +27,18 @@ parameters:
     options: [LLS_OFF, LLS_ON]
     option_labels: [Disabled, Enabled]
     option_attributes:
+        hide_llscount: [all, none]
         val: [atsc3.LLS_OFF, atsc3.LLS_ON]
     default: LLS_OFF
+-   id: llscount
+    label: Number of Services
+    dtype: enum
+    options: [LLS_ONE_SERVICE, LLS_TWO_SERVICE]
+    option_labels: [1, 2]
+    option_attributes:
+        val: [atsc3.LLS_ONE_SERVICE, atsc3.LLS_TWO_SERVICE]
+    hide: ${ llsmode.hide_llscount }
+    default: LLS_ONE_SERVICE
 
 inputs:
 -   domain: stream
