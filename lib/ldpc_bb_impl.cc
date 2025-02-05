@@ -326,10 +326,14 @@ namespace gr {
           memset(buffer, 0, sizeof(unsigned char)*plen);
           // now do the parity checking
           d = out;
-          for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
-            buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
+          for (int i_p = 0; i_p < plen; i_p++) {
+            unsigned char pbit = 0;
+            for (int i_d = 1; i_d < ldpc_lut[i_p][0]; i_d++) {
+              pbit ^= d[ldpc_lut[i_p][i_d]];
+            }
+            buffer[i_p] = pbit;
           }
-          for(int j = 1; j < m1; j++) {
+          for (int j = 1; j < m1; j++) {
             buffer[j] ^= buffer[j-1];
           }
           for (int t = 0; t < q1; t++) {
@@ -337,8 +341,16 @@ namespace gr {
               out[nbch + (360 * t) + s] = buffer[(q1 * s) + t];
             }
           }
-          for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
-            buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
+          for (int i_p = 0; i_p < plen; i_p++) {
+            unsigned char pbit = 0;
+            unsigned int count = 0;
+            for (int i_d = 1; i_d < ldpc_lut_aux[i_p][0]; i_d++) {
+              pbit ^= d[ldpc_lut_aux[i_p][i_d]];
+              count++;
+            }
+            if (count) {
+              buffer[i_p] ^= pbit;
+            }
           }
           for (int t = 0; t < q2; t++) {
             for (int s = 0; s < 360; s++) {

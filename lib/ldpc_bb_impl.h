@@ -11,12 +11,6 @@
 #include <atsc3/ldpc_bb.h>
 #include "atsc3_defines.h"
 
-typedef struct{
-    int table_length;
-    int d[LDPC_ENCODE_TABLE_LENGTH];
-    int p[LDPC_ENCODE_TABLE_LENGTH];
-}ldpc_encode_table;
-
 namespace gr {
   namespace atsc3 {
 
@@ -36,11 +30,11 @@ namespace gr {
       int ldpc_lut_index[FRAME_SIZE_NORMAL];
       unsigned char buffer[FRAME_SIZE_NORMAL];
       void ldpc_lookup_generate(void);
-      ldpc_encode_table ldpc_encode_1st;
-      ldpc_encode_table ldpc_encode_2nd;
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_data;
+      std::vector<uint16_t*> ldpc_lut_aux; // Pointers into ldpc_lut_data.
+      std::vector<uint16_t> ldpc_lut_aux_data;
 
       template <typename entry_t, size_t rows, size_t cols>
       void ldpc_bf_type_b(entry_t (&table)[rows][cols])
@@ -48,12 +42,6 @@ namespace gr {
         size_t max_lut_arraysize = 0;
         const unsigned int pbits = (frame_size) - nbch;
         const unsigned int q = q_val;
-        for (auto& row : table) { /* count the entries in the table */
-          max_lut_arraysize += row[0];
-        }
-
-        max_lut_arraysize *= 360;   /* 360 bits per table entry */
-        max_lut_arraysize /= pbits; /* spread over all parity bits */
 
         for (auto& ldpc_lut_index_entry : ldpc_lut_index) {
           ldpc_lut_index_entry = 1;
@@ -71,7 +59,7 @@ namespace gr {
             }
           }
         }
-        max_lut_arraysize += 1 + (max_index - max_lut_arraysize); /* 1 for the size at the start of the array */
+        max_lut_arraysize = 1 + max_index; /* 1 for the size at the start of the array */
 
         /* Allocate a 2D Array with pbits * max_lut_arraysize
          * while preserving two-subscript access
@@ -103,8 +91,72 @@ namespace gr {
       void ldpc_bf_type_a(entry_t (&table)[rows][cols])
       {
         int im = 0;
-        int index = 0;
         int row;
+        size_t max_lut_arraysize = 0;
+        const unsigned int pbits = (frame_size) - nbch;
+
+        for (auto& ldpc_lut_index_entry : ldpc_lut_index) {
+          ldpc_lut_index_entry = 1;
+        }
+
+        uint16_t max_index = 0;
+        for (unsigned int row = 0; row < rows; row++) {
+          if (im == nbch) {
+            break;
+          }
+          for (unsigned int n = 0; n < 360; n++) {
+            for (unsigned int col = 1; col <= table[row][0]; col++) {
+              if ((im % 360) == 0) {
+                unsigned int current_pbit = table[row][col];
+                ldpc_lut_index[current_pbit]++;
+                if (ldpc_lut_index[current_pbit] > max_index) {
+                  max_index = ldpc_lut_index[current_pbit];
+                }
+              }
+              else {
+                if (table[row][col] < m1_val) {
+                  unsigned int current_pbit = (table[row][col] + (n * q1_val)) % m1_val;
+                  ldpc_lut_index[current_pbit]++;
+                  if (ldpc_lut_index[current_pbit] > max_index) {
+                    max_index = ldpc_lut_index[current_pbit];
+                  }
+                }
+                else {
+                  unsigned int current_pbit = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
+                  ldpc_lut_index[current_pbit]++;
+                  if (ldpc_lut_index[current_pbit] > max_index) {
+                    max_index = ldpc_lut_index[current_pbit];
+                  }
+                }
+              }
+            }
+            im++;
+          }
+        }
+        im = 0;
+        max_lut_arraysize = 1 + max_index; /* 1 for the size at the start of the array */
+
+        /* Allocate a 2D Array with pbits * max_lut_arraysize
+         * while preserving two-subscript access
+         * see
+         * https://stackoverflow.com/questions/29375797/copy-2d-array-using-memcpy/29375830#29375830
+         */
+        ldpc_lut.resize(pbits);
+        ldpc_lut_data.resize(pbits * max_lut_arraysize);
+        ldpc_lut_data[0] = 1;
+        ldpc_lut[0] = ldpc_lut_data.data();
+        for (unsigned int i = 1; i < pbits; i++) {
+          ldpc_lut[i] = ldpc_lut[i - 1] + max_lut_arraysize;
+          ldpc_lut[i][0] = 1;
+        }
+        ldpc_lut_aux.resize(pbits);
+        ldpc_lut_aux_data.resize(pbits * max_lut_arraysize);
+        ldpc_lut_aux_data[0] = 1;
+        ldpc_lut_aux[0] = ldpc_lut_aux_data.data();
+        for (unsigned int i = 1; i < pbits; i++) {
+          ldpc_lut_aux[i] = ldpc_lut_aux[i - 1] + max_lut_arraysize;
+          ldpc_lut_aux[i][0] = 1;
+        }
         for (row = 0; row < (int)rows; row++) {
           if (im == nbch) {
             break;
@@ -112,53 +164,50 @@ namespace gr {
           for (int n = 0; n < 360; n++) {
             for (int col = 1; col <= table[row][0]; col++) {
               if ((im % 360) == 0) {
-                ldpc_encode_1st.p[index] = table[row][col];
-                ldpc_encode_1st.d[index] = im;
-                index++;
+                unsigned int current_pbit = table[row][col];
+                ldpc_lut[current_pbit][ldpc_lut[current_pbit][0]] = im;
+                ldpc_lut[current_pbit][0]++;
               }
               else {
                 if (table[row][col] < m1_val) {
-                  ldpc_encode_1st.p[index] = (table[row][col] + (n * q1_val)) % m1_val;
-                  ldpc_encode_1st.d[index] = im;
-                  index++;
+                  unsigned int current_pbit = (table[row][col] + (n * q1_val)) % m1_val;
+                  ldpc_lut[current_pbit][ldpc_lut[current_pbit][0]] = im;
+                  ldpc_lut[current_pbit][0]++;
                 }
                 else {
-                  ldpc_encode_1st.p[index] = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
-                  ldpc_encode_1st.d[index] = im;
-                  index++;
+                  unsigned int current_pbit = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
+                  ldpc_lut[current_pbit][ldpc_lut[current_pbit][0]] = im;
+                  ldpc_lut[current_pbit][0]++;
                 }
               }
             }
             im++;
           }
         }
-        ldpc_encode_1st.table_length = index;
-        index = 0;
         for (;row < (int)rows; row++) {
           for (int n = 0; n < 360; n++) {
             for (int col = 1; col <= table[row][0]; col++) {
               if ((im % 360) == 0) {
-                ldpc_encode_2nd.p[index] = table[row][col];
-                ldpc_encode_2nd.d[index] = im;
-                index++;
+                unsigned int current_pbit = table[row][col];
+                ldpc_lut_aux[current_pbit][ldpc_lut_aux[current_pbit][0]] = im;
+                ldpc_lut_aux[current_pbit][0]++;
               }
               else {
                 if (table[row][col] < m1_val) {
-                  ldpc_encode_2nd.p[index] = (table[row][col] + (n * q1_val)) % m1_val;
-                  ldpc_encode_2nd.d[index] = im;
-                  index++;
+                  unsigned int current_pbit = (table[row][col] + (n * q1_val)) % m1_val;
+                  ldpc_lut_aux[current_pbit][ldpc_lut_aux[current_pbit][0]] = im;
+                  ldpc_lut_aux[current_pbit][0]++;
                 }
                 else {
-                  ldpc_encode_2nd.p[index] = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
-                  ldpc_encode_2nd.d[index] = im;
-                  index++;
+                  unsigned int current_pbit = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
+                  ldpc_lut_aux[current_pbit][ldpc_lut_aux[current_pbit][0]] = im;
+                  ldpc_lut_aux[current_pbit][0]++;
                 }
               }
             }
             im++;
           }
         }
-        ldpc_encode_2nd.table_length = index;
       }
 
       const static uint16_t ldpc_tab_2_15N[29][21];
