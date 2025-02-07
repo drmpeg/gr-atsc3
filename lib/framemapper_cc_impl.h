@@ -211,12 +211,6 @@ namespace gr {
         size_t max_lut_arraysize = 0;
         const unsigned int pbits = FRAME_SIZE_SHORT - NBCH_6_15;
         const unsigned int q = q_val;
-        for (auto& row : table) { /* count the entries in the table */
-          max_lut_arraysize += row[0];
-        }
-
-        max_lut_arraysize *= 360;   /* 360 bits per table entry */
-        max_lut_arraysize /= pbits; /* spread over all parity bits */
 
         for (auto& ldpc_lut_index_entry : ldpc_lut_index) {
           ldpc_lut_index_entry = 1;
@@ -234,7 +228,7 @@ namespace gr {
             }
           }
         }
-        max_lut_arraysize += 1 + (max_index - max_lut_arraysize); /* 1 for the size at the start of the array */
+        max_lut_arraysize = 1 + max_index; /* 1 for the size at the start of the array */
 
         /* Allocate a 2D Array with pbits * max_lut_arraysize
          * while preserving two-subscript access
