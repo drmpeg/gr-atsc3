@@ -1819,7 +1819,7 @@ namespace gr {
       for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
         buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
       }
-      for(int j = 1; j < m1; j++) {
+      for (int j = 1; j < m1; j++) {
         buffer[j] ^= buffer[j-1];
       }
       for (int t = 0; t < q1; t++) {
@@ -2316,7 +2316,7 @@ namespace gr {
           for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
             buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
           }
-          for(int j = 1; j < m1; j++) {
+          for (int j = 1; j < m1; j++) {
             buffer[j] ^= buffer[j-1];
           }
           for (int t = 0; t < q1; t++) {
