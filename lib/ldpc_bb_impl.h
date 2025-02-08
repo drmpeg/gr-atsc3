@@ -39,27 +39,25 @@ namespace gr {
       template <typename entry_t, size_t rows, size_t cols>
       void ldpc_bf_type_b(entry_t (&table)[rows][cols])
       {
-        size_t max_lut_arraysize = 0;
+        uint16_t max_lut_arraysize = 0;
         const unsigned int pbits = (frame_size) - nbch;
         const unsigned int q = q_val;
 
         for (auto& ldpc_lut_index_entry : ldpc_lut_index) {
-          ldpc_lut_index_entry = 1;
+          ldpc_lut_index_entry = 1; /* 1 for the size at the start of the array */
         }
 
-        uint16_t max_index = 0;
         for (unsigned int row = 0; row < rows; row++) {
           for (unsigned int n = 0; n < 360; n++) {
             for (unsigned int col = 1; col <= table[row][0]; col++) {
               unsigned int current_pbit = (table[row][col] + (n * q)) % pbits;
               ldpc_lut_index[current_pbit]++;
-              if (ldpc_lut_index[current_pbit] > max_index) {
-                max_index = ldpc_lut_index[current_pbit];
+              if (ldpc_lut_index[current_pbit] > max_lut_arraysize) {
+                max_lut_arraysize = ldpc_lut_index[current_pbit];
               }
             }
           }
         }
-        max_lut_arraysize = 1 + max_index; /* 1 for the size at the start of the array */
 
         /* Allocate a 2D Array with pbits * max_lut_arraysize
          * while preserving two-subscript access
@@ -92,14 +90,13 @@ namespace gr {
       {
         int im = 0;
         int row;
-        size_t max_lut_arraysize = 0;
+        uint16_t max_lut_arraysize = 0;
         const unsigned int pbits = (frame_size) - nbch;
 
         for (auto& ldpc_lut_index_entry : ldpc_lut_index) {
-          ldpc_lut_index_entry = 1;
+          ldpc_lut_index_entry = 1; /* 1 for the size at the start of the array */
         }
 
-        uint16_t max_index = 0;
         for (unsigned int row = 0; row < rows; row++) {
           if (im == nbch) {
             break;
@@ -109,23 +106,23 @@ namespace gr {
               if ((im % 360) == 0) {
                 unsigned int current_pbit = table[row][col];
                 ldpc_lut_index[current_pbit]++;
-                if (ldpc_lut_index[current_pbit] > max_index) {
-                  max_index = ldpc_lut_index[current_pbit];
+                if (ldpc_lut_index[current_pbit] > max_lut_arraysize) {
+                  max_lut_arraysize = ldpc_lut_index[current_pbit];
                 }
               }
               else {
                 if (table[row][col] < m1_val) {
                   unsigned int current_pbit = (table[row][col] + (n * q1_val)) % m1_val;
                   ldpc_lut_index[current_pbit]++;
-                  if (ldpc_lut_index[current_pbit] > max_index) {
-                    max_index = ldpc_lut_index[current_pbit];
+                  if (ldpc_lut_index[current_pbit] > max_lut_arraysize) {
+                    max_lut_arraysize = ldpc_lut_index[current_pbit];
                   }
                 }
                 else {
                   unsigned int current_pbit = m1_val + (table[row][col] - m1_val + (n * q2_val)) % m2_val;
                   ldpc_lut_index[current_pbit]++;
-                  if (ldpc_lut_index[current_pbit] > max_index) {
-                    max_index = ldpc_lut_index[current_pbit];
+                  if (ldpc_lut_index[current_pbit] > max_lut_arraysize) {
+                    max_lut_arraysize = ldpc_lut_index[current_pbit];
                   }
                 }
               }
@@ -134,7 +131,6 @@ namespace gr {
           }
         }
         im = 0;
-        max_lut_arraysize = 1 + max_index; /* 1 for the size at the start of the array */
 
         /* Allocate a 2D Array with pbits * max_lut_arraysize
          * while preserving two-subscript access
