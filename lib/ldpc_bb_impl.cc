@@ -322,8 +322,6 @@ namespace gr {
         memcpy(out, &in[consumed], sizeof(unsigned char) * nbch);
         consumed += nbch;
         if (ldpc_type == LDPC_TYPE_A) {
-          // First zero all the parity bits
-          memset(buffer, 0, sizeof(unsigned char)*plen);
           // now do the parity checking
           d = out;
           for (int i_p = 0; i_p < plen; i_p++) {
