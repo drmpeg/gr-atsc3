@@ -236,6 +236,12 @@ namespace gr {
       ldpc_bb_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
       ~ldpc_bb_impl();
 
+      // Disallow copy/move because of the raw pointers.
+      ldpc_bb_impl(const ldpc_bb_impl&) = delete;
+      ldpc_bb_impl(ldpc_bb_impl&&) = delete;
+      ldpc_bb_impl& operator=(const ldpc_bb_impl&) = delete;
+      ldpc_bb_impl& operator=(ldpc_bb_impl&&) = delete;
+
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
