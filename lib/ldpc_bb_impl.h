@@ -28,7 +28,7 @@ namespace gr {
       int m1_val;
       int m2_val;
       int ldpc_lut_index[FRAME_SIZE_NORMAL];
-      unsigned char buffer[FRAME_SIZE_NORMAL];
+      unsigned char buffer[FRAME_SIZE_NORMAL] __attribute__ ((aligned(64)));
       void ldpc_lookup_generate(void);
 
       std::vector<uint16_t*> ldpc_lut; // Pointers into ldpc_lut_data.
@@ -57,6 +57,9 @@ namespace gr {
               }
             }
           }
+        }
+        if (max_lut_arraysize & 0x1) { /* Optimize for RISC-V */
+          max_lut_arraysize++;
         }
 
         /* Allocate a 2D Array with pbits * max_lut_arraysize
@@ -131,6 +134,9 @@ namespace gr {
           }
         }
         im = 0;
+        if (max_lut_arraysize & 0x1) { /* Optimize for RISC-V */
+          max_lut_arraysize++;
+        }
 
         /* Allocate a 2D Array with pbits * max_lut_arraysize
          * while preserving two-subscript access
