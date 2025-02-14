@@ -1697,12 +1697,14 @@ namespace gr {
 
       /* LDPC encoding */
       memcpy(&l1basic[0], &l1temp[0], sizeof(unsigned char) * NBCH_3_15);
-      // First zero all the parity bits
-      memset(buffer, 0, sizeof(unsigned char)*plen);
       // now do the parity checking
       d = &l1basic[0];
-      for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
-        buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
+      for (int i_p = 0; i_p < plen; i_p++) {
+        unsigned char pbit = 0;
+        for (int i_d = 1; i_d < ldpc_lut_a[i_p][0]; i_d++) {
+          pbit ^= d[ldpc_lut_a[i_p][i_d]];
+        }
+        buffer[i_p] = pbit;
       }
       for (int j = 1; j < m1; j++) {
         buffer[j] ^= buffer[j-1];
@@ -1712,8 +1714,16 @@ namespace gr {
           l1basic[NBCH_3_15 + (360 * t) + s] = buffer[(q1 * s) + t];
         }
       }
-      for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
-        buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
+      for (int i_p = 0; i_p < plen; i_p++) {
+        unsigned char pbit = 0;
+        unsigned int count = 0;
+        for (int i_d = 1; i_d < ldpc_lut_a_aux[i_p][0]; i_d++) {
+          pbit ^= d[ldpc_lut_a_aux[i_p][i_d]];
+          count++;
+        }
+        if (count) {
+          buffer[i_p] ^= pbit;
+        }
       }
       for (int t = 0; t < q2; t++) {
         for (int s = 0; s < 360; s++) {
@@ -2162,12 +2172,14 @@ namespace gr {
         case L1_FEC_MODE_1:
         case L1_FEC_MODE_2:
           memcpy(&l1detail[0], &l1temp[0], sizeof(unsigned char) * nbch);
-          // First zero all the parity bits
-          memset(buffer, 0, sizeof(unsigned char)*plen);
           // now do the parity checking
           d = &l1detail[0];
-          for (int j = 0; j < ldpc_encode_1st.table_length; j++) {
-            buffer[ldpc_encode_1st.p[j]] ^= d[ldpc_encode_1st.d[j]];
+          for (int i_p = 0; i_p < plen; i_p++) {
+            unsigned char pbit = 0;
+            for (int i_d = 1; i_d < ldpc_lut_a[i_p][0]; i_d++) {
+              pbit ^= d[ldpc_lut_a[i_p][i_d]];
+            }
+            buffer[i_p] = pbit;
           }
           for (int j = 1; j < m1; j++) {
             buffer[j] ^= buffer[j-1];
@@ -2177,8 +2189,16 @@ namespace gr {
               l1detail[nbch + (360 * t) + s] = buffer[(q1 * s) + t];
             }
           }
-          for (int j = 0; j < ldpc_encode_2nd.table_length; j++) {
-            buffer[ldpc_encode_2nd.p[j]] ^= d[ldpc_encode_2nd.d[j]];
+          for (int i_p = 0; i_p < plen; i_p++) {
+            unsigned char pbit = 0;
+            unsigned int count = 0;
+            for (int i_d = 1; i_d < ldpc_lut_a_aux[i_p][0]; i_d++) {
+              pbit ^= d[ldpc_lut_a_aux[i_p][i_d]];
+              count++;
+            }
+            if (count) {
+              buffer[i_p] ^= pbit;
+            }
           }
           for (int t = 0; t < q2; t++) {
             for (int s = 0; s < 360; s++) {
@@ -2197,8 +2217,8 @@ namespace gr {
           p = &buffer[nbch];
           for (int i_p = 0; i_p < plen; i_p++) {
             unsigned char pbit = 0;
-            for (int i_d = 1; i_d < ldpc_lut[i_p][0]; i_d++) {
-              pbit ^= d[ldpc_lut[i_p][i_d]];
+            for (int i_d = 1; i_d < ldpc_lut_b[i_p][0]; i_d++) {
+              pbit ^= d[ldpc_lut_b[i_p][i_d]];
             }
             p[i_p] = pbit;
           }
