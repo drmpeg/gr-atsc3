@@ -36,6 +36,9 @@ set(VERSION_ABI   0)
 set(VERSION_PATCH 0)
 
 cmake_policy(SET CMP0011 NEW)
+if(POLICY CMP0148)
+    cmake_policy(SET CMP0148 OLD)
+endif()
 
 # Enable generation of compile_commands.json for code completion engines
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
