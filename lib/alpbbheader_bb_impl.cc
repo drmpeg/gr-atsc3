@@ -406,6 +406,11 @@ namespace gr {
               lls_count--;
               if (lls_count == 0) {
                 lls_send = FALSE;
+                const uint64_t tagoffset = this->nitems_written(0);
+                const uint64_t tagvalue = 0;
+                pmt::pmt_t key = pmt::string_to_symbol("lls");
+                pmt::pmt_t value = pmt::from_uint64(tagvalue);
+                this->add_item_tag(0, tagoffset, key, value);
               }
               bits = llstemp[lls_index++];
               sendbits(bits, out);

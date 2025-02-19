@@ -195,6 +195,7 @@ namespace gr {
       }
       code_rate = rate;
       ldpc_lookup_generate();
+      set_tag_propagation_policy(TPP_DONT);
       set_output_multiple(frame_size);
     }
 
@@ -316,6 +317,19 @@ namespace gr {
       const int q1 = q1_val;
       const int q2 = q2_val;
       const int m1 = m1_val;
+
+      std::vector<tag_t> tags;
+      const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+
+      // Read all tags on the input buffer
+      this->get_tags_in_range(tags, 0, nread, nread + ((noutput_items / frame_size) * nbch), pmt::string_to_symbol("lls"));
+      if ((int)tags.size()) {
+        const uint64_t tagoffset = this->nitems_written(0);
+        const uint64_t tagvalue = 0;
+        pmt::pmt_t key = pmt::string_to_symbol("lls");
+        pmt::pmt_t value = pmt::from_uint64(tagvalue);
+        this->add_item_tag(0, tagoffset, key, value);
+      }
 
       for (int i = 0; i < noutput_items; i += frame_size) {
         // copy the information bits

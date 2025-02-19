@@ -141,6 +141,7 @@ namespace gr {
       plp_fec_mode = fecmode;
       bch_poly_build_tables();
       crc32_init();
+      set_tag_propagation_policy(TPP_DONT);
       set_output_multiple(nbch);
     }
 
@@ -304,10 +305,23 @@ namespace gr {
       unsigned char b, temp, msb;
       unsigned int crc32;
 
-      // We can use a 192 bits long bitset, all higher bits not used by the bch will just be
-      // ignored
+      // We can use a 192 bits long bitset, all higher bits not used by the bch
+      // will just be ignored
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       int consumed = 0;
+
+      std::vector<tag_t> tags;
+      const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+
+      // Read all tags on the input buffer
+      this->get_tags_in_range(tags, 0, nread, nread + ((noutput_items / nbch) * kbch), pmt::string_to_symbol("lls"));
+      if ((int)tags.size()) {
+        const uint64_t tagoffset = this->nitems_written(0);
+        const uint64_t tagvalue = 0;
+        pmt::pmt_t key = pmt::string_to_symbol("lls");
+        pmt::pmt_t value = pmt::from_uint64(tagvalue);
+        this->add_item_tag(0, tagoffset, key, value);
+      }
 
       for (int i = 0; i < noutput_items; i += nbch) {
         memcpy(out, in, sizeof(unsigned char) * kbch);

@@ -863,6 +863,7 @@ namespace gr {
           packed_items = frame_size / mod;
           break;
       }
+      set_tag_propagation_policy(TPP_DONT);
     }
 
     /*
@@ -892,6 +893,19 @@ namespace gr {
       int inner = 360 * mod;
       int outer = frame_size / inner;
       unsigned int pack;
+
+      std::vector<tag_t> tags;
+      const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+
+      // Read all tags on the input buffer
+      this->get_tags_in_range(tags, 0, nread, nread + (noutput_items * mod), pmt::string_to_symbol("lls"));
+      if ((int)tags.size()) {
+        const uint64_t tagoffset = this->nitems_written(0);
+        const uint64_t tagvalue = tagoffset + noutput_items;
+        pmt::pmt_t key = pmt::string_to_symbol("lls");
+        pmt::pmt_t value = pmt::from_uint64(tagvalue);
+        this->add_item_tag(0, tagoffset, key, value);
+      }
 
       switch (signal_constellation) {
         case MOD_QPSK:

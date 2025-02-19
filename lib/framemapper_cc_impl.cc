@@ -160,12 +160,6 @@ namespace gr {
 
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
-      if (llsmode == LLS_ON) {
-        l1basicinit->lls_flag = TRUE;
-      }
-      else {
-        l1basicinit->lls_flag = FALSE;
-      }
       l1basicinit->time_info_flag = tifmode;
       if (tifmode != TIF_NOT_INCLUDED) {
 #ifndef TIME_VALIDATION
@@ -365,7 +359,7 @@ namespace gr {
 
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0, 0, FALSE);
       printf("L1-Detail cells = %d\n", l1cells);
-      l1cells += add_l1basic(&l1_dummy[0], 0);
+      l1cells += add_l1basic(&l1_dummy[0], 0, FALSE);
       switch (fftsize) {
         case FFTSIZE_8K:
           fftsamples = 8192;
@@ -1262,6 +1256,7 @@ namespace gr {
         }
       }
 
+      set_tag_propagation_policy(TPP_DONT);
       set_output_multiple(totalcells);
     }
 
@@ -1607,7 +1602,7 @@ namespace gr {
     }
 
     int
-    framemapper_cc_impl::add_l1basic(gr_complex *out, int time_offset)
+    framemapper_cc_impl::add_l1basic(gr_complex *out, int time_offset, int lls_flag)
     {
       int bits, index, offset_bits = 0;
       int npad, padbits, count, nrepeat;
@@ -1631,7 +1626,7 @@ namespace gr {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->mimo_scattered_pilot_encoding;
-      l1basic[offset_bits++] = l1basicinit->lls_flag;
+      l1basic[offset_bits++] = lls_flag;
       bits = l1basicinit->time_info_flag;
       for (int n = 1; n >= 0; n--) {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
@@ -2596,6 +2591,24 @@ namespace gr {
       gr_complex *outtimehti;
       gr_complex *outtimeint;
 
+      std::vector<tag_t> tags;
+      const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+      uint64_t nread_end = nread + (plp_size * (noutput_items / total_cells));
+      uint64_t tagvalue;
+      int lls_flag = FALSE;
+
+      // Read all tags on the input buffer
+      this->get_tags_in_range(tags, 0, nread, nread_end, pmt::string_to_symbol("lls"));
+      if ((int)tags.size()) {
+        tagvalue = pmt::to_uint64(tags[0].value);
+        if (tagvalue > nread_end) {
+          lls_flag = FALSE; /* LLS possibly not entirely in the frame */
+        }
+        else {
+          lls_flag = TRUE;
+        }
+      }
+
       if (sbsnullcells & 0x1) {
         left_nulls = (sbsnullcells / 2);
         right_nulls = (sbsnullcells / 2) + 1;
@@ -2646,7 +2659,7 @@ namespace gr {
         indexin_timeint = 0;
 
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
-        indexout += add_l1basic(&out[0], time_offset);
+        indexout += add_l1basic(&out[0], time_offset, lls_flag);
 
         fec_block_start = cells % fec_cells;
         if (fec_block_start) {
