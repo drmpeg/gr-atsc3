@@ -133,7 +133,7 @@ namespace gr {
       int preamble_syms[NUM_SUBFRAMES];
       int max_output_cells;
       L1Signalling L1_Signalling[1];
-      int add_l1basic(gr_complex*, int);
+      int add_l1basic(gr_complex*, int, int);
       int add_l1detail(gr_complex*, int, int, int, int);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
@@ -168,6 +168,7 @@ namespace gr {
       int frame_samples[NUM_SUBFRAMES];
       long long cells[NUM_SUBFRAMES];
       int fec_cells[NUM_SUBFRAMES];
+      int plp_lls_flag[NUM_SUBFRAMES];
 
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 

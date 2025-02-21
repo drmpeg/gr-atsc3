@@ -167,6 +167,7 @@ namespace gr {
         alpha_vector[i] = alpha;
         beta_vector[i] = beta;
       }
+      set_tag_propagation_policy(TPP_DONT);
       set_output_multiple(num_items);
       set_max_noutput_items(num_items);
     }
@@ -186,6 +187,32 @@ namespace gr {
       auto in0 = static_cast<const input_type*>(input_items[0]);
       auto in1 = static_cast<const input_type*>(input_items[1]);
       auto out = static_cast<output_type*>(output_items[0]);
+
+      std::vector<tag_t> tags;
+      uint64_t nread;
+      uint64_t tagoffset;
+      uint64_t tagvalue;
+
+      nread = this->nitems_read(0); //number of items read on port 0
+      // Read all tags on the input buffer
+      this->get_tags_in_range(tags, 0, nread, nread + noutput_items, pmt::string_to_symbol("lls"));
+      if ((int)tags.size()) {
+        tagoffset = this->nitems_written(0);
+        tagvalue = pmt::to_uint64(tags[0].value);
+        pmt::pmt_t key = pmt::string_to_symbol("llscore");
+        pmt::pmt_t value = pmt::from_uint64(tagvalue);
+        this->add_item_tag(0, tagoffset, key, value);
+      }
+      nread = this->nitems_read(1); //number of items read on port 1
+      // Read all tags on the input buffer
+      this->get_tags_in_range(tags, 1, nread, nread + noutput_items, pmt::string_to_symbol("lls"));
+      if ((int)tags.size()) {
+        tagoffset = this->nitems_written(0);
+        tagvalue = pmt::to_uint64(tags[0].value);
+        pmt::pmt_t key = pmt::string_to_symbol("llsenh");
+        pmt::pmt_t value = pmt::from_uint64(tagvalue);
+        this->add_item_tag(0, tagoffset, key, value);
+      }
 
       volk_32fc_32f_multiply_32fc(&out[0], &in1[0], &alpha_vector[0], noutput_items);
       volk_32fc_x2_add_32fc(&out[0], &out[0], &in0[0], noutput_items);

@@ -158,12 +158,6 @@ namespace gr {
 
       l1basicinit->version = 0;
       l1basicinit->mimo_scattered_pilot_encoding = MSPE_WALSH_HADAMARD_PILOTS;
-      if (llsmodeplp0 == LLS_ON || llsmodeplp1 == LLS_ON) {
-        l1basicinit->lls_flag = TRUE;
-      }
-      else {
-        l1basicinit->lls_flag = FALSE;
-      }
       l1basicinit->time_info_flag = TIF_NOT_INCLUDED;
       l1basicinit->return_channel_flag = FALSE;
       l1basicinit->papr_reduction = paprmode;
@@ -221,6 +215,7 @@ namespace gr {
       else {
         l1detailinit[0][0]->plp_lls_flag = FALSE;
       }
+      plp_lls_flag[0] = l1detailinit[0][0]->plp_lls_flag;
       l1detailinit[0][0]->plp_layer = 0;
       l1detailinit[0][0]->plp_start = 0;
       l1detailinit[0][0]->plp_scrambler_type = 0;
@@ -315,6 +310,7 @@ namespace gr {
       else {
         l1detailinit[0][1]->plp_lls_flag = FALSE;
       }
+      plp_lls_flag[1] = l1detailinit[0][1]->plp_lls_flag;
       l1detailinit[0][1]->plp_layer = 0;
       l1detailinit[0][1]->plp_start = 0;
       l1detailinit[0][1]->plp_scrambler_type = 0;
@@ -405,7 +401,7 @@ namespace gr {
 
       l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0, 0);
       printf("L1-Detail cells = %d\n", l1cells);
-      l1cells += add_l1basic(&l1_dummy[0], 0);
+      l1cells += add_l1basic(&l1_dummy[0], 0, FALSE);
       switch (fftsize) {
         case FFTSIZE_8K:
           fftsamples = 8192;
@@ -1167,6 +1163,7 @@ namespace gr {
         }
       }
 
+      set_tag_propagation_policy(TPP_DONT);
       set_output_multiple(totalcells);
     }
 
@@ -1492,7 +1489,7 @@ namespace gr {
     }
 
     int
-    fdmframemapper_cc_impl::add_l1basic(gr_complex *out, int time_offset)
+    fdmframemapper_cc_impl::add_l1basic(gr_complex *out, int time_offset, int lls_flag)
     {
       int bits, index, offset_bits = 0;
       int npad, padbits, count, nrepeat;
@@ -1516,7 +1513,7 @@ namespace gr {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
       }
       l1basic[offset_bits++] = l1basicinit->mimo_scattered_pilot_encoding;
-      l1basic[offset_bits++] = l1basicinit->lls_flag;
+      l1basic[offset_bits++] = lls_flag;
       bits = l1basicinit->time_info_flag;
       for (int n = 1; n >= 0; n--) {
         l1basic[offset_bits++] = bits & (1 << n) ? 1 : 0;
@@ -2451,6 +2448,37 @@ namespace gr {
       gr_complex *outfreqdisp;
       gr_complex *infreqdisp[NUM_PLPS];
 
+      std::vector<tag_t> tags;
+      uint64_t nread;
+      uint64_t nread_end;
+      uint64_t tagvalue;
+      int lls_flag = FALSE;
+
+      if (plp_lls_flag[0] == TRUE) {
+        nread = this->nitems_read(0); //number of items read on port 0
+        nread_end = nread + (plp_size[0] * (noutput_items / total_cells));
+        // Read all tags on the input buffer
+        this->get_tags_in_range(tags, 0, nread, nread_end, pmt::string_to_symbol("lls"));
+        if ((int)tags.size()) {
+          tagvalue = pmt::to_uint64(tags[0].value);
+          if (tagvalue <= nread_end) {
+            lls_flag = TRUE; /* LLS is entirely in the frame */
+          }
+        }
+      }
+      if (lls_flag == FALSE && plp_lls_flag[1] == TRUE) {
+        nread = this->nitems_read(1); //number of items read on port 1
+        nread_end = nread + (plp_size[1] * (noutput_items / total_cells));
+        // Read all tags on the input buffer
+        this->get_tags_in_range(tags, 1, nread, nread_end, pmt::string_to_symbol("lls"));
+        if ((int)tags.size()) {
+          tagvalue = pmt::to_uint64(tags[0].value);
+          if (tagvalue <= nread_end) {
+            lls_flag = TRUE; /* LLS is entirely in the frame */
+          }
+        }
+      }
+
       if (sbsnullcells & 0x1) {
         left_nulls = (sbsnullcells / 2);
         right_nulls = (sbsnullcells / 2) + 1;
@@ -2511,7 +2539,7 @@ namespace gr {
         memcpy(outfreqdisp, infreqdisp[1], sizeof(gr_complex) * slice_last_size[1]);
 
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
-        indexout += add_l1basic(&out[0], time_offset);
+        indexout += add_l1basic(&out[0], time_offset, lls_flag);
 
         fec_block_start[0] = cells[0] % fec_cells[0];
         if (fec_block_start[0]) {
