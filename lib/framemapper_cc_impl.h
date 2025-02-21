@@ -168,6 +168,7 @@ namespace gr {
       int frame_samples;
       long long cells;
       int fec_cells;
+      int plp_lls_flag;
       struct timespec tai;
       int time_msec, time_usec, time_nsec;
       double frac_nsec, frame_nsec;

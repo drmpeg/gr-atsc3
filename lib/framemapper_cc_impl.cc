@@ -254,6 +254,7 @@ namespace gr {
       else {
         l1detailinit[0][0]->plp_lls_flag = FALSE;
       }
+      plp_lls_flag = l1detailinit[0][0]->plp_lls_flag;
       l1detailinit[0][0]->plp_layer = 0;
       l1detailinit[0][0]->plp_start = 0;
       l1detailinit[0][0]->plp_scrambler_type = 0;
@@ -2592,20 +2593,21 @@ namespace gr {
       gr_complex *outtimeint;
 
       std::vector<tag_t> tags;
-      const uint64_t nread = this->nitems_read(0); //number of items read on port 0
-      uint64_t nread_end = nread + (plp_size * (noutput_items / total_cells));
+      uint64_t nread;
+      uint64_t nread_end;
       uint64_t tagvalue;
       int lls_flag = FALSE;
 
-      // Read all tags on the input buffer
-      this->get_tags_in_range(tags, 0, nread, nread_end, pmt::string_to_symbol("lls"));
-      if ((int)tags.size()) {
-        tagvalue = pmt::to_uint64(tags[0].value);
-        if (tagvalue > nread_end) {
-          lls_flag = FALSE; /* LLS possibly not entirely in the frame */
-        }
-        else {
-          lls_flag = TRUE;
+      if (plp_lls_flag == TRUE) {
+        nread = this->nitems_read(0); //number of items read on port 0
+        nread_end = nread + (plp_size * (noutput_items / total_cells));
+        // Read all tags on the input buffer
+        this->get_tags_in_range(tags, 0, nread, nread_end, pmt::string_to_symbol("lls"));
+        if ((int)tags.size()) {
+          tagvalue = pmt::to_uint64(tags[0].value);
+          if (tagvalue <= nread_end) {
+            lls_flag = TRUE; /* LLS is entirely in the frame */
+          }
         }
       }
 
