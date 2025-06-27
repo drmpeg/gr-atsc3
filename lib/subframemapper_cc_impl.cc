@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "subframemapper_cc_impl.h"
+#include "params.h"
 #include <algorithm>
 
 namespace gr {
@@ -32,6 +33,7 @@ namespace gr {
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       L1_Detail *l1detailinit[NUM_SUBFRAMES][NUM_PLPS];
+      struct fec_params_t p;
       double normalization;
       int rateindex, i, j, l1cells, totalcells[NUM_SUBFRAMES];
       int fftsamples[2], gisamples[2];
@@ -1768,47 +1770,8 @@ namespace gr {
       ti_fecblocks[0] = tifecblocksplp0;
       ti_fecblocks_max[0] = tifecblocksmaxplp0;
       commutator[0] = 0;
-      switch (rateplp0) {
-        case C2_15:
-          rateindex = 0;
-          break;
-        case C3_15:
-          rateindex = 1;
-          break;
-        case C4_15:
-          rateindex = 2;
-          break;
-        case C5_15:
-          rateindex = 3;
-          break;
-        case C6_15:
-          rateindex = 4;
-          break;
-        case C7_15:
-          rateindex = 5;
-          break;
-        case C8_15:
-          rateindex = 6;
-          break;
-        case C9_15:
-          rateindex = 7;
-          break;
-        case C10_15:
-          rateindex = 8;
-          break;
-        case C11_15:
-          rateindex = 9;
-          break;
-        case C12_15:
-          rateindex = 10;
-          break;
-        case C13_15:
-          rateindex = 11;
-          break;
-        default:
-          rateindex = 0;
-          break;
-      }
+      p = fec_params(framesizeplp0, rateplp0);
+      rateindex = p.rate_index;
       switch (constellationplp0) {
         case MOD_QPSK:
           normalization = std::sqrt(2.0);
@@ -1970,47 +1933,8 @@ namespace gr {
       ti_fecblocks[1] = tifecblocksplp1;
       ti_fecblocks_max[1] = tifecblocksmaxplp1;
       commutator[1] = 0;
-      switch (rateplp1) {
-        case C2_15:
-          rateindex = 0;
-          break;
-        case C3_15:
-          rateindex = 1;
-          break;
-        case C4_15:
-          rateindex = 2;
-          break;
-        case C5_15:
-          rateindex = 3;
-          break;
-        case C6_15:
-          rateindex = 4;
-          break;
-        case C7_15:
-          rateindex = 5;
-          break;
-        case C8_15:
-          rateindex = 6;
-          break;
-        case C9_15:
-          rateindex = 7;
-          break;
-        case C10_15:
-          rateindex = 8;
-          break;
-        case C11_15:
-          rateindex = 9;
-          break;
-        case C12_15:
-          rateindex = 10;
-          break;
-        case C13_15:
-          rateindex = 11;
-          break;
-        default:
-          rateindex = 0;
-          break;
-      }
+      p = fec_params(framesizeplp1, rateplp1);
+      rateindex = p.rate_index;
       switch (constellationplp1) {
         case MOD_QPSK:
           normalization = std::sqrt(2.0);

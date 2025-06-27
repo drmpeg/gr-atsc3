@@ -30,6 +30,7 @@ list(APPEND atsc3_sources
     cyclicprefixer_cc_impl.cc
     tdmframemapper_cc_impl.cc
     fdmframemapper_cc_impl.cc
+    params.cc
 )
 
 set(atsc3_sources "${atsc3_sources}" PARENT_SCOPE)

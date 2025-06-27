@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "ldmframemapper_cc_impl.h"
+#include "params.h"
 
 namespace gr {
   namespace atsc3 {
@@ -1072,47 +1073,8 @@ namespace gr {
       ti_fecblocks = tifecblocks;
       ti_fecblocks_max = tifecblocksmax;
       commutator = 0;
-      switch (rate_core) {
-        case C2_15:
-          rateindex = 0;
-          break;
-        case C3_15:
-          rateindex = 1;
-          break;
-        case C4_15:
-          rateindex = 2;
-          break;
-        case C5_15:
-          rateindex = 3;
-          break;
-        case C6_15:
-          rateindex = 4;
-          break;
-        case C7_15:
-          rateindex = 5;
-          break;
-        case C8_15:
-          rateindex = 6;
-          break;
-        case C9_15:
-          rateindex = 7;
-          break;
-        case C10_15:
-          rateindex = 8;
-          break;
-        case C11_15:
-          rateindex = 9;
-          break;
-        case C12_15:
-          rateindex = 10;
-          break;
-        case C13_15:
-          rateindex = 11;
-          break;
-        default:
-          rateindex = 0;
-          break;
-      }
+      struct fec_params_t p = fec_params(framesize_core, rate_core);
+      rateindex = p.rate_index;
       switch (constellation_core) {
         case MOD_QPSK:
           normalization = std::sqrt(2.0);

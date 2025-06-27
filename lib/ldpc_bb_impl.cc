@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "ldpc_bb_impl.h"
+#include "params.h"
 
 namespace gr {
   namespace atsc3 {
@@ -32,167 +33,18 @@ namespace gr {
       frame_size_type = framesize;
       if (framesize == FECFRAME_NORMAL) {
         frame_size = FRAME_SIZE_NORMAL;
-        switch (rate) {
-          case C2_15:
-            nbch = 8640;
-            q1_val = 5;
-            q2_val = 151;
-            m1_val = 1800;
-            m2_val = 54360;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C3_15:
-            nbch = 12960;
-            q1_val = 5;
-            q2_val = 139;
-            m1_val = 1800;
-            m2_val = 50040;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C4_15:
-            nbch = 17280;
-            q1_val = 5;
-            q2_val = 127;
-            m1_val = 1800;
-            m2_val = 45720;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C5_15:
-            nbch = 21600;
-            q1_val = 4;
-            q2_val = 116;
-            m1_val = 1440;
-            m2_val = 41760;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C6_15:
-            nbch = 25920;
-            q_val = 108;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C7_15:
-            nbch = 30240;
-            q1_val = 3;
-            q2_val = 93;
-            m1_val = 1080;
-            m2_val = 33480;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C8_15:
-            nbch = 34560;
-            q_val = 84;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C9_15:
-            nbch = 38880;
-            q_val = 72;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C10_15:
-            nbch = 43200;
-            q_val = 60;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C11_15:
-            nbch = 47520;
-            q_val = 48;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C12_15:
-            nbch = 51840;
-            q_val = 36;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C13_15:
-            nbch = 56160;
-            q_val = 24;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          default:
-            nbch = 0;
-            break;
-        }
       }
       else if (framesize == FECFRAME_SHORT) {
         frame_size = FRAME_SIZE_SHORT;
-        switch (rate) {
-          case C2_15:
-            nbch = 2160;
-            q1_val = 9;
-            q2_val = 30;
-            m1_val = 3240;
-            m2_val = 10800;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C3_15:
-            nbch = 3240;
-            q1_val = 3;
-            q2_val = 33;
-            m1_val = 1080;
-            m2_val = 11880;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C4_15:
-            nbch = 4320;
-            q1_val = 3;
-            q2_val = 30;
-            m1_val = 1080;
-            m2_val = 10800;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C5_15:
-            nbch = 5400;
-            q1_val = 2;
-            q2_val = 28;
-            m1_val = 720;
-            m2_val = 10080;
-            ldpc_type = LDPC_TYPE_A;
-            break;
-          case C6_15:
-            nbch = 6480;
-            q_val = 27;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C7_15:
-            nbch = 7560;
-            q_val = 24;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C8_15:
-            nbch = 8640;
-            q_val = 21;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C9_15:
-            nbch = 9720;
-            q_val = 18;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C10_15:
-            nbch = 10800;
-            q_val = 15;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C11_15:
-            nbch = 11880;
-            q_val = 12;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C12_15:
-            nbch = 12960;
-            q_val = 9;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          case C13_15:
-            nbch = 14040;
-            q_val = 6;
-            ldpc_type = LDPC_TYPE_B;
-            break;
-          default:
-            nbch = 0;
-            break;
-        }
       }
+      struct fec_params_t p = fec_params(framesize, rate);
+      nbch = p.nbch;
+      q_val = p.q_val;
+      q1_val = p.q1_val;
+      q2_val = p.q2_val;
+      m1_val = p.m1_val;
+      m2_val = p.m2_val;
+      ldpc_type = p.ldpc_type;
       code_rate = rate;
       ldpc_lookup_generate();
       set_tag_propagation_policy(TPP_DONT);

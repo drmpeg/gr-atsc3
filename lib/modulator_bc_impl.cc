@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "modulator_bc_impl.h"
+#include "params.h"
 
 namespace gr {
   namespace atsc3 {
@@ -75,47 +76,8 @@ namespace gr {
             break;
         }
       }
-      switch (rate) {
-        case C2_15:
-          rateindex = 0;
-          break;
-        case C3_15:
-          rateindex = 1;
-          break;
-        case C4_15:
-          rateindex = 2;
-          break;
-        case C5_15:
-          rateindex = 3;
-          break;
-        case C6_15:
-          rateindex = 4;
-          break;
-        case C7_15:
-          rateindex = 5;
-          break;
-        case C8_15:
-          rateindex = 6;
-          break;
-        case C9_15:
-          rateindex = 7;
-          break;
-        case C10_15:
-          rateindex = 8;
-          break;
-        case C11_15:
-          rateindex = 9;
-          break;
-        case C12_15:
-          rateindex = 10;
-          break;
-        case C13_15:
-          rateindex = 11;
-          break;
-        default:
-          rateindex = 0;
-          break;
-      }
+      struct fec_params_t p = fec_params(framesize, rate);
+      rateindex = p.rate_index;
       m_1024qam = &mod_table_1024QAM[rateindex][0];
       m_4096qam = &mod_table_4096QAM[rateindex][0];
       switch (constellation) {

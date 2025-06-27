@@ -7,6 +7,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "bbscrambler_bb_impl.h"
+#include "params.h"
 
 namespace gr {
   namespace atsc3 {
@@ -51,92 +52,8 @@ namespace gr {
           num_fec_bits = 0;
           break;
       }
-      if (framesize == FECFRAME_NORMAL) {
-        switch (rate) {
-          case C2_15:
-            nbch = 8640;
-            break;
-          case C3_15:
-            nbch = 12960;
-            break;
-          case C4_15:
-            nbch = 17280;
-            break;
-          case C5_15:
-            nbch = 21600;
-            break;
-          case C6_15:
-            nbch = 25920;
-            break;
-          case C7_15:
-            nbch = 30240;
-            break;
-          case C8_15:
-            nbch = 34560;
-            break;
-          case C9_15:
-            nbch = 38880;
-            break;
-          case C10_15:
-            nbch = 43200;
-            break;
-          case C11_15:
-            nbch = 47520;
-            break;
-          case C12_15:
-            nbch = 51840;
-            break;
-          case C13_15:
-            nbch = 56160;
-            break;
-          default:
-            nbch = 0;
-            break;
-        }
-      }
-      else if (framesize == FECFRAME_SHORT) {
-        switch (rate) {
-          case C2_15:
-            nbch = 2160;
-            break;
-          case C3_15:
-            nbch = 3240;
-            break;
-          case C4_15:
-            nbch = 4320;
-            break;
-          case C5_15:
-            nbch = 5400;
-            break;
-          case C6_15:
-            nbch = 6480;
-            break;
-          case C7_15:
-            nbch = 7560;
-            break;
-          case C8_15:
-            nbch = 8640;
-            break;
-          case C9_15:
-            nbch = 9720;
-            break;
-          case C10_15:
-            nbch = 10800;
-            break;
-          case C11_15:
-            nbch = 11880;
-            break;
-          case C12_15:
-            nbch = 12960;
-            break;
-          case C13_15:
-            nbch = 14040;
-            break;
-          default:
-            nbch = 0;
-            break;
-        }
-      }
+      struct fec_params_t p = fec_params(framesize, rate);
+      nbch = p.nbch;
       kbch = nbch - num_fec_bits;
       init_bb_randomizer();
       set_output_multiple(kbch);
