@@ -72,14 +72,7 @@ namespace gr {
       const gr_complex *miso_coefficients;
       std::vector<gr_complex> miso_rotation;
 
-      const static int carriers_table[3][5];
-      const static int preamble_dx_table[32];
-      const static double preamble_power_table[32];
       const static double scattered_power_table[16][5];
-      const static double preamble_ifft_power_table[32][5];
-      const static double data_ifft_power_table_8K[16][5][5];
-      const static double data_ifft_power_table_16K[16][5][5];
-      const static double data_ifft_power_table_32K[16][5][5];
       const static int continual_pilot_table_8K[48];
       const static int continual_pilot_table_16K[96];
       const static int continual_pilot_table_32K[192];
@@ -89,13 +82,6 @@ namespace gr {
       const static int trpapr_alt_table_8K[72];
       const static int trpapr_alt_table_16K[144];
       const static int trpapr_alt_table_32K[288];
-      const static int preamble_cells_table[32][5];
-      const static int data_cells_table_8K[16][5];
-      const static int data_cells_table_16K[16][5];
-      const static int data_cells_table_32K[16][5];
-      const static int sbs_cells_table_8K[16][5];
-      const static int sbs_cells_table_16K[16][5];
-      const static int sbs_cells_table_32K[16][5];
       const static gr_complex miso_coefficients_64_1_2[64];
       const static gr_complex miso_coefficients_64_2_2[64];
       const static gr_complex miso_coefficients_64_1_3[64];

@@ -226,5 +226,854 @@ namespace gr {
       return p;
     }
 
+    struct ofdm_params_t ofdm_params(atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_reduced_carriers_t cred)
+    {
+      struct ofdm_params_t p;
+      switch (fftsize) {
+        case FFTSIZE_8K:
+          p.fftsamples = 8192;
+          p.papr_cells = 72;
+          p.carriers = carriers_table[FFTSIZE_8K][cred];
+          p.max_carriers = carriers_table[FFTSIZE_8K][0];
+          p.preamble_carriers = carriers_table[FFTSIZE_8K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[0][4];
+              p.preamble_cells = preamble_cells_table[0][cred];
+              p.preamble_dx = preamble_dx_table[0];
+              p.preamble_power = preamble_power_table[0];
+              p.preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[0][4];
+              break;
+            case GI_2_384:
+              p.gisamples = 384;
+              p.first_preamble_cells = preamble_cells_table[1][4];
+              p.preamble_cells = preamble_cells_table[1][cred];
+              p.preamble_dx = preamble_dx_table[1];
+              p.preamble_power = preamble_power_table[1];
+              p.preamble_ifft_power = preamble_ifft_power_table[1][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[1][4];
+              break;
+            case GI_3_512:
+              p.gisamples = 512;
+              p.first_preamble_cells = preamble_cells_table[2][4];
+              p.preamble_cells = preamble_cells_table[2][cred];
+              p.preamble_dx = preamble_dx_table[2];
+              p.preamble_power = preamble_power_table[2];
+              p.preamble_ifft_power = preamble_ifft_power_table[2][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[2][4];
+              break;
+            case GI_4_768:
+              p.gisamples = 768;
+              p.first_preamble_cells = preamble_cells_table[3][4];
+              p.preamble_cells = preamble_cells_table[3][cred];
+              p.preamble_dx = preamble_dx_table[3];
+              p.preamble_power = preamble_power_table[3];
+              p.preamble_ifft_power = preamble_ifft_power_table[3][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[3][4];
+              break;
+            case GI_5_1024:
+              p.gisamples = 1024;
+              p.first_preamble_cells = preamble_cells_table[4][4];
+              p.preamble_cells = preamble_cells_table[4][cred];
+              p.preamble_dx = preamble_dx_table[4];
+              p.preamble_power = preamble_power_table[4];
+              p.preamble_ifft_power = preamble_ifft_power_table[4][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[4][4];
+              break;
+            case GI_6_1536:
+              p.gisamples = 1536;
+              p.first_preamble_cells = preamble_cells_table[5][4];
+              p.preamble_cells = preamble_cells_table[5][cred];
+              p.preamble_dx = preamble_dx_table[5];
+              p.preamble_power = preamble_power_table[5];
+              p.preamble_ifft_power = preamble_ifft_power_table[5][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[5][4];
+              break;
+            case GI_7_2048:
+              p.gisamples = 2048;
+              p.first_preamble_cells = preamble_cells_table[6][4];
+              p.preamble_cells = preamble_cells_table[6][cred];
+              p.preamble_dx = preamble_dx_table[6];
+              p.preamble_power = preamble_power_table[6];
+              p.preamble_ifft_power = preamble_ifft_power_table[6][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[6][4];
+              break;
+            default:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[0][4];
+              p.preamble_cells = preamble_cells_table[0][cred];
+              p.preamble_dx = preamble_dx_table[0];
+              p.preamble_power = preamble_power_table[0];
+              p.preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[0][4];
+              break;
+          }
+          switch (pilotpattern) {
+            case PILOT_SP3_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
+              break;
+            case PILOT_SP3_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP3_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP3_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP3_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_4][cred][pilotboost];
+              break;
+            case PILOT_SP4_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP4_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP4_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP4_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_2][cred][pilotboost];
+              break;
+            case PILOT_SP4_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP4_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP4_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP4_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_4][cred][pilotboost];
+              break;
+            case PILOT_SP6_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP6_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP6_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP6_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_2][cred][pilotboost];
+              break;
+            case PILOT_SP6_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP6_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP6_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP6_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_4][cred][pilotboost];
+              break;
+            case PILOT_SP8_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP8_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP8_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP8_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_2][cred][pilotboost];
+              break;
+            case PILOT_SP8_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP8_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP8_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP8_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_4][cred][pilotboost];
+              break;
+            case PILOT_SP12_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP12_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP12_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP12_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_2][cred][pilotboost];
+              break;
+            case PILOT_SP12_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP12_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP12_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP12_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_4][cred][pilotboost];
+              break;
+            case PILOT_SP16_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP16_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP16_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP16_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_2][cred][pilotboost];
+              break;
+            case PILOT_SP16_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP16_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP16_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP16_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_4][cred][pilotboost];
+              break;
+            case PILOT_SP24_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP24_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP24_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP24_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_2][cred][pilotboost];
+              break;
+            case PILOT_SP24_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP24_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP24_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP24_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_4][cred][pilotboost];
+              break;
+            case PILOT_SP32_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP32_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP32_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP32_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_2][cred][pilotboost];
+              break;
+            case PILOT_SP32_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP32_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP32_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP32_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_4][cred][pilotboost];
+              break;
+            default:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
+              break;
+          }
+          break;
+        case FFTSIZE_16K:
+          p.fftsamples = 16384;
+          p.papr_cells = 144;
+          p.carriers = carriers_table[FFTSIZE_16K][cred];
+          p.max_carriers = carriers_table[FFTSIZE_16K][0];
+          p.preamble_carriers = carriers_table[FFTSIZE_16K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[7][4];
+              p.preamble_cells = preamble_cells_table[7][cred];
+              p.preamble_dx = preamble_dx_table[7];
+              p.preamble_power = preamble_power_table[7];
+              p.preamble_ifft_power = preamble_ifft_power_table[7][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[7][4];
+              break;
+            case GI_2_384:
+              p.gisamples = 384;
+              p.first_preamble_cells = preamble_cells_table[8][4];
+              p.preamble_cells = preamble_cells_table[8][cred];
+              p.preamble_dx = preamble_dx_table[8];
+              p.preamble_power = preamble_power_table[8];
+              p.preamble_ifft_power = preamble_ifft_power_table[8][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[8][4];
+              break;
+            case GI_3_512:
+              p.gisamples = 512;
+              p.first_preamble_cells = preamble_cells_table[9][4];
+              p.preamble_cells = preamble_cells_table[9][cred];
+              p.preamble_dx = preamble_dx_table[9];
+              p.preamble_power = preamble_power_table[9];
+              p.preamble_ifft_power = preamble_ifft_power_table[9][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[9][4];
+              break;
+            case GI_4_768:
+              p.gisamples = 768;
+              p.first_preamble_cells = preamble_cells_table[10][4];
+              p.preamble_cells = preamble_cells_table[10][cred];
+              p.preamble_dx = preamble_dx_table[10];
+              p.preamble_power = preamble_power_table[10];
+              p.preamble_ifft_power = preamble_ifft_power_table[10][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[10][4];
+              break;
+            case GI_5_1024:
+              p.gisamples = 1024;
+              p.first_preamble_cells = preamble_cells_table[11][4];
+              p.preamble_cells = preamble_cells_table[11][cred];
+              p.preamble_dx = preamble_dx_table[11];
+              p.preamble_power = preamble_power_table[11];
+              p.preamble_ifft_power = preamble_ifft_power_table[11][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[11][4];
+              break;
+            case GI_6_1536:
+              p.gisamples = 1536;
+              p.first_preamble_cells = preamble_cells_table[12][4];
+              p.preamble_cells = preamble_cells_table[12][cred];
+              p.preamble_dx = preamble_dx_table[12];
+              p.preamble_power = preamble_power_table[12];
+              p.preamble_ifft_power = preamble_ifft_power_table[12][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[12][4];
+              break;
+            case GI_7_2048:
+              p.gisamples = 2048;
+              p.first_preamble_cells = preamble_cells_table[13][4];
+              p.preamble_cells = preamble_cells_table[13][cred];
+              p.preamble_dx = preamble_dx_table[13];
+              p.preamble_power = preamble_power_table[13];
+              p.preamble_ifft_power = preamble_ifft_power_table[13][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[13][4];
+              break;
+            case GI_8_2432:
+              p.gisamples = 2432;
+              p.first_preamble_cells = preamble_cells_table[14][4];
+              p.preamble_cells = preamble_cells_table[14][cred];
+              p.preamble_dx = preamble_dx_table[14];
+              p.preamble_power = preamble_power_table[14];
+              p.preamble_ifft_power = preamble_ifft_power_table[14][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[14][4];
+              break;
+            case GI_9_3072:
+              p.gisamples = 3072;
+              p.first_preamble_cells = preamble_cells_table[15][4];
+              p.preamble_cells = preamble_cells_table[15][cred];
+              p.preamble_dx = preamble_dx_table[15];
+              p.preamble_power = preamble_power_table[15];
+              p.preamble_ifft_power = preamble_ifft_power_table[15][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[15][4];
+              break;
+            case GI_10_3648:
+              p.gisamples = 3648;
+              p.first_preamble_cells = preamble_cells_table[16][4];
+              p.preamble_cells = preamble_cells_table[16][cred];
+              p.preamble_dx = preamble_dx_table[16];
+              p.preamble_power = preamble_power_table[16];
+              p.preamble_ifft_power = preamble_ifft_power_table[16][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[16][4];
+              break;
+            case GI_11_4096:
+              p.gisamples = 4096;
+              p.first_preamble_cells = preamble_cells_table[17][4];
+              p.preamble_cells = preamble_cells_table[17][cred];
+              p.preamble_dx = preamble_dx_table[17];
+              p.preamble_power = preamble_power_table[17];
+              p.preamble_ifft_power = preamble_ifft_power_table[17][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[17][4];
+              break;
+            default:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[7][4];
+              p.preamble_cells = preamble_cells_table[7][cred];
+              p.preamble_dx = preamble_dx_table[7];
+              p.preamble_power = preamble_power_table[7];
+              p.preamble_ifft_power = preamble_ifft_power_table[7][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[7][4];
+              break;
+          }
+          switch (pilotpattern) {
+            case PILOT_SP3_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP3_2][cred][pilotboost];
+              break;
+            case PILOT_SP3_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP3_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP3_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP3_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP3_4][cred][pilotboost];
+              break;
+            case PILOT_SP4_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP4_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP4_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP4_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP4_2][cred][pilotboost];
+              break;
+            case PILOT_SP4_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP4_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP4_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP4_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP4_4][cred][pilotboost];
+              break;
+            case PILOT_SP6_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP6_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP6_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP6_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP6_2][cred][pilotboost];
+              break;
+            case PILOT_SP6_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP6_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP6_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP6_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP6_4][cred][pilotboost];
+              break;
+            case PILOT_SP8_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP8_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP8_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP8_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP8_2][cred][pilotboost];
+              break;
+            case PILOT_SP8_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP8_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP8_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP8_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP8_4][cred][pilotboost];
+              break;
+            case PILOT_SP12_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP12_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP12_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP12_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP12_2][cred][pilotboost];
+              break;
+            case PILOT_SP12_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP12_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP12_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP12_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP12_4][cred][pilotboost];
+              break;
+            case PILOT_SP16_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP16_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP16_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP16_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP16_2][cred][pilotboost];
+              break;
+            case PILOT_SP16_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP16_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP16_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP16_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP16_4][cred][pilotboost];
+              break;
+            case PILOT_SP24_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP24_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP24_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP24_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP24_2][cred][pilotboost];
+              break;
+            case PILOT_SP24_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP24_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP24_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP24_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP24_4][cred][pilotboost];
+              break;
+            case PILOT_SP32_2:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP32_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP32_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP32_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP32_2][cred][pilotboost];
+              break;
+            case PILOT_SP32_4:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP32_4][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP32_4][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP32_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP32_4][cred][pilotboost];
+              break;
+            default:
+              p.data_ifft_power = data_ifft_power_table_16K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_16K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_16K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_16K[PILOT_SP3_2][cred][pilotboost];
+              break;
+          }
+          break;
+        case FFTSIZE_32K:
+          p.fftsamples = 32768;
+          p.papr_cells = 288;
+          p.carriers = carriers_table[FFTSIZE_32K][cred];
+          p.max_carriers = carriers_table[FFTSIZE_32K][0];
+          p.preamble_carriers = carriers_table[FFTSIZE_32K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[18][4];
+              p.preamble_cells = preamble_cells_table[18][cred];
+              p.preamble_dx = preamble_dx_table[18];
+              p.preamble_power = preamble_power_table[18];
+              p.preamble_ifft_power = preamble_ifft_power_table[18][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[18][4];
+              break;
+            case GI_2_384:
+              p.gisamples = 384;
+              p.first_preamble_cells = preamble_cells_table[19][4];
+              p.preamble_cells = preamble_cells_table[19][cred];
+              p.preamble_dx = preamble_dx_table[19];
+              p.preamble_power = preamble_power_table[19];
+              p.preamble_ifft_power = preamble_ifft_power_table[19][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[19][4];
+              break;
+            case GI_3_512:
+              p.gisamples = 512;
+              p.first_preamble_cells = preamble_cells_table[20][4];
+              p.preamble_cells = preamble_cells_table[20][cred];
+              p.preamble_dx = preamble_dx_table[20];
+              p.preamble_power = preamble_power_table[20];
+              p.preamble_ifft_power = preamble_ifft_power_table[20][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[20][4];
+              break;
+            case GI_4_768:
+              p.gisamples = 768;
+              p.first_preamble_cells = preamble_cells_table[21][4];
+              p.preamble_cells = preamble_cells_table[21][cred];
+              p.preamble_dx = preamble_dx_table[21];
+              p.preamble_power = preamble_power_table[21];
+              p.preamble_ifft_power = preamble_ifft_power_table[21][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[21][4];
+              break;
+            case GI_5_1024:
+              p.gisamples = 1024;
+              p.first_preamble_cells = preamble_cells_table[22][4];
+              p.preamble_cells = preamble_cells_table[22][cred];
+              p.preamble_dx = preamble_dx_table[22];
+              p.preamble_power = preamble_power_table[22];
+              p.preamble_ifft_power = preamble_ifft_power_table[22][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[22][4];
+              break;
+            case GI_6_1536:
+              p.gisamples = 1536;
+              p.first_preamble_cells = preamble_cells_table[23][4];
+              p.preamble_cells = preamble_cells_table[23][cred];
+              p.preamble_dx = preamble_dx_table[23];
+              p.preamble_power = preamble_power_table[23];
+              p.preamble_ifft_power = preamble_ifft_power_table[23][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[23][4];
+              break;
+            case GI_7_2048:
+              p.gisamples = 2048;
+              p.first_preamble_cells = preamble_cells_table[24][4];
+              p.preamble_cells = preamble_cells_table[24][cred];
+              p.preamble_dx = preamble_dx_table[24];
+              p.preamble_power = preamble_power_table[24];
+              p.preamble_ifft_power = preamble_ifft_power_table[24][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[24][4];
+              break;
+            case GI_8_2432:
+              p.gisamples = 2432;
+              p.first_preamble_cells = preamble_cells_table[25][4];
+              p.preamble_cells = preamble_cells_table[25][cred];
+              p.preamble_dx = preamble_dx_table[25];
+              p.preamble_power = preamble_power_table[25];
+              p.preamble_ifft_power = preamble_ifft_power_table[25][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[25][4];
+              break;
+            case GI_9_3072:
+              p.gisamples = 3072;
+              if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
+                p.first_preamble_cells = preamble_cells_table[26][4];
+                p.preamble_cells = preamble_cells_table[26][cred];
+                p.preamble_dx = preamble_dx_table[26];
+                p.preamble_power = preamble_power_table[26];
+                p.preamble_ifft_power = preamble_ifft_power_table[26][cred];
+                p.first_preamble_ifft_power = preamble_ifft_power_table[26][4];
+              }
+              else {
+                p.first_preamble_cells = preamble_cells_table[27][4];
+                p.preamble_cells = preamble_cells_table[27][cred];
+                p.preamble_dx = preamble_dx_table[27];
+                p.preamble_power = preamble_power_table[27];
+                p.preamble_ifft_power = preamble_ifft_power_table[27][cred];
+                p.first_preamble_ifft_power = preamble_ifft_power_table[27][4];
+              }
+              break;
+            case GI_10_3648:
+              p.gisamples = 3648;
+              if (pilotpattern == PILOT_SP8_2 || pilotpattern == PILOT_SP8_4) {
+                p.first_preamble_cells = preamble_cells_table[28][4];
+                p.preamble_cells = preamble_cells_table[28][cred];
+                p.preamble_dx = preamble_dx_table[28];
+                p.preamble_power = preamble_power_table[28];
+                p.preamble_ifft_power = preamble_ifft_power_table[28][cred];
+                p.first_preamble_ifft_power = preamble_ifft_power_table[28][4];
+              }
+              else {
+                p.first_preamble_cells = preamble_cells_table[29][4];
+                p.preamble_cells = preamble_cells_table[29][cred];
+                p.preamble_dx = preamble_dx_table[29];
+                p.preamble_power = preamble_power_table[29];
+                p.preamble_ifft_power = preamble_ifft_power_table[29][cred];
+                p.first_preamble_ifft_power = preamble_ifft_power_table[29][4];
+              }
+              break;
+            case GI_11_4096:
+              p.gisamples = 4096;
+              p.first_preamble_cells = preamble_cells_table[30][4];
+              p.preamble_cells = preamble_cells_table[30][cred];
+              p.preamble_dx = preamble_dx_table[30];
+              p.preamble_power = preamble_power_table[30];
+              p.preamble_ifft_power = preamble_ifft_power_table[30][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[30][4];
+              break;
+            case GI_12_4864:
+              p.gisamples = 4864;
+              p.first_preamble_cells = preamble_cells_table[31][4];
+              p.preamble_cells = preamble_cells_table[31][cred];
+              p.preamble_dx = preamble_dx_table[31];
+              p.preamble_power = preamble_power_table[31];
+              p.preamble_ifft_power = preamble_ifft_power_table[31][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[31][4];
+              break;
+            default:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[18][4];
+              p.preamble_cells = preamble_cells_table[18][cred];
+              p.preamble_dx = preamble_dx_table[18];
+              p.preamble_power = preamble_power_table[18];
+              p.preamble_ifft_power = preamble_ifft_power_table[18][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[18][4];
+              break;
+          }
+          switch (pilotpattern) {
+            case PILOT_SP3_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP3_2][cred][pilotboost];
+              break;
+            case PILOT_SP3_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP3_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP3_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP3_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP3_4][cred][pilotboost];
+              break;
+            case PILOT_SP4_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP4_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP4_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP4_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP4_2][cred][pilotboost];
+              break;
+            case PILOT_SP4_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP4_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP4_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP4_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP4_4][cred][pilotboost];
+              break;
+            case PILOT_SP6_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP6_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP6_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP6_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP6_2][cred][pilotboost];
+              break;
+            case PILOT_SP6_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP6_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP6_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP6_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP6_4][cred][pilotboost];
+              break;
+            case PILOT_SP8_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP8_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP8_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP8_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP8_2][cred][pilotboost];
+              break;
+            case PILOT_SP8_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP8_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP8_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP8_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP8_4][cred][pilotboost];
+              break;
+            case PILOT_SP12_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP12_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP12_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP12_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP12_2][cred][pilotboost];
+              break;
+            case PILOT_SP12_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP12_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP12_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP12_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP12_4][cred][pilotboost];
+              break;
+            case PILOT_SP16_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP16_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP16_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP16_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP16_2][cred][pilotboost];
+              break;
+            case PILOT_SP16_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP16_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP16_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP16_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP16_4][cred][pilotboost];
+              break;
+            case PILOT_SP24_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP24_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP24_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP24_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP24_2][cred][pilotboost];
+              break;
+            case PILOT_SP24_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP24_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP24_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP24_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP24_4][cred][pilotboost];
+              break;
+            case PILOT_SP32_2:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP32_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP32_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP32_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP32_2][cred][pilotboost];
+              break;
+            case PILOT_SP32_4:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP32_4][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP32_4][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP32_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP32_4][cred][pilotboost];
+              break;
+            default:
+              p.data_ifft_power = data_ifft_power_table_32K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_32K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_32K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_32K[PILOT_SP3_2][cred][pilotboost];
+              break;
+          }
+          break;
+        default:
+          p.papr_cells = 72;
+          p.fftsamples = 8192;
+          p.carriers = carriers_table[FFTSIZE_8K][cred];
+          p.max_carriers = carriers_table[FFTSIZE_8K][0];
+          p.preamble_carriers = carriers_table[FFTSIZE_8K][4];
+          switch (guardinterval) {
+            case GI_1_192:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[0][4];
+              p.preamble_cells = preamble_cells_table[0][cred];
+              p.preamble_dx = preamble_dx_table[0];
+              p.preamble_power = preamble_power_table[0];
+              p.preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[0][4];
+              break;
+            case GI_2_384:
+              p.gisamples = 384;
+              p.first_preamble_cells = preamble_cells_table[1][4];
+              p.preamble_cells = preamble_cells_table[1][cred];
+              p.preamble_dx = preamble_dx_table[1];
+              p.preamble_power = preamble_power_table[1];
+              p.preamble_ifft_power = preamble_ifft_power_table[1][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[1][4];
+              break;
+            case GI_3_512:
+              p.gisamples = 512;
+              p.first_preamble_cells = preamble_cells_table[2][4];
+              p.preamble_cells = preamble_cells_table[2][cred];
+              p.preamble_dx = preamble_dx_table[2];
+              p.preamble_power = preamble_power_table[2];
+              p.preamble_ifft_power = preamble_ifft_power_table[2][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[2][4];
+              break;
+            case GI_4_768:
+              p.gisamples = 768;
+              p.first_preamble_cells = preamble_cells_table[3][4];
+              p.preamble_cells = preamble_cells_table[3][cred];
+              p.preamble_dx = preamble_dx_table[3];
+              p.preamble_power = preamble_power_table[3];
+              p.preamble_ifft_power = preamble_ifft_power_table[3][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[3][4];
+              break;
+            case GI_5_1024:
+              p.gisamples = 1024;
+              p.first_preamble_cells = preamble_cells_table[4][4];
+              p.preamble_cells = preamble_cells_table[4][cred];
+              p.preamble_dx = preamble_dx_table[4];
+              p.preamble_power = preamble_power_table[4];
+              p.preamble_ifft_power = preamble_ifft_power_table[4][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[4][4];
+              break;
+            case GI_6_1536:
+              p.gisamples = 1536;
+              p.first_preamble_cells = preamble_cells_table[5][4];
+              p.preamble_cells = preamble_cells_table[5][cred];
+              p.preamble_dx = preamble_dx_table[5];
+              p.preamble_power = preamble_power_table[5];
+              p.preamble_ifft_power = preamble_ifft_power_table[5][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[5][4];
+              break;
+            case GI_7_2048:
+              p.gisamples = 2048;
+              p.first_preamble_cells = preamble_cells_table[6][4];
+              p.preamble_cells = preamble_cells_table[6][cred];
+              p.preamble_dx = preamble_dx_table[6];
+              p.preamble_power = preamble_power_table[6];
+              p.preamble_ifft_power = preamble_ifft_power_table[6][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[6][4];
+              break;
+            default:
+              p.gisamples = 192;
+              p.first_preamble_cells = preamble_cells_table[0][4];
+              p.preamble_cells = preamble_cells_table[0][cred];
+              p.preamble_dx = preamble_dx_table[0];
+              p.preamble_power = preamble_power_table[0];
+              p.preamble_ifft_power = preamble_ifft_power_table[0][cred];
+              p.first_preamble_ifft_power = preamble_ifft_power_table[0][4];
+              break;
+          }
+          switch (pilotpattern) {
+            case PILOT_SP3_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
+              break;
+            case PILOT_SP3_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP3_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP3_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP3_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_4][cred][pilotboost];
+              break;
+            case PILOT_SP4_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP4_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP4_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP4_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_2][cred][pilotboost];
+              break;
+            case PILOT_SP4_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP4_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP4_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP4_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP4_4][cred][pilotboost];
+              break;
+            case PILOT_SP6_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP6_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP6_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP6_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_2][cred][pilotboost];
+              break;
+            case PILOT_SP6_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP6_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP6_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP6_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP6_4][cred][pilotboost];
+              break;
+            case PILOT_SP8_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP8_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP8_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP8_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_2][cred][pilotboost];
+              break;
+            case PILOT_SP8_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP8_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP8_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP8_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP8_4][cred][pilotboost];
+              break;
+            case PILOT_SP12_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP12_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP12_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP12_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_2][cred][pilotboost];
+              break;
+            case PILOT_SP12_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP12_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP12_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP12_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP12_4][cred][pilotboost];
+              break;
+            case PILOT_SP16_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP16_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP16_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP16_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_2][cred][pilotboost];
+              break;
+            case PILOT_SP16_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP16_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP16_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP16_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP16_4][cred][pilotboost];
+              break;
+            case PILOT_SP24_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP24_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP24_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP24_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_2][cred][pilotboost];
+              break;
+            case PILOT_SP24_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP24_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP24_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP24_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP24_4][cred][pilotboost];
+              break;
+            case PILOT_SP32_2:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP32_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP32_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP32_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_2][cred][pilotboost];
+              break;
+            case PILOT_SP32_4:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP32_4][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP32_4][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP32_4][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP32_4][cred][pilotboost];
+              break;
+            default:
+              p.data_ifft_power = data_ifft_power_table_8K[PILOT_SP3_2][cred][pilotboost];
+              p.data_cells = data_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_cells = sbs_cells_table_8K[PILOT_SP3_2][cred];
+              p.sbs_data_cells = sbs_data_cells_table_8K[PILOT_SP3_2][cred][pilotboost];
+              break;
+          }
+          break;
+      }
+      return p;
+    }
+
   } /* namespace atsc3 */
 } /* namespace gr */
