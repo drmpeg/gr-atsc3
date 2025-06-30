@@ -70,8 +70,6 @@ namespace gr {
       int frame_symbols[4352];
       void init_pilots(int);
 
-      const static int carriers_table[3][5];
-      const static int preamble_dx_table[32];
       const static int trpapr_table_8K[72];
       const static int trpapr_table_16K[144];
       const static int trpapr_table_32K[288];
