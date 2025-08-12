@@ -22,11 +22,11 @@ parameters:
 -   id: subframemode
     label: Subframe Mode
     dtype: enum
-    options: [CYCLICPREFIXER_SINGLE_SUBFRAME, CYCLICPREFIXER_DUAL_SUBFRAME_PLP0, CYCLICPREFIXER_DUAL_SUBFRAME_PLP1]
-    option_labels: ['Single', 'Dual (PLP0)', Dual (PLP1)]
+    options: [CYCLICPREFIXER_SINGLE_SUBFRAME, CYCLICPREFIXER_DUAL_SUBFRAME_SUB0, CYCLICPREFIXER_DUAL_SUBFRAME_SUB1]
+    option_labels: ['Single', 'Dual (Subframe 0)', Dual (Subframe 1)]
     option_attributes:
         hide_alt: [all, none, none]
-        val: [atsc3.CYCLICPREFIXER_SINGLE_SUBFRAME, atsc3.CYCLICPREFIXER_DUAL_SUBFRAME_PLP0, atsc3.CYCLICPREFIXER_DUAL_SUBFRAME_PLP1]
+        val: [atsc3.CYCLICPREFIXER_SINGLE_SUBFRAME, atsc3.CYCLICPREFIXER_DUAL_SUBFRAME_SUB0, atsc3.CYCLICPREFIXER_DUAL_SUBFRAME_SUB1]
     default: CYCLICPREFIXER_SINGLE_SUBFRAME
     hide: 'part'
 -   id: fftsize

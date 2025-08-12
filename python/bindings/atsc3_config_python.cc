@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Free Software Foundation, Inc.
+ * Copyright 2025 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(09cf3ed8f4990cb6228aef49f38aef46)                     */
+/* BINDTOOL_HEADER_FILE_HASH(ef04e423f6a3738c3e01c85408c4ee74)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -362,8 +362,8 @@ void bind_atsc3_config(py::module& m)
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_pilotgenerator_mode_t>();
     py::enum_<::gr::atsc3::atsc3_cyclicprefixer_mode_t>(m,"atsc3_cyclicprefixer_mode_t")
         .value("CYCLICPREFIXER_SINGLE_SUBFRAME", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_SINGLE_SUBFRAME) // 0
-        .value("CYCLICPREFIXER_DUAL_SUBFRAME_PLP0", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_DUAL_SUBFRAME_PLP0) // 1
-        .value("CYCLICPREFIXER_DUAL_SUBFRAME_PLP1", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_DUAL_SUBFRAME_PLP1) // 2
+        .value("CYCLICPREFIXER_DUAL_SUBFRAME_SUB0", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_DUAL_SUBFRAME_SUB0) // 1
+        .value("CYCLICPREFIXER_DUAL_SUBFRAME_SUB1", ::gr::atsc3::atsc3_cyclicprefixer_mode_t::CYCLICPREFIXER_DUAL_SUBFRAME_SUB1) // 2
         .export_values()
     ;
 

@@ -135,7 +135,7 @@ namespace gr {
         Nfinal = Nextra % numpayloadsyms;
         Nextra = Nextra / numpayloadsyms;
       }
-      else if (submode == CYCLICPREFIXER_DUAL_SUBFRAME_PLP0) {
+      else if (submode == CYCLICPREFIXER_DUAL_SUBFRAME_SUB0) {
         Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples + gisamples) - ((numpayloadsyms * (fftsamples + gisamples)) + (altnumpayloadsyms * (altfftsamples + altgisamples)));
         Nfinal = 0;
         Nextra = Nextra / (numpayloadsyms + altnumpayloadsyms);

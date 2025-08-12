@@ -287,8 +287,8 @@ namespace gr {
 
     enum atsc3_cyclicprefixer_mode_t {
       CYCLICPREFIXER_SINGLE_SUBFRAME = 0,
-      CYCLICPREFIXER_DUAL_SUBFRAME_PLP0,
-      CYCLICPREFIXER_DUAL_SUBFRAME_PLP1,
+      CYCLICPREFIXER_DUAL_SUBFRAME_SUB0,
+      CYCLICPREFIXER_DUAL_SUBFRAME_SUB1,
     };
 
     enum atsc3_lls_insertion_mode_t {
