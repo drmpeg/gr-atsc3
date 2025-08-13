@@ -133,7 +133,7 @@ namespace gr {
       int preamble_syms;
       L1Signalling L1_Signalling[1];
       int add_l1basic(gr_complex*, int, int);
-      int add_l1detail(gr_complex*, int, int, int, int);
+      struct l1_detail_params_t add_l1detail(gr_complex*, int, int, int, int);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
       void calculate_crc_table();

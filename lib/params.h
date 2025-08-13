@@ -45,6 +45,11 @@ namespace gr {
       int gisamples;
     };
 
+    struct l1_detail_params_t {
+      int cells;
+      int xbits;
+    };
+
     fec_params_t fec_params(atsc3_framesize_t framesize, atsc3_code_rate_t rate);
 
     ofdm_params_t ofdm_params(atsc3_fftsize_t fftsize, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_reduced_carriers_t cred);

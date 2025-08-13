@@ -44,6 +44,8 @@ namespace gr {
       int papr_cells;
       int plp_size_total;
       int Nextra;
+      int xbytes, xbits;
+      struct l1_detail_params_t rtn;
 
       l1detailinit[0][0] = &L1_Signalling[0].l1detail_data[0][0];
       l1detailinit[0][1] = &L1_Signalling[0].l1detail_data[0][1];
@@ -180,15 +182,7 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = cred;
       }
       l1basicinit->L1_Detail_content_tag = 0;
-      if (timodeplp0 == TI_MODE_OFF && timodeplp1 == TI_MODE_OFF) {
-        l1basicinit->L1_Detail_size_bytes = 30;
-      }
-      else if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == TI_MODE_HYBRID) {
-        l1basicinit->L1_Detail_size_bytes = 34;
-      }
-      else {
-        l1basicinit->L1_Detail_size_bytes = 32;
-      }
+      l1basicinit->L1_Detail_size_bytes = MIN_L1DETAIL_BYTES * 3;
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
@@ -203,7 +197,7 @@ namespace gr {
       l1basicinit->first_sub_sbs_last = SBS_ON;
       l1basicinit->reserved = 0xffffffffffff;
 
-      l1detailinit[0][0]->version = 0;
+      l1detailinit[0][0]->version = 1;
       l1detailinit[0][0]->num_rf = 0;
       l1detailinit[0][0]->frequency_interleaver = fimode;
       l1detailinit[0][0]->num_plp = NUM_PLPS - 1;
@@ -394,9 +388,20 @@ namespace gr {
       l1detailinit[0][1]->plp_HTI_num_fec_blocks = tifecblocksplp1 - 1;
       l1detailinit[0][1]->plp_HTI_cell_interleaver = TRUE;
       l1detailinit[0][1]->plp_type = 0;
+      l1detailinit[0][1]->bsid = 0x8086;
       l1detailinit[0][1]->reserved = 0x7fffffffffffffff;
 
-      l1basicinit->L1_Detail_total_cells = l1cells = add_l1detail(&l1_dummy[0], 0, 0, 0, 0);
+      rtn = add_l1detail(&l1_dummy[0], 0, 0, 0, 0);
+      if (rtn.xbits >= (MIN_L1DETAIL_BYTES * 2 * 8)) {
+        l1basicinit->L1_Detail_size_bytes = MIN_L1DETAIL_BYTES;
+      }
+      else {
+        xbits = (MIN_L1DETAIL_BYTES * 2 * 8) - rtn.xbits;
+        xbytes = (xbits / 8) + (xbits % 8 ? 1 : 0);
+        l1basicinit->L1_Detail_size_bytes = MIN_L1DETAIL_BYTES + xbytes;
+      }
+      rtn = add_l1detail(&l1_dummy[0], 0, 0, 0, 0);
+      l1basicinit->L1_Detail_total_cells = l1cells = rtn.cells;
       printf("L1-Detail cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0, FALSE);
       struct ofdm_params_t p = ofdm_params(fftsize, guardinterval, pilotpattern, pilotboost, cred);
@@ -1181,14 +1186,14 @@ namespace gr {
       return (rows);
     }
 
-    int
+    struct l1_detail_params_t
     tdmframemapper_cc_impl::add_l1detail(gr_complex *out, int block_start0, int start_row0, int block_start1, int start_row1)
     {
       int bits, index, offset_bits = 0;
       int npad, padbits, count, nrepeat, table;
       int block, indexb, nouter, numbits;
       int npunctemp, npunc, nfectemp, nfec;
-      int Anum, Aden, B, mod, rows, temp;
+      int Anum, Aden, B, mod, rows, temp = 0;
       long long bitslong;
       std::bitset<MAX_BCH_PARITY_BITS> parity_bits;
       unsigned char b, tempbch, msb;
@@ -1202,6 +1207,7 @@ namespace gr {
       const int q1 = q1_val;
       const int q2 = q2_val;
       const int m1 = m1_val;
+      struct l1_detail_params_t rtn;
 
       l1detailinit[0][0] = &L1_Signalling[0].l1detail_data[0][0];
       l1detailinit[0][1] = &L1_Signalling[0].l1detail_data[0][1];
@@ -1363,6 +1369,10 @@ namespace gr {
           }
         }
       }
+      bits = l1detailinit[0][1]->bsid;
+      for (int n = 15; n >= 0; n--) {
+        l1detail[offset_bits++] = bits & (1 << n) ? 1 : 0;
+      }
       if ((((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) > 0) {
         bitslong = l1detailinit[0][1]->reserved;
         temp = (((l1basicinit->L1_Detail_size_bytes * 8) - 32) - offset_bits) - 1;
@@ -1371,6 +1381,7 @@ namespace gr {
         }
       }
       offset_bits += add_crc32_bits(l1detail, offset_bits);
+      rtn.xbits = temp;
 
 #if 0
       printf("L1Detail\n");
@@ -1647,7 +1658,8 @@ namespace gr {
       /* block interleaver, bit demuxing and constellation mapping */
       rows = numbits / mod;
       block_interleaver(&l1detail[0], &l1temp[0], out, l1d_mode, rows, L1_DETAIL);
-      return (rows);
+      rtn.cells = rows;
+      return (rtn);
     }
 
     void
@@ -1821,6 +1833,7 @@ namespace gr {
       uint64_t nread_end;
       uint64_t tagvalue;
       int lls_flag = FALSE;
+      struct l1_detail_params_t rtn;
 
       if (plp_lls_flag[0] == TRUE) {
         nread = this->nitems_read(0); //number of items read on port 0
@@ -1904,7 +1917,8 @@ namespace gr {
           fec_block_start[1] = fec_cells[1] - (cells[1] % fec_cells[1]);
         }
 
-        l1detailcells = add_l1detail(&l1_dummy[0], fec_block_start[0], 0, fec_block_start[1], 0);
+        rtn = add_l1detail(&l1_dummy[0], fec_block_start[0], 0, fec_block_start[1], 0);
+        l1detailcells = rtn.cells;
         rows = l1detailcells / preamblesyms;
         for (int i = 0; i < preamblesyms; i++) {
           for (int j = 0; j < rows; j++) {
