@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Free Software Foundation, Inc.
+ * Copyright 2025 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(subframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(897a1cf8f630e5cf3b29e3d34483e281)                     */
+/* BINDTOOL_HEADER_FILE_HASH(bd833cd9798a572588bbf3b8b425c7e3)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -37,44 +37,44 @@ void bind_subframemapper_cc(py::module& m)
         std::shared_ptr<subframemapper_cc>>(m, "subframemapper_cc", D(subframemapper_cc))
 
         .def(py::init(&subframemapper_cc::make),
-           py::arg("framesizeplp0"),
-           py::arg("rateplp0"),
-           py::arg("fecmodeplp0"),
-           py::arg("constellationplp0"),
-           py::arg("fftsizeplp0"),
-           py::arg("numpayloadsymsplp0"),
+           py::arg("framesizesub0"),
+           py::arg("ratesub0"),
+           py::arg("fecmodesub0"),
+           py::arg("constellationsub0"),
+           py::arg("fftsizesub0"),
+           py::arg("numpayloadsymssub0"),
            py::arg("numpreamblesyms"),
-           py::arg("guardintervalplp0"),
-           py::arg("pilotpatternplp0"),
-           py::arg("pilotboostplp0"),
+           py::arg("guardintervalsub0"),
+           py::arg("pilotpatternsub0"),
+           py::arg("pilotboostsub0"),
            py::arg("firstsbs"),
-           py::arg("fimodeplp0"),
-           py::arg("timodeplp0"),
-           py::arg("tidepthplp0"),
-           py::arg("tiblocksplp0"),
-           py::arg("tifecblocksmaxplp0"),
-           py::arg("tifecblocksplp0"),
-           py::arg("llsmodeplp0"),
-           py::arg("credplp0"),
-           py::arg("misomodeplp0"),
-           py::arg("framesizeplp1"),
-           py::arg("rateplp1"),
-           py::arg("fecmodeplp1"),
-           py::arg("constellationplp1"),
-           py::arg("fftsizeplp1"),
-           py::arg("numpayloadsymsplp1"),
-           py::arg("guardintervalplp1"),
-           py::arg("pilotpatternplp1"),
-           py::arg("pilotboostplp1"),
-           py::arg("fimodeplp1"),
-           py::arg("timodeplp1"),
-           py::arg("tidepthplp1"),
-           py::arg("tiblocksplp1"),
-           py::arg("tifecblocksmaxplp1"),
-           py::arg("tifecblocksplp1"),
-           py::arg("llsmodeplp1"),
-           py::arg("credplp1"),
-           py::arg("misomodeplp1"),
+           py::arg("fimodesub0"),
+           py::arg("timodesub0"),
+           py::arg("tidepthsub0"),
+           py::arg("tiblockssub0"),
+           py::arg("tifecblocksmaxsub0"),
+           py::arg("tifecblockssub0"),
+           py::arg("llsmodesub0"),
+           py::arg("credsub0"),
+           py::arg("misomodesub0"),
+           py::arg("framesizesub1"),
+           py::arg("ratesub1"),
+           py::arg("fecmodesub1"),
+           py::arg("constellationsub1"),
+           py::arg("fftsizesub1"),
+           py::arg("numpayloadsymssub1"),
+           py::arg("guardintervalsub1"),
+           py::arg("pilotpatternsub1"),
+           py::arg("pilotboostsub1"),
+           py::arg("fimodesub1"),
+           py::arg("timodesub1"),
+           py::arg("tidepthsub1"),
+           py::arg("tiblockssub1"),
+           py::arg("tifecblocksmaxsub1"),
+           py::arg("tifecblockssub1"),
+           py::arg("llsmodesub1"),
+           py::arg("credsub1"),
+           py::arg("misomodesub1"),
            py::arg("flmode"),
            py::arg("flen"),
            py::arg("paprmode"),

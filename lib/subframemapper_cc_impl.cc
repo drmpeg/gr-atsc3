@@ -16,17 +16,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     subframemapper_cc::sptr
-    subframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_scattered_pilot_boost_t pilotboostplp0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodeplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_reduced_carriers_t credplp0, atsc3_miso_t misomodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_scattered_pilot_boost_t pilotboostplp1, atsc3_frequency_interleaver_t fimodeplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_reduced_carriers_t credplp1, atsc3_miso_t misomodeplp1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc::make(atsc3_framesize_t framesizesub0, atsc3_code_rate_t ratesub0, atsc3_plp_fec_mode_t fecmodesub0, atsc3_constellation_t constellationsub0, atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_scattered_pilot_boost_t pilotboostsub0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodesub0, atsc3_time_interleaver_mode_t timodesub0, atsc3_time_interleaver_depth_t tidepthsub0, int tiblockssub0, int tifecblocksmaxsub0, int tifecblockssub0, atsc3_lls_insertion_mode_t llsmodesub0, atsc3_reduced_carriers_t credsub0, atsc3_miso_t misomodesub0, atsc3_framesize_t framesizesub1, atsc3_code_rate_t ratesub1, atsc3_plp_fec_mode_t fecmodesub1, atsc3_constellation_t constellationsub1, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_scattered_pilot_boost_t pilotboostsub1, atsc3_frequency_interleaver_t fimodesub1, atsc3_time_interleaver_mode_t timodesub1, atsc3_time_interleaver_depth_t tidepthsub1, int tiblockssub1, int tifecblocksmaxsub1, int tifecblockssub1, atsc3_lls_insertion_mode_t llsmodesub1, atsc3_reduced_carriers_t credsub1, atsc3_miso_t misomodesub1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<subframemapper_cc_impl>(
-        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, fftsizeplp0, numpayloadsymsplp0, numpreamblesyms, guardintervalplp0, pilotpatternplp0, pilotboostplp0, firstsbs, fimodeplp0, timodeplp0, tidepthplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, llsmodeplp0, credplp0, misomodeplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, fftsizeplp1, numpayloadsymsplp1, guardintervalplp1, pilotpatternplp1, pilotboostplp1, fimodeplp1, timodeplp1, tidepthplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, llsmodeplp1, credplp1, misomodeplp1, flmode, flen, paprmode, l1bmode, l1dmode);
+        framesizesub0, ratesub0, fecmodesub0, constellationsub0, fftsizesub0, numpayloadsymssub0, numpreamblesyms, guardintervalsub0, pilotpatternsub0, pilotboostsub0, firstsbs, fimodesub0, timodesub0, tidepthsub0, tiblockssub0, tifecblocksmaxsub0, tifecblockssub0, llsmodesub0, credsub0, misomodesub0, framesizesub1, ratesub1, fecmodesub1, constellationsub1, fftsizesub1, numpayloadsymssub1, guardintervalsub1, pilotpatternsub1, pilotboostsub1, fimodesub1, timodesub1, tidepthsub1, tiblockssub1, tifecblocksmaxsub1, tifecblockssub1, llsmodesub1, credsub1, misomodesub1, flmode, flen, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_scattered_pilot_boost_t pilotboostplp0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodeplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_reduced_carriers_t credplp0, atsc3_miso_t misomodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_scattered_pilot_boost_t pilotboostplp1, atsc3_frequency_interleaver_t fimodeplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_reduced_carriers_t credplp1, atsc3_miso_t misomodeplp1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesizesub0, atsc3_code_rate_t ratesub0, atsc3_plp_fec_mode_t fecmodesub0, atsc3_constellation_t constellationsub0, atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_scattered_pilot_boost_t pilotboostsub0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodesub0, atsc3_time_interleaver_mode_t timodesub0, atsc3_time_interleaver_depth_t tidepthsub0, int tiblockssub0, int tifecblocksmaxsub0, int tifecblockssub0, atsc3_lls_insertion_mode_t llsmodesub0, atsc3_reduced_carriers_t credsub0, atsc3_miso_t misomodesub0, atsc3_framesize_t framesizesub1, atsc3_code_rate_t ratesub1, atsc3_plp_fec_mode_t fecmodesub1, atsc3_constellation_t constellationsub1, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_scattered_pilot_boost_t pilotboostsub1, atsc3_frequency_interleaver_t fimodesub1, atsc3_time_interleaver_mode_t timodesub1, atsc3_time_interleaver_depth_t tidepthsub1, int tiblockssub1, int tifecblocksmaxsub1, int tifecblockssub1, atsc3_lls_insertion_mode_t llsmodesub1, atsc3_reduced_carriers_t credsub1, atsc3_miso_t misomodesub1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("subframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(2, 2, sizeof(output_type)))
@@ -61,8 +61,8 @@ namespace gr {
       l1d_mode = l1dmode;
       first_sbs[0] = firstsbs;
       first_sbs[1] = SBS_ON;
-      symbols[0] = numpreamblesyms + numpayloadsymsplp0;
-      symbols[1] = numpayloadsymsplp1;
+      symbols[0] = numpreamblesyms + numpayloadsymssub0;
+      symbols[1] = numpayloadsymssub1;
       preamble_syms[0] = numpreamblesyms;
       preamble_syms[1] = 0;
       init_fm_randomizer();
@@ -188,20 +188,20 @@ namespace gr {
         l1basicinit->preamble_reduced_carriers = 0;
       }
       else {
-        l1basicinit->preamble_reduced_carriers = credplp0;
+        l1basicinit->preamble_reduced_carriers = credsub0;
       }
       l1basicinit->L1_Detail_content_tag = 0;
       l1basicinit->L1_Detail_size_bytes = MIN_L1DETAIL_BYTES * 3;
       l1basicinit->L1_Detail_fec_type = l1dmode;
       l1basicinit->L1_Detail_additional_parity_mode = APM_K0;
       l1basicinit->first_sub_mimo = FALSE;
-      l1basicinit->first_sub_miso = misomodeplp0;
-      l1basicinit->first_sub_fft_size = fftsizeplp0;
-      l1basicinit->first_sub_reduced_carriers = credplp0;
-      l1basicinit->first_sub_guard_interval = guardintervalplp0;
-      l1basicinit->first_sub_num_ofdm_symbols = numpayloadsymsplp0 - 1;
-      l1basicinit->first_sub_scattered_pilot_pattern = pilotpatternplp0;
-      l1basicinit->first_sub_scattered_pilot_boost = pilotboostplp0;
+      l1basicinit->first_sub_miso = misomodesub0;
+      l1basicinit->first_sub_fft_size = fftsizesub0;
+      l1basicinit->first_sub_reduced_carriers = credsub0;
+      l1basicinit->first_sub_guard_interval = guardintervalsub0;
+      l1basicinit->first_sub_num_ofdm_symbols = numpayloadsymssub0 - 1;
+      l1basicinit->first_sub_scattered_pilot_pattern = pilotpatternsub0;
+      l1basicinit->first_sub_scattered_pilot_boost = pilotboostsub0;
       l1basicinit->first_sub_sbs_first = firstsbs;
       l1basicinit->first_sub_sbs_last = SBS_ON;
       l1basicinit->reserved = 0xffffffffffff;
@@ -209,10 +209,10 @@ namespace gr {
       l1detailinit[0][0]->version = 1;
       l1detailinit[0][0]->num_rf = 0;
       l1detailinit[0][0]->subframe_multiplex = 0;
-      l1detailinit[0][0]->frequency_interleaver = fimodeplp0;
+      l1detailinit[0][0]->frequency_interleaver = fimodesub0;
       l1detailinit[0][0]->num_plp = NUM_PLPS - 1;
       l1detailinit[0][0]->plp_id = 0;
-      if (llsmodeplp0 == LLS_ON) {
+      if (llsmodesub0 == LLS_ON) {
         l1detailinit[0][0]->plp_lls_flag = TRUE;
       }
       else {
@@ -222,8 +222,8 @@ namespace gr {
       l1detailinit[0][0]->plp_layer = 0;
       l1detailinit[0][0]->plp_start = 0;
       l1detailinit[0][0]->plp_scrambler_type = 0;
-      if (framesizeplp0 == FECFRAME_SHORT) {
-        switch (constellationplp0) {
+      if (framesizesub0 == FECFRAME_SHORT) {
+        switch (constellationsub0) {
           case MOD_QPSK:
             fec_cells[0] = 8100;
             break;
@@ -240,7 +240,7 @@ namespace gr {
             fec_cells[0] = 0;
             break;
         }
-        switch (fecmodeplp0) {
+        switch (fecmodesub0) {
           case PLP_FEC_NONE:
             l1detailinit[0][0]->plp_fec_type = FEC_TYPE_ONLY_16K;
             break;
@@ -256,7 +256,7 @@ namespace gr {
         }
       }
       else {
-        switch (constellationplp0) {
+        switch (constellationsub0) {
           case MOD_QPSK:
             fec_cells[0] = 32400;
             break;
@@ -279,7 +279,7 @@ namespace gr {
             fec_cells[0] = 0;
             break;
         }
-        switch (fecmodeplp0) {
+        switch (fecmodesub0) {
           case PLP_FEC_NONE:
             l1detailinit[0][0]->plp_fec_type = FEC_TYPE_ONLY_64K;
             break;
@@ -294,46 +294,46 @@ namespace gr {
             break;
         }
       }
-      l1detailinit[0][0]->plp_mod = constellationplp0;
-      l1detailinit[0][0]->plp_cod = rateplp0;
-      l1detailinit[0][0]->plp_TI_mode = timodeplp0;
+      l1detailinit[0][0]->plp_mod = constellationsub0;
+      l1detailinit[0][0]->plp_cod = ratesub0;
+      l1detailinit[0][0]->plp_TI_mode = timodesub0;
       l1detailinit[0][0]->plp_TI_extended_interleaving = FALSE;
       l1detailinit[0][0]->plp_HTI_inter_subframe = FALSE;
-      l1detailinit[0][0]->plp_HTI_num_ti_blocks = tiblocksplp0 - 1;
-      l1detailinit[0][0]->plp_HTI_num_fec_blocks_max = tifecblocksmaxplp0 - 1;
-      l1detailinit[0][0]->plp_HTI_num_fec_blocks = tifecblocksplp0 - 1;
+      l1detailinit[0][0]->plp_HTI_num_ti_blocks = tiblockssub0 - 1;
+      l1detailinit[0][0]->plp_HTI_num_fec_blocks_max = tifecblocksmaxsub0 - 1;
+      l1detailinit[0][0]->plp_HTI_num_fec_blocks = tifecblockssub0 - 1;
       l1detailinit[0][0]->plp_HTI_cell_interleaver = TRUE;
       l1detailinit[0][0]->plp_type = 0;
       if (l1detailinit[0][0]->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        if (tidepthplp0 == TI_DEPTH_1254) {
+        if (tidepthsub0 == TI_DEPTH_1254) {
           l1detailinit[0][0]->plp_TI_extended_interleaving = TRUE;
-          tidepthplp0 = TI_DEPTH_887;
+          tidepthsub0 = TI_DEPTH_887;
         }
-        else if (tidepthplp0 == TI_DEPTH_1448) {
+        else if (tidepthsub0 == TI_DEPTH_1448) {
           l1detailinit[0][0]->plp_TI_extended_interleaving = TRUE;
-          tidepthplp0 = TI_DEPTH_1024;
+          tidepthsub0 = TI_DEPTH_1024;
         }
         else {
           l1detailinit[0][0]->plp_TI_extended_interleaving = FALSE;
         }
-        l1detailinit[0][0]->plp_CTI_depth = tidepthplp0;
+        l1detailinit[0][0]->plp_CTI_depth = tidepthsub0;
       }
 
       l1detailinit[1][0]->mimo = FALSE;
-      l1detailinit[1][0]->miso = misomodeplp1;
-      l1detailinit[1][0]->fft_size = fftsizeplp1;
-      l1detailinit[1][0]->reduced_carriers = credplp1;
-      l1detailinit[1][0]->guard_interval = guardintervalplp1;
-      l1detailinit[1][0]->num_ofdm_symbols = numpayloadsymsplp1 - 1;
-      l1detailinit[1][0]->scattered_pilot_pattern = pilotpatternplp1;
-      l1detailinit[1][0]->scattered_pilot_boost = pilotboostplp1;
+      l1detailinit[1][0]->miso = misomodesub1;
+      l1detailinit[1][0]->fft_size = fftsizesub1;
+      l1detailinit[1][0]->reduced_carriers = credsub1;
+      l1detailinit[1][0]->guard_interval = guardintervalsub1;
+      l1detailinit[1][0]->num_ofdm_symbols = numpayloadsymssub1 - 1;
+      l1detailinit[1][0]->scattered_pilot_pattern = pilotpatternsub1;
+      l1detailinit[1][0]->scattered_pilot_boost = pilotboostsub1;
       l1detailinit[1][0]->sbs_first = SBS_ON;
       l1detailinit[1][0]->sbs_last = SBS_ON;
       l1detailinit[1][0]->subframe_multiplex = 0;
-      l1detailinit[1][0]->frequency_interleaver = fimodeplp1;
+      l1detailinit[1][0]->frequency_interleaver = fimodesub1;
       l1detailinit[1][0]->num_plp = NUM_PLPS - 1;
       l1detailinit[1][0]->plp_id = 1;
-      if (llsmodeplp1 == LLS_ON) {
+      if (llsmodesub1 == LLS_ON) {
         l1detailinit[1][0]->plp_lls_flag = TRUE;
       }
       else {
@@ -343,8 +343,8 @@ namespace gr {
       l1detailinit[1][0]->plp_layer = 0;
       l1detailinit[1][0]->plp_start = 0;
       l1detailinit[1][0]->plp_scrambler_type = 0;
-      if (framesizeplp1 == FECFRAME_SHORT) {
-        switch (constellationplp1) {
+      if (framesizesub1 == FECFRAME_SHORT) {
+        switch (constellationsub1) {
           case MOD_QPSK:
             fec_cells[1] = 8100;
             break;
@@ -361,7 +361,7 @@ namespace gr {
             fec_cells[1] = 0;
             break;
         }
-        switch (fecmodeplp1) {
+        switch (fecmodesub1) {
           case PLP_FEC_NONE:
             l1detailinit[1][0]->plp_fec_type = FEC_TYPE_ONLY_16K;
             break;
@@ -377,7 +377,7 @@ namespace gr {
         }
       }
       else {
-        switch (constellationplp1) {
+        switch (constellationsub1) {
           case MOD_QPSK:
             fec_cells[1] = 32400;
             break;
@@ -400,7 +400,7 @@ namespace gr {
             fec_cells[1] = 0;
             break;
         }
-        switch (fecmodeplp1) {
+        switch (fecmodesub1) {
           case PLP_FEC_NONE:
             l1detailinit[1][0]->plp_fec_type = FEC_TYPE_ONLY_64K;
             break;
@@ -415,29 +415,29 @@ namespace gr {
             break;
         }
       }
-      l1detailinit[1][0]->plp_mod = constellationplp1;
-      l1detailinit[1][0]->plp_cod = rateplp1;
-      l1detailinit[1][0]->plp_TI_mode = timodeplp1;
+      l1detailinit[1][0]->plp_mod = constellationsub1;
+      l1detailinit[1][0]->plp_cod = ratesub1;
+      l1detailinit[1][0]->plp_TI_mode = timodesub1;
       l1detailinit[1][0]->plp_TI_extended_interleaving = FALSE;
       l1detailinit[1][0]->plp_HTI_inter_subframe = FALSE;
-      l1detailinit[1][0]->plp_HTI_num_ti_blocks = tiblocksplp1 - 1;
-      l1detailinit[1][0]->plp_HTI_num_fec_blocks_max = tifecblocksmaxplp1 - 1;
-      l1detailinit[1][0]->plp_HTI_num_fec_blocks = tifecblocksplp1 - 1;
+      l1detailinit[1][0]->plp_HTI_num_ti_blocks = tiblockssub1 - 1;
+      l1detailinit[1][0]->plp_HTI_num_fec_blocks_max = tifecblocksmaxsub1 - 1;
+      l1detailinit[1][0]->plp_HTI_num_fec_blocks = tifecblockssub1 - 1;
       l1detailinit[1][0]->plp_HTI_cell_interleaver = TRUE;
       l1detailinit[1][0]->plp_type = 0;
       if (l1detailinit[1][0]->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
-        if (tidepthplp1 == TI_DEPTH_1254) {
+        if (tidepthsub1 == TI_DEPTH_1254) {
           l1detailinit[1][0]->plp_TI_extended_interleaving = TRUE;
-          tidepthplp1 = TI_DEPTH_887;
+          tidepthsub1 = TI_DEPTH_887;
         }
-        else if (tidepthplp1 == TI_DEPTH_1448) {
+        else if (tidepthsub1 == TI_DEPTH_1448) {
           l1detailinit[1][0]->plp_TI_extended_interleaving = TRUE;
-          tidepthplp1 = TI_DEPTH_1024;
+          tidepthsub1 = TI_DEPTH_1024;
         }
         else {
           l1detailinit[1][0]->plp_TI_extended_interleaving = FALSE;
         }
-        l1detailinit[1][0]->plp_CTI_depth = tidepthplp1;
+        l1detailinit[1][0]->plp_CTI_depth = tidepthsub1;
       }
       l1detailinit[1][0]->bsid = 0x8086;
       l1detailinit[1][0]->reserved = 0x7fffffffffffffff;
@@ -455,7 +455,7 @@ namespace gr {
       l1basicinit->L1_Detail_total_cells = l1cells = rtn.cells;
       printf("L1-Detail cells = %d\n", l1cells);
       l1cells += add_l1basic(&l1_dummy[0], 0, FALSE);
-      po = ofdm_params(fftsizeplp0, guardintervalplp0, pilotpatternplp0, pilotboostplp0, credplp0);
+      po = ofdm_params(fftsizesub0, guardintervalsub0, pilotpatternsub0, pilotboostsub0, credsub0);
       fftsamples[0] = po.fftsamples;
       papr_cells = po.papr_cells;
       gisamples[0] = po.gisamples;
@@ -467,7 +467,7 @@ namespace gr {
       if (paprmode != PAPR_TR) {
         papr_cells = 0;
       }
-      frame_samples[0] = ((fftsamples[0] + gisamples[0]) * (numpayloadsymsplp0 + numpreamblesyms)) + BOOTSTRAP_SAMPLES;
+      frame_samples[0] = ((fftsamples[0] + gisamples[0]) * (numpayloadsymssub0 + numpreamblesyms)) + BOOTSTRAP_SAMPLES;
       frame_symbols[0][0] = first_preamble_cells;
       total_preamble_cells = 0;
       for (int n = 1; n < numpreamblesyms; n++) {
@@ -476,21 +476,21 @@ namespace gr {
       }
       if (firstsbs == SBS_ON) {
         frame_symbols[0][numpreamblesyms] = (sbs_cells - papr_cells);
-        for (int n = 0; n < numpayloadsymsplp0 - 2; n++) {
+        for (int n = 0; n < numpayloadsymssub0 - 2; n++) {
           frame_symbols[0][n + numpreamblesyms + 1] = (data_cells - papr_cells);
         }
       }
       else {
-        for (int n = 0; n < numpayloadsymsplp0 - 1; n++) {
+        for (int n = 0; n < numpayloadsymssub0 - 1; n++) {
           frame_symbols[0][n + numpreamblesyms] = (data_cells - papr_cells);
         }
       }
-      frame_symbols[0][numpreamblesyms + numpayloadsymsplp0 - 1] = (sbs_cells - papr_cells);
+      frame_symbols[0][numpreamblesyms + numpayloadsymssub0 - 1] = (sbs_cells - papr_cells);
       if (firstsbs == SBS_ON) {
-        totalcells[0] = first_preamble_cells + total_preamble_cells + ((numpayloadsymsplp0 - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+        totalcells[0] = first_preamble_cells + total_preamble_cells + ((numpayloadsymssub0 - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
-        totalcells[0] = first_preamble_cells + total_preamble_cells + ((numpayloadsymsplp0 - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        totalcells[0] = first_preamble_cells + total_preamble_cells + ((numpayloadsymssub0 - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
       }
       total_cells[0] = totalcells[0];
       l1detailinit[0][0]->sbs_null_cells = sbsnullcells[0] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
@@ -503,8 +503,8 @@ namespace gr {
         printf("PLP0 SBS null cells = %d\n", sbsnullcells[0]);
         plp_size_total[0] = totalcells[0] - l1cells - sbsnullcells[0];
       }
-      if (timodeplp0 == TI_MODE_HYBRID) {
-        plp_size[0] = tifecblocksplp0 * fec_cells[0];
+      if (timodesub0 == TI_MODE_HYBRID) {
+        plp_size[0] = tifecblockssub0 * fec_cells[0];
         if (plp_size[0] > plp_size_total[0]) {
           throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
         }
@@ -515,7 +515,7 @@ namespace gr {
       l1detailinit[0][0]->plp_size = plp_size[0];
       printf("PLP0 size = %d\n", plp_size[0]);
 
-      po = ofdm_params(fftsizeplp1, guardintervalplp1, pilotpatternplp1, pilotboostplp1, credplp1);
+      po = ofdm_params(fftsizesub1, guardintervalsub1, pilotpatternsub1, pilotboostsub1, credsub1);
       fftsamples[1] = po.fftsamples;
       papr_cells = po.papr_cells;
       gisamples[1] = po.gisamples;
@@ -527,26 +527,26 @@ namespace gr {
       if (paprmode != PAPR_TR) {
         papr_cells = 0;
       }
-      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples[0] + gisamples[0]) - ((numpayloadsymsplp0 * (fftsamples[0] + gisamples[0])) + (numpayloadsymsplp1 * (fftsamples[1] + gisamples[1])));
-      l1basicinit->excess_samples_per_symbol = Nextra / (numpayloadsymsplp0 + numpayloadsymsplp1);
-      frame_samples[1] = ((fftsamples[1] + gisamples[1]) * (numpayloadsymsplp1 + 0)) + BOOTSTRAP_SAMPLES;
+      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (fftsamples[0] + gisamples[0]) - ((numpayloadsymssub0 * (fftsamples[0] + gisamples[0])) + (numpayloadsymssub1 * (fftsamples[1] + gisamples[1])));
+      l1basicinit->excess_samples_per_symbol = Nextra / (numpayloadsymssub0 + numpayloadsymssub1);
+      frame_samples[1] = ((fftsamples[1] + gisamples[1]) * (numpayloadsymssub1 + 0)) + BOOTSTRAP_SAMPLES;
       if (first_sbs[1] == SBS_ON) {
         frame_symbols[1][0] = (sbs_cells - papr_cells);
-        for (int n = 0; n < numpayloadsymsplp1 - 2; n++) {
+        for (int n = 0; n < numpayloadsymssub1 - 2; n++) {
           frame_symbols[1][n + 1] = (data_cells - papr_cells);
         }
       }
       else {
-        for (int n = 0; n < numpayloadsymsplp1 - 1; n++) {
+        for (int n = 0; n < numpayloadsymssub1 - 1; n++) {
           frame_symbols[1][n] = (data_cells - papr_cells);
         }
       }
-      frame_symbols[1][numpayloadsymsplp1 - 1] = (sbs_cells - papr_cells);
+      frame_symbols[1][numpayloadsymssub1 - 1] = (sbs_cells - papr_cells);
       if (first_sbs[1] == SBS_ON) {
-        totalcells[1] = ((numpayloadsymsplp1 - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
+        totalcells[1] = ((numpayloadsymssub1 - 2) * (data_cells - papr_cells)) + ((sbs_cells - papr_cells) * 2);
       }
       else {
-        totalcells[1] = ((numpayloadsymsplp1 - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
+        totalcells[1] = ((numpayloadsymssub1 - 1) * (data_cells - papr_cells)) + (sbs_cells - papr_cells);
       }
       total_cells[1] = totalcells[1];
       l1detailinit[1][0]->sbs_null_cells = sbsnullcells[1] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
@@ -559,8 +559,8 @@ namespace gr {
         printf("PLP1 SBS null cells = %d\n", sbsnullcells[1]);
         plp_size_total[1] = totalcells[1] - sbsnullcells[1];
       }
-      if (timodeplp1 == TI_MODE_HYBRID) {
-        plp_size[1] = tifecblocksplp1 * fec_cells[1];
+      if (timodesub1 == TI_MODE_HYBRID) {
+        plp_size[1] = tifecblockssub1 * fec_cells[1];
         if (plp_size[1] > plp_size_total[1]) {
           throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
         }
@@ -571,7 +571,7 @@ namespace gr {
       l1detailinit[1][0]->plp_size = plp_size[1];
       printf("PLP1 size = %d\n", plp_size[1]);
 
-      switch(tidepthplp0) {
+      switch(tidepthsub0) {
         case TI_DEPTH_512:
           depth = 512;
           break;
@@ -597,15 +597,15 @@ namespace gr {
 
       init_ti_randomizer();
       randomindex = 0;
-      ti_mode[0] = timodeplp0;
+      ti_mode[0] = timodesub0;
       ti_depth[0] = depth;
-      ti_blocks[0] = tiblocksplp0;
-      ti_fecblocks[0] = tifecblocksplp0;
-      ti_fecblocks_max[0] = tifecblocksmaxplp0;
+      ti_blocks[0] = tiblockssub0;
+      ti_fecblocks[0] = tifecblockssub0;
+      ti_fecblocks_max[0] = tifecblocksmaxsub0;
       commutator[0] = 0;
-      pf = fec_params(framesizeplp0, rateplp0);
+      pf = fec_params(framesizesub0, ratesub0);
       rateindex = pf.rate_index;
-      switch (constellationplp0) {
+      switch (constellationsub0) {
         case MOD_QPSK:
           normalization = std::sqrt(2.0);
           ti_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
@@ -672,7 +672,7 @@ namespace gr {
         delay_line[0].emplace_back(i, 0);
       }
       for (int i = 0; i < depth; i++) {
-        switch (constellationplp0) {
+        switch (constellationsub0) {
           case MOD_QPSK:
             for (int j = 0; j < i; j++) {
               randombits = ti_randomize[randomindex] << 1;
@@ -735,7 +735,7 @@ namespace gr {
       }
       time_interleaver[0].resize(plp_size_total[0]);
 
-      switch(tidepthplp1) {
+      switch(tidepthsub1) {
         case TI_DEPTH_512:
           depth = 512;
           break;
@@ -760,15 +760,15 @@ namespace gr {
       }
 
       randomindex = 0;
-      ti_mode[1] = timodeplp1;
+      ti_mode[1] = timodesub1;
       ti_depth[1] = depth;
-      ti_blocks[1] = tiblocksplp1;
-      ti_fecblocks[1] = tifecblocksplp1;
-      ti_fecblocks_max[1] = tifecblocksmaxplp1;
+      ti_blocks[1] = tiblockssub1;
+      ti_fecblocks[1] = tifecblockssub1;
+      ti_fecblocks_max[1] = tifecblocksmaxsub1;
       commutator[1] = 0;
-      pf = fec_params(framesizeplp1, rateplp1);
+      pf = fec_params(framesizesub1, ratesub1);
       rateindex = pf.rate_index;
-      switch (constellationplp1) {
+      switch (constellationsub1) {
         case MOD_QPSK:
           normalization = std::sqrt(2.0);
           ti_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
@@ -835,7 +835,7 @@ namespace gr {
         delay_line[1].emplace_back(i, 0);
       }
       for (int i = 0; i < depth; i++) {
-        switch (constellationplp1) {
+        switch (constellationsub1) {
           case MOD_QPSK:
             for (int j = 0; j < i; j++) {
               randombits = ti_randomize[randomindex] << 1;

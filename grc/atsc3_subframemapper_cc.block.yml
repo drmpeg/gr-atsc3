@@ -199,7 +199,7 @@ parameters:
     dtype: int
     default: '72'
 -   id: numpreamblesyms
-    label: Number of Preamble Symbols
+    label: Number of Preamble Symbols Sub0
     dtype: int
     default: '2'
 -   id: guardintervalplp0
