@@ -9,7 +9,7 @@
 ########################################################################
 # Setup library
 ########################################################################
-include(GrPlatform) #define LIB_SUFFIX
+include(GNUInstallDirs)
 
 list(APPEND atsc3_sources
     bbscrambler_bb_impl.cc
@@ -43,7 +43,7 @@ add_library(gnuradio-atsc3 SHARED ${atsc3_sources})
 target_link_libraries(gnuradio-atsc3 gnuradio::gnuradio-runtime gnuradio::gnuradio-fft gnuradio::gnuradio-filter gnuradio::gnuradio-blocks ZLIB::ZLIB)
 target_include_directories(gnuradio-atsc3
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-    PUBLIC $<INSTALL_INTERFACE:include>
+    PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 set_target_properties(gnuradio-atsc3 PROPERTIES DEFINE_SYMBOL "gnuradio_atsc3_EXPORTS")
 
