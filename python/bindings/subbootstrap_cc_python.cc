@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Free Software Foundation, Inc.
+ * Copyright 2025 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(subbootstrap_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(15856a281b2c1d6761e8d909093b7107)                     */
+/* BINDTOOL_HEADER_FILE_HASH(dad46c152971da3cf4e8f2217fd93e69)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -37,15 +37,15 @@ void bind_subbootstrap_cc(py::module& m)
         std::shared_ptr<subbootstrap_cc>>(m, "subbootstrap_cc", D(subbootstrap_cc))
 
         .def(py::init(&subbootstrap_cc::make),
-           py::arg("fftsize"),
-           py::arg("numpayloadsyms"),
+           py::arg("fftsizesub0"),
+           py::arg("numpayloadsymssub0"),
            py::arg("numpreamblesyms"),
-           py::arg("guardinterval"),
-           py::arg("pilotpattern"),
-           py::arg("fftsizeplp1"),
-           py::arg("numpayloadsymsplp1"),
-           py::arg("guardintervalplp1"),
-           py::arg("pilotpatternplp1"),
+           py::arg("guardintervalsub0"),
+           py::arg("pilotpatternsub0"),
+           py::arg("fftsizesub1"),
+           py::arg("numpayloadsymssub1"),
+           py::arg("guardintervalsub1"),
+           py::arg("pilotpatternsub1"),
            py::arg("frameinterval"),
            py::arg("flmode"),
            py::arg("flen"),

@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     subbootstrap_cc::sptr
-    subbootstrap_cc::make(atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    subbootstrap_cc::make(atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
     {
       return gnuradio::make_block_sptr<subbootstrap_cc_impl>(
-        fftsizeplp0, numpayloadsymsplp0, numpreamblesyms, guardintervalplp0, pilotpatternplp0, fftsizeplp1, numpayloadsymsplp1, guardintervalplp1, pilotpatternplp1, frameinterval, flmode, flen, l1bmode, outputmode, showlevels, vclip);
+        fftsizesub0, numpayloadsymssub0, numpreamblesyms, guardintervalsub0, pilotpatternsub0, fftsizesub1, numpayloadsymssub1, guardintervalsub1, pilotpatternsub1, frameinterval, flmode, flen, l1bmode, outputmode, showlevels, vclip);
     }
 
 
     /*
      * The private constructor
      */
-    subbootstrap_cc_impl::subbootstrap_cc_impl(atsc3_fftsize_t fftsizeplp0, int numpayloadsymsplp0, int numpreamblesyms, atsc3_guardinterval_t guardintervalplp0, atsc3_pilotpattern_t pilotpatternplp0, atsc3_fftsize_t fftsizeplp1, int numpayloadsymsplp1, atsc3_guardinterval_t guardintervalplp1, atsc3_pilotpattern_t pilotpatternplp1, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    subbootstrap_cc_impl::subbootstrap_cc_impl(atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
       : gr::block("subbootstrap_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -78,14 +78,14 @@ namespace gr {
       install_taps(d_new_taps);
 
       output_mode = outputmode;
-      symbols[0] = numpreamblesyms + numpayloadsymsplp0;
-      symbols[1] = numpayloadsymsplp1;
+      symbols[0] = numpreamblesyms + numpayloadsymssub0;
+      symbols[1] = numpayloadsymssub1;
       bootstrap_signal[0] = (frameinterval << 2) | SYSTEM_BANDWIDTH_6MHZ;
       bootstrap_signal[1] = BSR_COEFFICIENT;
-      switch (fftsizeplp0) {
+      switch (fftsizesub0) {
         case FFTSIZE_8K:
           symbol_size[0] = 8192;
-          switch (guardintervalplp0) {
+          switch (guardintervalsub0) {
             case GI_1_192:
               switch (l1bmode) {
                 case L1_FEC_MODE_1:
@@ -266,7 +266,7 @@ namespace gr {
           break;
         case FFTSIZE_16K:
           symbol_size[0] = 16384;
-          switch (guardintervalplp0) {
+          switch (guardintervalsub0) {
             case GI_1_192:
               switch (l1bmode) {
                 case L1_FEC_MODE_1:
@@ -534,7 +534,7 @@ namespace gr {
           break;
         case FFTSIZE_32K:
           symbol_size[0] = 32768;
-          switch (guardintervalplp0) {
+          switch (guardintervalsub0) {
             case GI_1_192:
               switch (l1bmode) {
                 case L1_FEC_MODE_1:
@@ -712,7 +712,7 @@ namespace gr {
               }
               break;
             case GI_9_3072:
-              if (pilotpatternplp0 == PILOT_SP8_2 || pilotpatternplp0 == PILOT_SP8_4) {
+              if (pilotpatternsub0 == PILOT_SP8_2 || pilotpatternsub0 == PILOT_SP8_4) {
                 switch (l1bmode) {
                   case L1_FEC_MODE_1:
                     preamble_structure = 130;
@@ -758,7 +758,7 @@ namespace gr {
               }
               break;
             case GI_10_3648:
-              if (pilotpatternplp0 == PILOT_SP8_2 || pilotpatternplp0 == PILOT_SP8_4) {
+              if (pilotpatternsub0 == PILOT_SP8_2 || pilotpatternsub0 == PILOT_SP8_4) {
                 switch (l1bmode) {
                   case L1_FEC_MODE_1:
                     preamble_structure = 140;
@@ -873,7 +873,7 @@ namespace gr {
           break;
         default:
           symbol_size[0] = 8192;
-          switch (guardintervalplp0) {
+          switch (guardintervalsub0) {
             case GI_1_192:
               switch (l1bmode) {
                 case L1_FEC_MODE_1:
@@ -1054,7 +1054,7 @@ namespace gr {
           break;
       }
       bootstrap_signal[2] = preamble_structure;
-      switch (fftsizeplp1) {
+      switch (fftsizesub1) {
         case FFTSIZE_8K:
           symbol_size[1] = 8192;
           break;
@@ -1068,7 +1068,7 @@ namespace gr {
           symbol_size[1] = 8192;
           break;
       }
-      switch (guardintervalplp0) {
+      switch (guardintervalsub0) {
         case GI_1_192:
           guard_interval[0] = 192;
           break;
@@ -1109,7 +1109,7 @@ namespace gr {
           guard_interval[0] = 192;
           break;
       }
-      switch (guardintervalplp1) {
+      switch (guardintervalsub1) {
         case GI_1_192:
           guard_interval[1] = 192;
           break;
@@ -1271,16 +1271,16 @@ namespace gr {
         }
       }
 
-      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (symbol_size[0] + guard_interval[0]) - ((numpayloadsymsplp0 * (symbol_size[0] + guard_interval[0])) + (numpayloadsymsplp1 * (symbol_size[1] + guard_interval[1])));
-      Nfinal = Nextra % (numpayloadsymsplp0 + numpayloadsymsplp1);
-      Nextra = Nextra / (numpayloadsymsplp0 + numpayloadsymsplp1);
+      Nextra = ((flen * 6912) - BOOTSTRAP_SAMPLES) - numpreamblesyms * (symbol_size[0] + guard_interval[0]) - ((numpayloadsymssub0 * (symbol_size[0] + guard_interval[0])) + (numpayloadsymssub1 * (symbol_size[1] + guard_interval[1])));
+      Nfinal = Nextra % (numpayloadsymssub0 + numpayloadsymssub1);
+      Nextra = Nextra / (numpayloadsymssub0 + numpayloadsymssub1);
       if (flmode == FLM_SYMBOL_ALIGNED) {
         frame_items[0] = (symbols[0] * symbol_size[0]) + (symbols[0] * guard_interval[0]);
         frame_items[1] = (symbols[1] * symbol_size[1]) + (symbols[1] * guard_interval[1]);
       }
       else {
-        frame_items[0] = (symbols[0] * symbol_size[0]) + (numpreamblesyms * guard_interval[0]) + (numpayloadsymsplp0 * (guard_interval[0] + Nextra));
-        frame_items[1] = (symbols[1] * symbol_size[1]) + (numpayloadsymsplp1 * (guard_interval[1] + Nextra)) + Nfinal;
+        frame_items[0] = (symbols[0] * symbol_size[0]) + (numpreamblesyms * guard_interval[0]) + (numpayloadsymssub0 * (guard_interval[0] + Nextra));
+        frame_items[1] = (symbols[1] * symbol_size[1]) + (numpayloadsymssub1 * (guard_interval[1] + Nextra)) + Nfinal;
       }
       total_frame_items = frame_items[0] + frame_items[1];
       if (outputmode) {
