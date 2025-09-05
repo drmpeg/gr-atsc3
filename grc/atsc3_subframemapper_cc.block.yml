@@ -6,140 +6,140 @@ templates:
   imports: import atsc3
   make: |-
       atsc3.subframemapper_cc(
-          ${framesizeplp0.val},
-          ${rateplp0.val},
-          ${fecmodeplp0.val},
-          % if str(framesizeplp0) == 'FECFRAME_NORMAL':
-          ${constellationplp01.val},
+          ${framesizesub0.val},
+          ${ratesub0.val},
+          ${fecmodesub0.val},
+          % if str(framesizesub0) == 'FECFRAME_NORMAL':
+          ${constellationsub01.val},
           % else:
-          ${constellationplp02.val},
+          ${constellationsub02.val},
           % endif
-          ${fftsizeplp0.val},
-          ${numpayloadsymsplp0},
+          ${fftsizesub0.val},
+          ${numpayloadsymssub0},
           ${numpreamblesyms},
-          ${guardintervalplp0.val},
-          ${pilotpatternplp0.val},
-          % if str(pilotpatternplp0) == 'PILOT_SP3_2':
-          ${pilotboostplp01.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP3_4':
-          ${pilotboostplp02.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP4_2':
-          ${pilotboostplp03.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP4_4':
-          ${pilotboostplp04.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP6_2':
-          ${pilotboostplp05.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP6_4':
-          ${pilotboostplp06.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP8_2':
-          ${pilotboostplp07.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP8_4':
-          ${pilotboostplp08.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP12_2':
-          ${pilotboostplp09.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP12_4':
-          ${pilotboostplp010.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP16_2':
-          ${pilotboostplp011.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP16_4':
-          ${pilotboostplp012.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP24_2':
-          ${pilotboostplp013.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP24_4':
-          ${pilotboostplp014.val},
-          % elif str(pilotpatternplp0) == 'PILOT_SP32_2':
-          ${pilotboostplp015.val},
+          ${guardintervalsub0.val},
+          ${pilotpatternsub0.val},
+          % if str(pilotpatternsub0) == 'PILOT_SP3_2':
+          ${pilotboostsub01.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP3_4':
+          ${pilotboostsub02.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP4_2':
+          ${pilotboostsub03.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP4_4':
+          ${pilotboostsub04.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP6_2':
+          ${pilotboostsub05.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP6_4':
+          ${pilotboostsub06.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP8_2':
+          ${pilotboostsub07.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP8_4':
+          ${pilotboostsub08.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP12_2':
+          ${pilotboostsub09.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP12_4':
+          ${pilotboostsub010.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP16_2':
+          ${pilotboostsub011.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP16_4':
+          ${pilotboostsub012.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP24_2':
+          ${pilotboostsub013.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP24_4':
+          ${pilotboostsub014.val},
+          % elif str(pilotpatternsub0) == 'PILOT_SP32_2':
+          ${pilotboostsub015.val},
           % else:
-          ${pilotboostplp016.val},
+          ${pilotboostsub016.val},
           % endif
           ${firstsbs.val},
-          ${fimodeplp0.val},
-          ${timodeplp0.val},
-          % if str(framesizeplp0) == 'FECFRAME_NORMAL':
-          % if str(constellationplp01) != 'MOD_QPSK':
-          ${tidepthplp01.val},
+          ${fimodesub0.val},
+          ${timodesub0.val},
+          % if str(framesizesub0) == 'FECFRAME_NORMAL':
+          % if str(constellationsub01) != 'MOD_QPSK':
+          ${tidepthsub01.val},
           % else:
-          ${tidepthplp02.val},
+          ${tidepthsub02.val},
           % endif
           % else:
-          % if str(constellationplp02) != 'MOD_QPSK':
-          ${tidepthplp03.val},
+          % if str(constellationsub02) != 'MOD_QPSK':
+          ${tidepthsub03.val},
           % else:
-          ${tidepthplp04.val},
+          ${tidepthsub04.val},
           % endif
           % endif
-          ${tiblocksplp0},
-          ${tifecblocksmaxplp0},
-          ${tifecblocksplp0},
-          ${llsmodeplp0.val},
-          ${credplp0.val},
-          ${misomodeplp0.val},
-          ${framesizeplp1.val},
-          ${rateplp1.val},
-          ${fecmodeplp1.val},
-          % if str(framesizeplp1) == 'FECFRAME_NORMAL':
-          ${constellationplp11.val},
+          ${tiblockssub0},
+          ${tifecblocksmaxsub0},
+          ${tifecblockssub0},
+          ${llsmodesub0.val},
+          ${credsub0.val},
+          ${misomodesub0.val},
+          ${framesizesub1.val},
+          ${ratesub1.val},
+          ${fecmodesub1.val},
+          % if str(framesizesub1) == 'FECFRAME_NORMAL':
+          ${constellationsub11.val},
           % else:
-          ${constellationplp12.val},
+          ${constellationsub12.val},
           % endif
-          ${fftsizeplp1.val},
-          ${numpayloadsymsplp1},
-          ${guardintervalplp1.val},
-          ${pilotpatternplp1.val},
-          % if str(pilotpatternplp1) == 'PILOT_SP3_2':
-          ${pilotboostplp11.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP3_4':
-          ${pilotboostplp12.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP4_2':
-          ${pilotboostplp13.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP4_4':
-          ${pilotboostplp14.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP6_2':
-          ${pilotboostplp15.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP6_4':
-          ${pilotboostplp16.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP8_2':
-          ${pilotboostplp17.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP8_4':
-          ${pilotboostplp18.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP12_2':
-          ${pilotboostplp19.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP12_4':
-          ${pilotboostplp110.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP16_2':
-          ${pilotboostplp111.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP16_4':
-          ${pilotboostplp112.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP24_2':
-          ${pilotboostplp113.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP24_4':
-          ${pilotboostplp114.val},
-          % elif str(pilotpatternplp1) == 'PILOT_SP32_2':
-          ${pilotboostplp115.val},
+          ${fftsizesub1.val},
+          ${numpayloadsymssub1},
+          ${guardintervalsub1.val},
+          ${pilotpatternsub1.val},
+          % if str(pilotpatternsub1) == 'PILOT_SP3_2':
+          ${pilotboostsub11.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP3_4':
+          ${pilotboostsub12.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP4_2':
+          ${pilotboostsub13.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP4_4':
+          ${pilotboostsub14.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP6_2':
+          ${pilotboostsub15.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP6_4':
+          ${pilotboostsub16.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP8_2':
+          ${pilotboostsub17.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP8_4':
+          ${pilotboostsub18.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP12_2':
+          ${pilotboostsub19.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP12_4':
+          ${pilotboostsub110.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP16_2':
+          ${pilotboostsub111.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP16_4':
+          ${pilotboostsub112.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP24_2':
+          ${pilotboostsub113.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP24_4':
+          ${pilotboostsub114.val},
+          % elif str(pilotpatternsub1) == 'PILOT_SP32_2':
+          ${pilotboostsub115.val},
           % else:
-          ${pilotboostplp116.val},
+          ${pilotboostsub116.val},
           % endif
-          ${fimodeplp1.val},
-          ${timodeplp1.val},
-          % if str(framesizeplp1) == 'FECFRAME_NORMAL':
-          % if str(constellationplp11) != 'MOD_QPSK':
-          ${tidepthplp11.val},
+          ${fimodesub1.val},
+          ${timodesub1.val},
+          % if str(framesizesub1) == 'FECFRAME_NORMAL':
+          % if str(constellationsub11) != 'MOD_QPSK':
+          ${tidepthsub11.val},
           % else:
-          ${tidepthplp12.val},
+          ${tidepthsub12.val},
           % endif
           % else:
-          % if str(constellationplp12) != 'MOD_QPSK':
-          ${tidepthplp13.val},
+          % if str(constellationsub12) != 'MOD_QPSK':
+          ${tidepthsub13.val},
           % else:
-          ${tidepthplp14.val},
+          ${tidepthsub14.val},
           % endif
           % endif
-          ${tiblocksplp1},
-          ${tifecblocksmaxplp1},
-          ${tifecblocksplp1},
-          ${llsmodeplp1.val},
-          ${credplp1.val},
-          ${misomodeplp1.val},
+          ${tiblockssub1},
+          ${tifecblocksmaxsub1},
+          ${tifecblockssub1},
+          ${llsmodesub1.val},
+          ${credsub1.val},
+          ${misomodesub1.val},
           ${flmode.val},
           ${flen},
           ${paprmode.val},
@@ -147,7 +147,7 @@ templates:
           ${l1dmode.val})
 
 parameters:
--   id: framesizeplp0
+-   id: framesizesub0
     label: FECFRAME Size Sub0
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
@@ -156,14 +156,14 @@ parameters:
         hide_constellation1: [none, all]
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
--   id: rateplp0
+-   id: ratesub0
     label: Code Rate Sub0
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
--   id: fecmodeplp0
+-   id: fecmodesub0
     label: PLP FEC Mode Sub0
     dtype: enum
     default: 'PLP_FEC_BCH'
@@ -171,30 +171,30 @@ parameters:
     option_labels: [LDPC only, CRC32, BCH]
     option_attributes:
         val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
--   id: constellationplp01
+-   id: constellationsub01
     label: Constellation Sub0
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM, MOD_1024QAM, MOD_4096QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM, 4096QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM, atsc3.MOD_1024QAM, atsc3.MOD_4096QAM]
-    hide: ${ framesizeplp0.hide_constellation1 }
--   id: constellationplp02
+    hide: ${ framesizesub0.hide_constellation1 }
+-   id: constellationsub02
     label: Constellation Sub0
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
-    hide: ${ framesizeplp0.hide_constellation2 }
--   id: fftsizeplp0
+    hide: ${ framesizesub0.hide_constellation2 }
+-   id: fftsizesub0
     label: FFT Size Sub0
     dtype: enum
     options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
     option_labels: [8K, 16K, 32K]
     option_attributes:
         val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
--   id: numpayloadsymsplp0
+-   id: numpayloadsymssub0
     label: Number of Payload Symbols Sub0
     dtype: int
     default: '72'
@@ -202,14 +202,14 @@ parameters:
     label: Number of Preamble Symbols Sub0
     dtype: int
     default: '2'
--   id: guardintervalplp0
+-   id: guardintervalsub0
     label: Guard Interval Samples Sub0
     dtype: enum
     options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
     option_attributes:
         val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
--   id: pilotpatternplp0
+-   id: pilotpatternsub0
     label: Pilot Pattern Sub0
     dtype: enum
     options: [PILOT_SP3_2, PILOT_SP3_4, PILOT_SP4_2, PILOT_SP4_4, PILOT_SP6_2, PILOT_SP6_4, PILOT_SP8_2, PILOT_SP8_4, PILOT_SP12_2, PILOT_SP12_4, PILOT_SP16_2, PILOT_SP16_4, PILOT_SP24_2, PILOT_SP24_4, PILOT_SP32_2, PILOT_SP32_4]
@@ -232,134 +232,134 @@ parameters:
         hide_boost15: [all, all, all, all, all, all, all, all, all, all, all, all, all, all, none, all]
         hide_boost16: [all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, none]
         val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
--   id: pilotboostplp01
+-   id: pilotboostsub01
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.000, 1.175, 1.288, 1.396]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost1 }
--   id: pilotboostplp02
+    hide: ${ pilotpatternsub0.hide_boost1 }
+-   id: pilotboostsub02
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.175, 1.396, 1.549, 1.660]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost2 }
--   id: pilotboostplp03
+    hide: ${ pilotpatternsub0.hide_boost2 }
+-   id: pilotboostsub03
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.072, 1.274, 1.413, 1.514]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost3 }
--   id: pilotboostplp04
+    hide: ${ pilotpatternsub0.hide_boost3 }
+-   id: pilotboostsub04
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.274, 1.514, 1.660, 1.799]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost4 }
--   id: pilotboostplp05
+    hide: ${ pilotpatternsub0.hide_boost4 }
+-   id: pilotboostsub05
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.202, 1.429, 1.585, 1.698]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost5 }
--   id: pilotboostplp06
+    hide: ${ pilotpatternsub0.hide_boost5 }
+-   id: pilotboostsub06
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.413, 1.679, 1.862, 1.995]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost6 }
--   id: pilotboostplp07
+    hide: ${ pilotpatternsub0.hide_boost6 }
+-   id: pilotboostsub07
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.288, 1.549, 1.698, 1.841]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost7 }
--   id: pilotboostplp08
+    hide: ${ pilotpatternsub0.hide_boost7 }
+-   id: pilotboostsub08
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.514, 1.799, 1.995, 2.138]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost8 }
--   id: pilotboostplp09
+    hide: ${ pilotpatternsub0.hide_boost8 }
+-   id: pilotboostsub09
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.445, 1.718, 1.905, 2.042]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost9 }
--   id: pilotboostplp010
+    hide: ${ pilotpatternsub0.hide_boost9 }
+-   id: pilotboostsub010
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.679, 1.995, 2.213, 2.371]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost10 }
--   id: pilotboostplp011
+    hide: ${ pilotpatternsub0.hide_boost10 }
+-   id: pilotboostsub011
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.549, 1.841, 2.042, 2.188]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost11 }
--   id: pilotboostplp012
+    hide: ${ pilotpatternsub0.hide_boost11 }
+-   id: pilotboostsub012
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.820, 2.163, 2.399, 2.570]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost12 }
--   id: pilotboostplp013
+    hide: ${ pilotpatternsub0.hide_boost12 }
+-   id: pilotboostsub013
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.718, 2.042, 2.265, 2.427]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost13 }
--   id: pilotboostplp014
+    hide: ${ pilotpatternsub0.hide_boost13 }
+-   id: pilotboostsub014
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 2.018, 2.399, 2.661, 2.851]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost14 }
--   id: pilotboostplp015
+    hide: ${ pilotpatternsub0.hide_boost14 }
+-   id: pilotboostsub015
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.862, 2.213, 2.427, 2.630]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost15 }
--   id: pilotboostplp016
+    hide: ${ pilotpatternsub0.hide_boost15 }
+-   id: pilotboostsub016
     label: Scattered Pilot Boost Sub0
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 2.163, 2.570, 2.851, 3.055]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp0.hide_boost16 }
+    hide: ${ pilotpatternsub0.hide_boost16 }
 -   id: firstsbs
     label: First SBS Insertion Sub0
     dtype: enum
@@ -367,14 +367,14 @@ parameters:
     option_labels: [Disabled, Enabled]
     option_attributes:
         val: [atsc3.SBS_OFF, atsc3.SBS_ON]
--   id: fimodeplp0
+-   id: fimodesub0
     label: Frequency Interleaver Sub0
     dtype: enum
     options: [FREQ_PREAMBLE_ONLY, FREQ_ALL_SYMBOLS]
     option_labels: [Preamble Only, All Symbols]
     option_attributes:
         val: [atsc3.FREQ_PREAMBLE_ONLY, atsc3.FREQ_ALL_SYMBOLS]
--   id: timodeplp0
+-   id: timodesub0
     label: Time Interleaver Mode Sub0
     dtype: enum
     options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
@@ -382,7 +382,7 @@ parameters:
     option_attributes:
         hide_tiblocks: [all, all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
--   id: tidepthplp01
+-   id: tidepthsub01
     label: Time Interleaver Depth Sub0
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
@@ -390,8 +390,8 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_NORMAL' and str(constellationplp01) != 'MOD_QPSK' else 'all') }
--   id: tidepthplp02
+    hide: ${ ('none' if str(timodesub0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub0) == 'FECFRAME_NORMAL' and str(constellationsub01) != 'MOD_QPSK' else 'all') }
+-   id: tidepthsub02
     label: Time Interleaver Depth Sub0
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
@@ -399,8 +399,8 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_NORMAL' and str(constellationplp01) == 'MOD_QPSK' else 'all') }
--   id: tidepthplp03
+    hide: ${ ('none' if str(timodesub0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub0) == 'FECFRAME_NORMAL' and str(constellationsub01) == 'MOD_QPSK' else 'all') }
+-   id: tidepthsub03
     label: Time Interleaver Depth Sub0
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
@@ -408,8 +408,8 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_SHORT' and str(constellationplp02) != 'MOD_QPSK' else 'all') }
--   id: tidepthplp04
+    hide: ${ ('none' if str(timodesub0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub0) == 'FECFRAME_SHORT' and str(constellationsub02) != 'MOD_QPSK' else 'all') }
+-   id: tidepthsub04
     label: Time Interleaver Depth Sub0
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
@@ -417,23 +417,23 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_SHORT' and str(constellationplp02) == 'MOD_QPSK' else 'all') }
--   id: tiblocksplp0
+    hide: ${ ('none' if str(timodesub0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub0) == 'FECFRAME_SHORT' and str(constellationsub02) == 'MOD_QPSK' else 'all') }
+-   id: tiblockssub0
     label: TI Blocks Sub0
     dtype: int
     default: '2'
-    hide: ${ timodeplp0.hide_tiblocks }
--   id: tifecblocksmaxplp0
+    hide: ${ timodesub0.hide_tiblocks }
+-   id: tifecblocksmaxsub0
     label: TI FEC Blocks Max Sub0
     dtype: int
     default: '14'
-    hide: ${ timodeplp0.hide_tiblocks }
--   id: tifecblocksplp0
+    hide: ${ timodesub0.hide_tiblocks }
+-   id: tifecblockssub0
     label: TI FEC Blocks Sub0
     dtype: int
     default: '14'
-    hide: ${ timodeplp0.hide_tiblocks }
--   id: llsmodeplp0
+    hide: ${ timodesub0.hide_tiblocks }
+-   id: llsmodesub0
     label: LLS Insertion Sub0
     dtype: enum
     options: [LLS_OFF, LLS_ON]
@@ -441,14 +441,14 @@ parameters:
     option_attributes:
         val: [atsc3.LLS_OFF, atsc3.LLS_ON]
     default: LLS_OFF
--   id: credplp0
+-   id: credsub0
     label: Reduced Carriers Sub0
     dtype: enum
     options: [CRED_0, CRED_1, CRED_2, CRED_3, CRED_4]
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
--   id: misomodeplp0
+-   id: misomodesub0
     label: MISO Mode Sub0
     dtype: enum
     options: [MISO_OFF, MISO_64, MISO_256]
@@ -456,7 +456,7 @@ parameters:
     option_attributes:
         val: [atsc3.MISO_OFF, atsc3.MISO_64, atsc3.MISO_256]
     default: MISO_OFF
--   id: framesizeplp1
+-   id: framesizesub1
     label: FECFRAME Size Sub1
     dtype: enum
     options: [FECFRAME_NORMAL, FECFRAME_SHORT]
@@ -465,14 +465,14 @@ parameters:
         hide_constellation1: [none, all]
         hide_constellation2: [all, none]
         val: [atsc3.FECFRAME_NORMAL, atsc3.FECFRAME_SHORT]
--   id: rateplp1
+-   id: ratesub1
     label: Code Rate Sub1
     dtype: enum
     options: [C2_15, C3_15, C4_15, C5_15, C6_15, C7_15, C8_15, C9_15, C10_15, C11_15, C12_15, C13_15]
     option_labels: [2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15]
     option_attributes:
         val: [atsc3.C2_15, atsc3.C3_15, atsc3.C4_15, atsc3.C5_15, atsc3.C6_15, atsc3.C7_15, atsc3.C8_15, atsc3.C9_15, atsc3.C10_15, atsc3.C11_15, atsc3.C12_15, atsc3.C13_15]
--   id: fecmodeplp1
+-   id: fecmodesub1
     label: PLP FEC Mode Sub1
     dtype: enum
     default: 'PLP_FEC_BCH'
@@ -480,41 +480,41 @@ parameters:
     option_labels: [LDPC only, CRC32, BCH]
     option_attributes:
         val: [atsc3.PLP_FEC_NONE, atsc3.PLP_FEC_CRC32, atsc3.PLP_FEC_BCH]
--   id: constellationplp11
+-   id: constellationsub11
     label: Constellation Sub1
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM, MOD_1024QAM, MOD_4096QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM, 4096QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM, atsc3.MOD_1024QAM, atsc3.MOD_4096QAM]
-    hide: ${ framesizeplp1.hide_constellation1 }
--   id: constellationplp12
+    hide: ${ framesizesub1.hide_constellation1 }
+-   id: constellationsub12
     label: Constellation Sub1
     dtype: enum
     options: [MOD_QPSK, MOD_16QAM, MOD_64QAM, MOD_256QAM]
     option_labels: [QPSK, 16QAM, 64QAM, 256QAM]
     option_attributes:
         val: [atsc3.MOD_QPSK, atsc3.MOD_16QAM, atsc3.MOD_64QAM, atsc3.MOD_256QAM]
-    hide: ${ framesizeplp1.hide_constellation2 }
--   id: fftsizeplp1
+    hide: ${ framesizesub1.hide_constellation2 }
+-   id: fftsizesub1
     label: FFT Size Sub1
     dtype: enum
     options: [FFTSIZE_8K, FFTSIZE_16K, FFTSIZE_32K]
     option_labels: [8K, 16K, 32K]
     option_attributes:
         val: [atsc3.FFTSIZE_8K, atsc3.FFTSIZE_16K, atsc3.FFTSIZE_32K]
--   id: numpayloadsymsplp1
+-   id: numpayloadsymssub1
     label: Number of Payload Symbols Sub1
     dtype: int
     default: '72'
--   id: guardintervalplp1
+-   id: guardintervalsub1
     label: Guard Interval Samples Sub1
     dtype: enum
     options: [GI_1_192, GI_2_384, GI_3_512, GI_4_768, GI_5_1024, GI_6_1536, GI_7_2048, GI_8_2432, GI_9_3072, GI_10_3648, GI_11_4096, GI_12_4864]
     option_labels: [192, 384, 512, 768, 1024, 1536, 2048, 2432, 3072, 3648, 4096, 4864]
     option_attributes:
         val: [atsc3.GI_1_192, atsc3.GI_2_384, atsc3.GI_3_512, atsc3.GI_4_768, atsc3.GI_5_1024, atsc3.GI_6_1536, atsc3.GI_7_2048, atsc3.GI_8_2432, atsc3.GI_9_3072, atsc3.GI_10_3648, atsc3.GI_11_4096, atsc3.GI_12_4864]
--   id: pilotpatternplp1
+-   id: pilotpatternsub1
     label: Pilot Pattern Sub1
     dtype: enum
     options: [PILOT_SP3_2, PILOT_SP3_4, PILOT_SP4_2, PILOT_SP4_4, PILOT_SP6_2, PILOT_SP6_4, PILOT_SP8_2, PILOT_SP8_4, PILOT_SP12_2, PILOT_SP12_4, PILOT_SP16_2, PILOT_SP16_4, PILOT_SP24_2, PILOT_SP24_4, PILOT_SP32_2, PILOT_SP32_4]
@@ -537,142 +537,142 @@ parameters:
         hide_boost15: [all, all, all, all, all, all, all, all, all, all, all, all, all, all, none, all]
         hide_boost16: [all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, none]
         val: [atsc3.PILOT_SP3_2, atsc3.PILOT_SP3_4, atsc3.PILOT_SP4_2, atsc3.PILOT_SP4_4, atsc3.PILOT_SP6_2, atsc3.PILOT_SP6_4, atsc3.PILOT_SP8_2, atsc3.PILOT_SP8_4, atsc3.PILOT_SP12_2, atsc3.PILOT_SP12_4, atsc3.PILOT_SP16_2, atsc3.PILOT_SP16_4, atsc3.PILOT_SP24_2, atsc3.PILOT_SP24_4, atsc3.PILOT_SP32_2, atsc3.PILOT_SP32_4]
--   id: pilotboostplp11
+-   id: pilotboostsub11
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.000, 1.175, 1.288, 1.396]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost1 }
--   id: pilotboostplp12
+    hide: ${ pilotpatternsub1.hide_boost1 }
+-   id: pilotboostsub12
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.175, 1.396, 1.549, 1.660]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost2 }
--   id: pilotboostplp13
+    hide: ${ pilotpatternsub1.hide_boost2 }
+-   id: pilotboostsub13
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.072, 1.274, 1.413, 1.514]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost3 }
--   id: pilotboostplp14
+    hide: ${ pilotpatternsub1.hide_boost3 }
+-   id: pilotboostsub14
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.274, 1.514, 1.660, 1.799]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost4 }
--   id: pilotboostplp15
+    hide: ${ pilotpatternsub1.hide_boost4 }
+-   id: pilotboostsub15
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.202, 1.429, 1.585, 1.698]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost5 }
--   id: pilotboostplp16
+    hide: ${ pilotpatternsub1.hide_boost5 }
+-   id: pilotboostsub16
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.413, 1.679, 1.862, 1.995]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost6 }
--   id: pilotboostplp17
+    hide: ${ pilotpatternsub1.hide_boost6 }
+-   id: pilotboostsub17
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.288, 1.549, 1.698, 1.841]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost7 }
--   id: pilotboostplp18
+    hide: ${ pilotpatternsub1.hide_boost7 }
+-   id: pilotboostsub18
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.514, 1.799, 1.995, 2.138]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost8 }
--   id: pilotboostplp19
+    hide: ${ pilotpatternsub1.hide_boost8 }
+-   id: pilotboostsub19
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.445, 1.718, 1.905, 2.042]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost9 }
--   id: pilotboostplp110
+    hide: ${ pilotpatternsub1.hide_boost9 }
+-   id: pilotboostsub110
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.679, 1.995, 2.213, 2.371]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost10 }
--   id: pilotboostplp111
+    hide: ${ pilotpatternsub1.hide_boost10 }
+-   id: pilotboostsub111
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.549, 1.841, 2.042, 2.188]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost11 }
--   id: pilotboostplp112
+    hide: ${ pilotpatternsub1.hide_boost11 }
+-   id: pilotboostsub112
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.820, 2.163, 2.399, 2.570]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost12 }
--   id: pilotboostplp113
+    hide: ${ pilotpatternsub1.hide_boost12 }
+-   id: pilotboostsub113
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.718, 2.042, 2.265, 2.427]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost13 }
--   id: pilotboostplp114
+    hide: ${ pilotpatternsub1.hide_boost13 }
+-   id: pilotboostsub114
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 2.018, 2.399, 2.661, 2.851]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost14 }
--   id: pilotboostplp115
+    hide: ${ pilotpatternsub1.hide_boost14 }
+-   id: pilotboostsub115
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 1.862, 2.213, 2.427, 2.630]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost15 }
--   id: pilotboostplp116
+    hide: ${ pilotpatternsub1.hide_boost15 }
+-   id: pilotboostsub116
     label: Scattered Pilot Boost Sub1
     dtype: enum
     options: [SPB_0, SPB_1, SPB_2, SPB_3, SPB_4]
     option_labels: [1.000, 2.163, 2.570, 2.851, 3.055]
     option_attributes:
         val: [atsc3.SPB_0, atsc3.SPB_1, atsc3.SPB_2, atsc3.SPB_3, atsc3.SPB_4]
-    hide: ${ pilotpatternplp1.hide_boost16 }
--   id: fimodeplp1
+    hide: ${ pilotpatternsub1.hide_boost16 }
+-   id: fimodesub1
     label: Frequency Interleaver Sub1
     dtype: enum
     options: [FREQ_PREAMBLE_ONLY, FREQ_ALL_SYMBOLS]
     option_labels: [Preamble Only, All Symbols]
     option_attributes:
         val: [atsc3.FREQ_PREAMBLE_ONLY, atsc3.FREQ_ALL_SYMBOLS]
--   id: timodeplp1
+-   id: timodesub1
     label: Time Interleaver Mode Sub1
     dtype: enum
     options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
@@ -680,7 +680,7 @@ parameters:
     option_attributes:
         hide_tiblocks: [all, all, none]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
--   id: tidepthplp11
+-   id: tidepthsub11
     label: Time Interleaver Depth Sub1
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
@@ -688,8 +688,8 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_NORMAL' and str(constellationplp11) != 'MOD_QPSK' else 'all') }
--   id: tidepthplp12
+    hide: ${ ('none' if str(timodesub1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub1) == 'FECFRAME_NORMAL' and str(constellationsub11) != 'MOD_QPSK' else 'all') }
+-   id: tidepthsub12
     label: Time Interleaver Depth Sub1
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
@@ -697,8 +697,8 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_NORMAL' and str(constellationplp11) == 'MOD_QPSK' else 'all') }
--   id: tidepthplp13
+    hide: ${ ('none' if str(timodesub1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub1) == 'FECFRAME_NORMAL' and str(constellationsub11) == 'MOD_QPSK' else 'all') }
+-   id: tidepthsub13
     label: Time Interleaver Depth Sub1
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
@@ -706,8 +706,8 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_SHORT' and str(constellationplp12) != 'MOD_QPSK' else 'all') }
--   id: tidepthplp14
+    hide: ${ ('none' if str(timodesub1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub1) == 'FECFRAME_SHORT' and str(constellationsub12) != 'MOD_QPSK' else 'all') }
+-   id: tidepthsub14
     label: Time Interleaver Depth Sub1
     dtype: enum
     options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
@@ -715,23 +715,23 @@ parameters:
     option_attributes:
         val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
     default: 'TI_DEPTH_1024'
-    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_SHORT' and str(constellationplp12) == 'MOD_QPSK' else 'all') }
--   id: tiblocksplp1
+    hide: ${ ('none' if str(timodesub1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizesub1) == 'FECFRAME_SHORT' and str(constellationsub12) == 'MOD_QPSK' else 'all') }
+-   id: tiblockssub1
     label: TI Blocks Sub1
     dtype: int
     default: '2'
-    hide: ${ timodeplp1.hide_tiblocks }
--   id: tifecblocksmaxplp1
+    hide: ${ timodesub1.hide_tiblocks }
+-   id: tifecblocksmaxsub1
     label: TI FEC Blocks Max Sub1
     dtype: int
     default: '44'
-    hide: ${ timodeplp1.hide_tiblocks }
--   id: tifecblocksplp1
+    hide: ${ timodesub1.hide_tiblocks }
+-   id: tifecblockssub1
     label: TI FEC Blocks Sub1
     dtype: int
     default: '44'
-    hide: ${ timodeplp1.hide_tiblocks }
--   id: llsmodeplp1
+    hide: ${ timodesub1.hide_tiblocks }
+-   id: llsmodesub1
     label: LLS Insertion Sub1
     dtype: enum
     options: [LLS_OFF, LLS_ON]
@@ -739,14 +739,14 @@ parameters:
     option_attributes:
         val: [atsc3.LLS_OFF, atsc3.LLS_ON]
     default: LLS_OFF
--   id: credplp1
+-   id: credsub1
     label: Reduced Carriers Sub1
     dtype: enum
     options: [CRED_0, CRED_1, CRED_2, CRED_3, CRED_4]
     option_labels: [5.833 MHz, 5.752 MHz, 5.671 MHz, 5.590 MHz, 5.509 MHz]
     option_attributes:
         val: [atsc3.CRED_0, atsc3.CRED_1, atsc3.CRED_2, atsc3.CRED_3, atsc3.CRED_4]
--   id: misomodeplp1
+-   id: misomodesub1
     label: MISO Mode Sub1
     dtype: enum
     options: [MISO_OFF, MISO_64, MISO_256]
