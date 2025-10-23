@@ -173,8 +173,6 @@ namespace gr {
         l1basicinit->frame_length = flen / 5;
         l1basicinit->excess_samples_per_symbol = 0;
       }
-      l1basicinit->time_offset = 0;
-      l1basicinit->additional_samples = 0; /* always 0 */
       l1basicinit->num_subframes = NUM_SUBFRAMES - 1;
       l1basicinit->preamble_num_symbols = numpreamblesyms - 1;
       if (numpreamblesyms == 1) {
