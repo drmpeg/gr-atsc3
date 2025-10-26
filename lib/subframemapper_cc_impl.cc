@@ -2290,9 +2290,9 @@ namespace gr {
         }
       }
 
-      commutator_start[0] = commutator[0];
-      commutator_start[1] = commutator[1];
       for (int i = 0; i < noutput_items; i += noutput_items) {
+        commutator_start[0] = commutator[0];
+        commutator_start[1] = commutator[1];
         for (int subframe = 0; subframe < NUM_SUBFRAMES; subframe++) {
           outtimeint = &time_interleaver[subframe][0];
           inx = static_cast<const input_type*>(input_items[subframe]);
