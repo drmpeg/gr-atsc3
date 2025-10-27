@@ -136,6 +136,7 @@ namespace gr {
       struct l1_detail_params_t add_l1detail(gr_complex*, int, int, int, int);
       int add_crc32_bits(unsigned char*, int);
       void init_fm_randomizer(void);
+      void init_ti_randomizer(void);
       void calculate_crc_table();
       int poly_mult(const int*, int, const int*, int, int*);
       void bch_poly_build_tables(void);
@@ -171,16 +172,24 @@ namespace gr {
       gr_complex l1_dummy[FRAME_SIZE_SHORT];
 
       int ti_mode[NUM_PLPS];
+      int ti_depth[NUM_PLPS];
       int ti_blocks[NUM_PLPS];
       int ti_fecblocks[NUM_PLPS];
       int ti_fecblocks_max[NUM_PLPS];
       int Nfec_ti_max[NUM_PLPS];
+      int ti_randomize[(MAX_INTERLEAVER_DEPTH * MAX_INTERLEAVER_DEPTH) * 4];
+      int commutator[NUM_PLPS];
+      gr_complex ti_qpsk[4];
+      gr_complex ti_16qam[16];
+      gr_complex ti_64qam[64];
+      gr_complex ti_256qam[256];
       std::vector<gr_complex> time_interleaver;
       std::vector<gr_complex> hybrid_time_interleaver[NUM_PLPS];
       std::vector<std::vector<std::vector<int>>> HtimeLr[NUM_PLPS];
       std::vector<std::vector<int>> HtimePr[NUM_PLPS];
       std::vector<std::vector<int>> HtimeTBI[NUM_PLPS];
       std::vector<int> HtimeNfec[NUM_PLPS];
+      std::vector<std::deque<gr_complex>> delay_line[NUM_PLPS];
 
       std::vector<uint16_t*> ldpc_lut_a; // Pointers into ldpc_lut_data.
       std::vector<uint16_t> ldpc_lut_a_data;
@@ -200,7 +209,7 @@ namespace gr {
       const static gr_complex mod_table_256QAM[12][64];
 
      public:
-      tdmframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
+      tdmframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, int plpsizeplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, int plpsizeplp1, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode);
       ~tdmframemapper_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

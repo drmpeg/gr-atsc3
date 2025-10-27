@@ -8,6 +8,7 @@
 #include <gnuradio/io_signature.h>
 #include "tdmframemapper_cc_impl.h"
 #include "params.h"
+#include <algorithm>
 
 namespace gr {
   namespace atsc3 {
@@ -15,23 +16,24 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     tdmframemapper_cc::sptr
-    tdmframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc::make(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, int plpsizeplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, int plpsizeplp1, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<tdmframemapper_cc_impl>(
-        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, timodeplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, llsmodeplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, timodeplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, plpsplit, llsmodeplp1, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
+        framesizeplp0, rateplp0, fecmodeplp0, constellationplp0, timodeplp0, tidepthplp0, tiblocksplp0, tifecblocksmaxplp0, tifecblocksplp0, plpsizeplp0, llsmodeplp0, framesizeplp1, rateplp1, fecmodeplp1, constellationplp1, timodeplp1, tidepthplp1, tiblocksplp1, tifecblocksmaxplp1, tifecblocksplp1, plpsizeplp1, llsmodeplp1, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, cred, flmode, flen, misomode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, float plpsplit, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    tdmframemapper_cc_impl::tdmframemapper_cc_impl(atsc3_framesize_t framesizeplp0, atsc3_code_rate_t rateplp0, atsc3_plp_fec_mode_t fecmodeplp0, atsc3_constellation_t constellationplp0, atsc3_time_interleaver_mode_t timodeplp0, atsc3_time_interleaver_depth_t tidepthplp0, int tiblocksplp0, int tifecblocksmaxplp0, int tifecblocksplp0, int plpsizeplp0, atsc3_lls_insertion_mode_t llsmodeplp0, atsc3_framesize_t framesizeplp1, atsc3_code_rate_t rateplp1, atsc3_plp_fec_mode_t fecmodeplp1, atsc3_constellation_t constellationplp1, atsc3_time_interleaver_mode_t timodeplp1, atsc3_time_interleaver_depth_t tidepthplp1, int tiblocksplp1, int tifecblocksmaxplp1, int tifecblocksplp1, int plpsizeplp1, atsc3_lls_insertion_mode_t llsmodeplp1, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("tdmframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
     {
       L1_Basic *l1basicinit = &L1_Signalling[0].l1basic_data;
       L1_Detail *l1detailinit[NUM_SUBFRAMES][NUM_PLPS];
+      struct fec_params_t pf;
       double normalization;
       int rateindex, i, j, l1cells, totalcells;
       int fftsamples, gisamples;
@@ -43,6 +45,8 @@ namespace gr {
       int sbs_data_cells;
       int papr_cells;
       int plp_size_total;
+      int depth;
+      int randombits, randomindex;
       int Nextra;
       int xbytes, xbits;
       struct l1_detail_params_t rtn;
@@ -292,6 +296,20 @@ namespace gr {
       l1detailinit[0][0]->plp_HTI_num_fec_blocks = tifecblocksplp0 - 1;
       l1detailinit[0][0]->plp_HTI_cell_interleaver = TRUE;
       l1detailinit[0][0]->plp_type = 0;
+      if (l1detailinit[0][0]->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+        if (tidepthplp0 == TI_DEPTH_1254) {
+          l1detailinit[0][0]->plp_TI_extended_interleaving = TRUE;
+          tidepthplp0 = TI_DEPTH_887;
+        }
+        else if (tidepthplp0 == TI_DEPTH_1448) {
+          l1detailinit[0][0]->plp_TI_extended_interleaving = TRUE;
+          tidepthplp0 = TI_DEPTH_1024;
+        }
+        else {
+          l1detailinit[0][0]->plp_TI_extended_interleaving = FALSE;
+        }
+        l1detailinit[0][0]->plp_CTI_depth = tidepthplp0;
+      }
 
       l1detailinit[0][1]->plp_id = 1;
       if (llsmodeplp1 == LLS_ON) {
@@ -386,6 +404,20 @@ namespace gr {
       l1detailinit[0][1]->plp_HTI_num_fec_blocks = tifecblocksplp1 - 1;
       l1detailinit[0][1]->plp_HTI_cell_interleaver = TRUE;
       l1detailinit[0][1]->plp_type = 0;
+      if (l1detailinit[0][1]->plp_TI_mode == TI_MODE_CONVOLUTIONAL) {
+        if (tidepthplp1 == TI_DEPTH_1254) {
+          l1detailinit[0][1]->plp_TI_extended_interleaving = TRUE;
+          tidepthplp1 = TI_DEPTH_887;
+        }
+        else if (tidepthplp1 == TI_DEPTH_1448) {
+          l1detailinit[0][1]->plp_TI_extended_interleaving = TRUE;
+          tidepthplp1 = TI_DEPTH_1024;
+        }
+        else {
+          l1detailinit[0][1]->plp_TI_extended_interleaving = FALSE;
+        }
+        l1detailinit[0][1]->plp_CTI_depth = tidepthplp1;
+      }
       l1detailinit[0][1]->bsid = 0x8086;
       l1detailinit[0][1]->reserved = 0x7fffffffffffffff;
 
@@ -461,17 +493,41 @@ namespace gr {
           throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
         }
       }
-      else if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == TI_MODE_OFF) {
+      else if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == (TI_MODE_OFF || timodeplp1 == TI_MODE_CONVOLUTIONAL)) {
         plp_size[0] = tifecblocksplp0 * fec_cells[0];
-        plp_size[1] = plp_size_total - plp_size[0];
+        if (plpsizeplp1 != 0) {
+          plp_size[1] = plpsizeplp1;
+        }
+        else {
+          plp_size[1] = plp_size_total - plp_size[0];
+        }
       }
-      else if (timodeplp0 == TI_MODE_OFF && timodeplp1 == TI_MODE_HYBRID) {
+      else if ((timodeplp0 == TI_MODE_OFF || timodeplp0 == TI_MODE_CONVOLUTIONAL) && timodeplp1 == TI_MODE_HYBRID) {
         plp_size[1] = tifecblocksplp1 * fec_cells[1];
-        plp_size[0] = plp_size_total - plp_size[1];
+        if (plpsizeplp0 != 0) {
+          plp_size[0] = plpsizeplp0;
+        }
+        else {
+          plp_size[0] = plp_size_total - plp_size[1];
+        }
       }
       else {
-        plp_size[0] = (float)plp_size_total * plpsplit;
-        plp_size[1] = plp_size_total - plp_size[0];
+        if (plpsizeplp0 != 0 && plpsizeplp1 == 0) {
+          plp_size[0] = plpsizeplp0;
+          plp_size[1] = plp_size_total - plp_size[0];
+        }
+        else if (plpsizeplp0 == 0 && plpsizeplp1 != 0) {
+          plp_size[1] = plpsizeplp1;
+          plp_size[0] = plp_size_total - plp_size[1];
+        }
+        else if (plpsizeplp0 != 0 && plpsizeplp1 != 0) {
+          plp_size[0] = plpsizeplp0;
+          plp_size[1] = plpsizeplp1;
+        }
+        else {
+          plp_size[0] = plp_size_total / 2;
+          plp_size[1] = plp_size_total - plp_size[0];
+        }
       }
       l1detailinit[0][0]->plp_size = plp_size[0];
       l1detailinit[0][1]->plp_size = plp_size[1];
@@ -479,14 +535,330 @@ namespace gr {
       printf("PLP size 0 = %d\n", plp_size[0]);
       printf("PLP size 1 = %d\n", plp_size[1]);
 
+      switch(tidepthplp0) {
+        case TI_DEPTH_512:
+          depth = 512;
+          break;
+        case TI_DEPTH_724:
+          depth = 724;
+          break;
+        case TI_DEPTH_887:
+          depth = 887;
+          break;
+        case TI_DEPTH_1024:
+          depth = 1024;
+          break;
+        case TI_DEPTH_1254:
+          depth = 1254;
+          break;
+        case TI_DEPTH_1448:
+          depth = 1448;
+          break;
+        default:
+          depth = 512;
+          break;
+      }
+
+      init_ti_randomizer();
+      randomindex = 0;
       ti_mode[0] = timodeplp0;
-      ti_mode[1] = timodeplp1;
+      ti_depth[0] = depth;
       ti_blocks[0] = tiblocksplp0;
-      ti_blocks[1] = tiblocksplp1;
       ti_fecblocks[0] = tifecblocksplp0;
-      ti_fecblocks[1] = tifecblocksplp1;
       ti_fecblocks_max[0] = tifecblocksmaxplp0;
+      commutator[0] = 0;
+      pf = fec_params(framesizeplp0, rateplp0);
+      rateindex = pf.rate_index;
+      switch (constellationplp0) {
+        case MOD_QPSK:
+          normalization = std::sqrt(2.0);
+          ti_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[1] = gr_complex(-1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[2] = gr_complex( 1.0 / normalization, -1.0 / normalization);
+          ti_qpsk[3] = gr_complex(-1.0 / normalization, -1.0 / normalization);
+          break;
+        case MOD_16QAM:
+          ti_16qam[0] = mod_table_16QAM[rateindex][0];
+          ti_16qam[1] = mod_table_16QAM[rateindex][1];
+          ti_16qam[2] = mod_table_16QAM[rateindex][2];
+          ti_16qam[3] = mod_table_16QAM[rateindex][3];
+          ti_16qam[4] = -std::conj(mod_table_16QAM[rateindex][0]);
+          ti_16qam[5] = -std::conj(mod_table_16QAM[rateindex][1]);
+          ti_16qam[6] = -std::conj(mod_table_16QAM[rateindex][2]);
+          ti_16qam[7] = -std::conj(mod_table_16QAM[rateindex][3]);
+          ti_16qam[8] = std::conj(mod_table_16QAM[rateindex][0]);
+          ti_16qam[9] = std::conj(mod_table_16QAM[rateindex][1]);
+          ti_16qam[10] = std::conj(mod_table_16QAM[rateindex][2]);
+          ti_16qam[11] = std::conj(mod_table_16QAM[rateindex][3]);
+          ti_16qam[12] = -mod_table_16QAM[rateindex][0];
+          ti_16qam[13] = -mod_table_16QAM[rateindex][1];
+          ti_16qam[14] = -mod_table_16QAM[rateindex][2];
+          ti_16qam[15] = -mod_table_16QAM[rateindex][3];
+          break;
+        case MOD_64QAM:
+          for (i = 0, j = 0; i < 16; i++, j++) {
+            ti_64qam[i] = mod_table_64QAM[rateindex][j];
+          }
+          for (i = 16, j = 0; i < 32; i++, j++) {
+            ti_64qam[i] = -std::conj(mod_table_64QAM[rateindex][j]);
+          }
+          for (i = 32, j = 0; i < 48; i++, j++) {
+            ti_64qam[i] = std::conj(mod_table_64QAM[rateindex][j]);
+          }
+          for (i = 48, j = 0; i < 64; i++, j++) {
+            ti_64qam[i] = -mod_table_64QAM[rateindex][j];
+          }
+          break;
+        case MOD_256QAM:
+          for (i = 0, j = 0; i < 64; i++, j++) {
+            ti_256qam[i] = mod_table_256QAM[rateindex][j];
+          }
+          for (i = 64, j = 0; i < 128; i++, j++) {
+            ti_256qam[i] = -std::conj(mod_table_256QAM[rateindex][j]);
+          }
+          for (i = 128, j = 0; i < 192; i++, j++) {
+            ti_256qam[i] = std::conj(mod_table_256QAM[rateindex][j]);
+          }
+          for (i = 192, j = 0; i < 256; i++, j++) {
+            ti_256qam[i] = -mod_table_256QAM[rateindex][j];
+          }
+          break;
+        default:
+          normalization = std::sqrt(2.0);
+          ti_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[1] = gr_complex(-1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[2] = gr_complex( 1.0 / normalization, -1.0 / normalization);
+          ti_qpsk[3] = gr_complex(-1.0 / normalization, -1.0 / normalization);
+          break;
+      }
+      delay_line[0].reserve(depth);
+      for (int i = 0; i < depth; i++) {
+        delay_line[0].emplace_back(i, 0);
+      }
+      for (int i = 0; i < depth; i++) {
+        switch (constellationplp0) {
+          case MOD_QPSK:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 1;
+              randombits |= ti_randomize[randomindex + 1];
+              if (i != 0) {
+                delay_line[0][i].push_back(ti_qpsk[randombits]);
+                delay_line[0][i].pop_front();
+              }
+              randomindex += 2;
+            }
+            break;
+          case MOD_16QAM:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 3;
+              randombits |= ti_randomize[randomindex + 1] << 2;
+              randombits |= ti_randomize[randomindex + 2] << 1;
+              randombits |= ti_randomize[randomindex + 3];
+              if (i != 0) {
+                delay_line[0][i].push_back(ti_16qam[randombits]);
+                delay_line[0][i].pop_front();
+              }
+              randomindex += 4;
+            }
+            break;
+          case MOD_64QAM:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 5;
+              randombits |= ti_randomize[randomindex + 1] << 4;
+              randombits |= ti_randomize[randomindex + 2] << 3;
+              randombits |= ti_randomize[randomindex + 3] << 2;
+              randombits |= ti_randomize[randomindex + 4] << 1;
+              randombits |= ti_randomize[randomindex + 5];
+              if (i != 0) {
+                delay_line[0][i].push_back(ti_64qam[randombits]);
+                delay_line[0][i].pop_front();
+              }
+              randomindex += 6;
+            }
+            break;
+          case MOD_256QAM:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 7;
+              randombits |= ti_randomize[randomindex + 1] << 6;
+              randombits |= ti_randomize[randomindex + 2] << 5;
+              randombits |= ti_randomize[randomindex + 3] << 4;
+              randombits |= ti_randomize[randomindex + 4] << 3;
+              randombits |= ti_randomize[randomindex + 5] << 2;
+              randombits |= ti_randomize[randomindex + 6] << 1;
+              randombits |= ti_randomize[randomindex + 7];
+              if (i != 0) {
+                delay_line[0][i].push_back(ti_256qam[randombits]);
+                delay_line[0][i].pop_front();
+              }
+              randomindex += 8;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+
+      switch(tidepthplp1) {
+        case TI_DEPTH_512:
+          depth = 512;
+          break;
+        case TI_DEPTH_724:
+          depth = 724;
+          break;
+        case TI_DEPTH_887:
+          depth = 887;
+          break;
+        case TI_DEPTH_1024:
+          depth = 1024;
+          break;
+        case TI_DEPTH_1254:
+          depth = 1254;
+          break;
+        case TI_DEPTH_1448:
+          depth = 1448;
+          break;
+        default:
+          depth = 512;
+          break;
+      }
+
+      randomindex = 0;
+      ti_mode[1] = timodeplp1;
+      ti_depth[1] = depth;
+      ti_blocks[1] = tiblocksplp1;
+      ti_fecblocks[1] = tifecblocksplp1;
       ti_fecblocks_max[1] = tifecblocksmaxplp1;
+      commutator[1] = 0;
+      pf = fec_params(framesizeplp1, rateplp1);
+      rateindex = pf.rate_index;
+      switch (constellationplp1) {
+        case MOD_QPSK:
+          normalization = std::sqrt(2.0);
+          ti_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[1] = gr_complex(-1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[2] = gr_complex( 1.0 / normalization, -1.0 / normalization);
+          ti_qpsk[3] = gr_complex(-1.0 / normalization, -1.0 / normalization);
+          break;
+        case MOD_16QAM:
+          ti_16qam[0] = mod_table_16QAM[rateindex][0];
+          ti_16qam[1] = mod_table_16QAM[rateindex][1];
+          ti_16qam[2] = mod_table_16QAM[rateindex][2];
+          ti_16qam[3] = mod_table_16QAM[rateindex][3];
+          ti_16qam[4] = -std::conj(mod_table_16QAM[rateindex][0]);
+          ti_16qam[5] = -std::conj(mod_table_16QAM[rateindex][1]);
+          ti_16qam[6] = -std::conj(mod_table_16QAM[rateindex][2]);
+          ti_16qam[7] = -std::conj(mod_table_16QAM[rateindex][3]);
+          ti_16qam[8] = std::conj(mod_table_16QAM[rateindex][0]);
+          ti_16qam[9] = std::conj(mod_table_16QAM[rateindex][1]);
+          ti_16qam[10] = std::conj(mod_table_16QAM[rateindex][2]);
+          ti_16qam[11] = std::conj(mod_table_16QAM[rateindex][3]);
+          ti_16qam[12] = -mod_table_16QAM[rateindex][0];
+          ti_16qam[13] = -mod_table_16QAM[rateindex][1];
+          ti_16qam[14] = -mod_table_16QAM[rateindex][2];
+          ti_16qam[15] = -mod_table_16QAM[rateindex][3];
+          break;
+        case MOD_64QAM:
+          for (i = 0, j = 0; i < 16; i++, j++) {
+            ti_64qam[i] = mod_table_64QAM[rateindex][j];
+          }
+          for (i = 16, j = 0; i < 32; i++, j++) {
+            ti_64qam[i] = -std::conj(mod_table_64QAM[rateindex][j]);
+          }
+          for (i = 32, j = 0; i < 48; i++, j++) {
+            ti_64qam[i] = std::conj(mod_table_64QAM[rateindex][j]);
+          }
+          for (i = 48, j = 0; i < 64; i++, j++) {
+            ti_64qam[i] = -mod_table_64QAM[rateindex][j];
+          }
+          break;
+        case MOD_256QAM:
+          for (i = 0, j = 0; i < 64; i++, j++) {
+            ti_256qam[i] = mod_table_256QAM[rateindex][j];
+          }
+          for (i = 64, j = 0; i < 128; i++, j++) {
+            ti_256qam[i] = -std::conj(mod_table_256QAM[rateindex][j]);
+          }
+          for (i = 128, j = 0; i < 192; i++, j++) {
+            ti_256qam[i] = std::conj(mod_table_256QAM[rateindex][j]);
+          }
+          for (i = 192, j = 0; i < 256; i++, j++) {
+            ti_256qam[i] = -mod_table_256QAM[rateindex][j];
+          }
+          break;
+        default:
+          normalization = std::sqrt(2.0);
+          ti_qpsk[0] = gr_complex( 1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[1] = gr_complex(-1.0 / normalization,  1.0 / normalization);
+          ti_qpsk[2] = gr_complex( 1.0 / normalization, -1.0 / normalization);
+          ti_qpsk[3] = gr_complex(-1.0 / normalization, -1.0 / normalization);
+          break;
+      }
+      delay_line[1].reserve(depth);
+      for (int i = 0; i < depth; i++) {
+        delay_line[1].emplace_back(i, 0);
+      }
+      for (int i = 0; i < depth; i++) {
+        switch (constellationplp1) {
+          case MOD_QPSK:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 1;
+              randombits |= ti_randomize[randomindex + 1];
+              if (i != 0) {
+                delay_line[1][i].push_back(ti_qpsk[randombits]);
+                delay_line[1][i].pop_front();
+              }
+              randomindex += 2;
+            }
+            break;
+          case MOD_16QAM:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 3;
+              randombits |= ti_randomize[randomindex + 1] << 2;
+              randombits |= ti_randomize[randomindex + 2] << 1;
+              randombits |= ti_randomize[randomindex + 3];
+              if (i != 0) {
+                delay_line[1][i].push_back(ti_16qam[randombits]);
+                delay_line[1][i].pop_front();
+              }
+              randomindex += 4;
+            }
+            break;
+          case MOD_64QAM:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 5;
+              randombits |= ti_randomize[randomindex + 1] << 4;
+              randombits |= ti_randomize[randomindex + 2] << 3;
+              randombits |= ti_randomize[randomindex + 3] << 2;
+              randombits |= ti_randomize[randomindex + 4] << 1;
+              randombits |= ti_randomize[randomindex + 5];
+              if (i != 0) {
+                delay_line[1][i].push_back(ti_64qam[randombits]);
+                delay_line[1][i].pop_front();
+              }
+              randomindex += 6;
+            }
+            break;
+          case MOD_256QAM:
+            for (int j = 0; j < i; j++) {
+              randombits = ti_randomize[randomindex] << 7;
+              randombits |= ti_randomize[randomindex + 1] << 6;
+              randombits |= ti_randomize[randomindex + 2] << 5;
+              randombits |= ti_randomize[randomindex + 3] << 4;
+              randombits |= ti_randomize[randomindex + 4] << 3;
+              randombits |= ti_randomize[randomindex + 5] << 2;
+              randombits |= ti_randomize[randomindex + 6] << 1;
+              randombits |= ti_randomize[randomindex + 7];
+              if (i != 0) {
+                delay_line[1][i].push_back(ti_256qam[randombits]);
+                delay_line[1][i].pop_front();
+              }
+              randomindex += 8;
+            }
+            break;
+          default:
+            break;
+        }
+      }
       time_interleaver.resize(plp_size_total);
       for (int plp = 0; plp < NUM_PLPS; plp++) {
         if (ti_mode[plp] == TI_MODE_HYBRID) {
@@ -587,6 +959,27 @@ namespace gr {
         fm_randomize[i] = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
                           ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
                           ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        b = sr & 1;
+        sr >>= 1;
+        if (b) {
+          sr ^= POLYNOMIAL;
+        }
+      }
+    }
+
+    void
+    tdmframemapper_cc_impl::init_ti_randomizer(void)
+    {
+      int sr = 0x18f;
+      int b, packed;
+
+      for (int i = 0; i < (MAX_INTERLEAVER_DEPTH * MAX_INTERLEAVER_DEPTH) * 4;) {
+        packed = ((sr & 0x4) << 5) | ((sr & 0x8) << 3) | ((sr & 0x10) << 1) | \
+                 ((sr & 0x20) >> 1) | ((sr & 0x200) >> 6) | ((sr & 0x1000) >> 10) | \
+                 ((sr & 0x2000) >> 12) | ((sr & 0x8000) >> 15);
+        for (int n = 7; n >= 0; n--) {
+          ti_randomize[i++] = packed & (1 << n) ? 1 : 0;
+        }
         b = sr & 1;
         sr >>= 1;
         if (b) {
@@ -1821,6 +2214,7 @@ namespace gr {
       int left_nulls;
       int right_nulls;
       int l1detailcells, l1totalcells;
+      int commutator_start[NUM_PLPS] = {0, 0};
       int virtual_offset;
       std::vector<int> H;
       gr_complex *outtimehti;
@@ -1866,6 +2260,7 @@ namespace gr {
         left_nulls = sbsnullcells / 2;
         right_nulls = left_nulls;
       }
+
       for (int i = 0; i < noutput_items; i += noutput_items) {
         outtimeint = &time_interleaver[0];
         for (int plp = 0; plp < NUM_PLPS; plp++) {
@@ -1893,6 +2288,16 @@ namespace gr {
               in += fec_cells[plp] * HtimeNfec[x];
             }
           }
+          else if (ti_mode[plp] == TI_MODE_CONVOLUTIONAL) {
+            commutator_start[plp] = commutator[plp];
+            for (int n = 0; n < plp_size[plp]; n++) {
+              delay_line[plp][commutator[plp]].push_front(inx[indexin[plp]++]);
+              outtimeint[n] = delay_line[plp][commutator[plp]].back();
+              delay_line[plp][commutator[plp]].pop_back();
+              commutator[plp] = (commutator[plp] + 1) % ti_depth[plp];
+            }
+            outtimeint += plp_size[plp];
+          }
           else {
             memcpy(&outtimeint[0], &inx[indexin[plp]], sizeof(gr_complex) * plp_size[plp]);
             indexin[plp] += plp_size[plp];
@@ -1905,17 +2310,18 @@ namespace gr {
         time_offset = samples % SAMPLES_PER_MILLISECOND_6MHZ;
         indexout += add_l1basic(&out[0], time_offset, lls_flag);
 
-        fec_block_start[0] = cells[0] % fec_cells[0];
-        if (fec_block_start[0]) {
-          fec_block_start[0] = fec_cells[0] - (cells[0] % fec_cells[0]);
+        for (int k = 0; k < 2; k++) {
+          fec_block_start[k] = cells[k] % fec_cells[k];
+          if (fec_block_start[k]) {
+            fec_block_start[k] = fec_cells[k] - (cells[k] % fec_cells[k]);
+          }
+
+          if (ti_mode[k] == TI_MODE_CONVOLUTIONAL) {
+            fec_block_start[k] = fec_block_start[k] + ti_depth[k] * ((commutator_start[k] + fec_block_start[k]) % ti_depth[k]);
+          }
         }
 
-        fec_block_start[1] = cells[1] % fec_cells[1];
-        if (fec_block_start[1]) {
-          fec_block_start[1] = fec_cells[1] - (cells[1] % fec_cells[1]);
-        }
-
-        rtn = add_l1detail(&l1_dummy[0], fec_block_start[0], 0, fec_block_start[1], 0);
+        rtn = add_l1detail(&l1_dummy[0], fec_block_start[0], commutator_start[0], fec_block_start[1], commutator_start[1]);
         l1detailcells = rtn.cells;
         rows = l1detailcells / preamblesyms;
         for (int i = 0; i < preamblesyms; i++) {
