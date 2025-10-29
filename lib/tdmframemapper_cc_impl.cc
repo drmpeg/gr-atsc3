@@ -493,7 +493,7 @@ namespace gr {
           throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
         }
       }
-      else if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == (TI_MODE_OFF || timodeplp1 == TI_MODE_CONVOLUTIONAL)) {
+      else if (timodeplp0 == TI_MODE_HYBRID && (timodeplp1 == TI_MODE_OFF || timodeplp1 == TI_MODE_CONVOLUTIONAL)) {
         plp_size[0] = tifecblocksplp0 * fec_cells[0];
         if (plpsizeplp1 != 0) {
           plp_size[1] = plpsizeplp1;
