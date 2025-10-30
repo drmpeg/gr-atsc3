@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Free Software Foundation, Inc.
+ * Copyright 2025 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(fdmframemapper_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(f840cd3ca73b1a3f4c054c70040ad666)                     */
+/* BINDTOOL_HEADER_FILE_HASH(01e9316ad17a33d191ecccea7abe99fd)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -42,19 +42,22 @@ void bind_fdmframemapper_cc(py::module& m)
            py::arg("fecmodeplp0"),
            py::arg("constellationplp0"),
            py::arg("timodeplp0"),
+           py::arg("tidepthplp0"),
            py::arg("tiblocksplp0"),
            py::arg("tifecblocksmaxplp0"),
            py::arg("tifecblocksplp0"),
+           py::arg("plpsizeplp0"),
            py::arg("llsmodeplp0"),
            py::arg("framesizeplp1"),
            py::arg("rateplp1"),
            py::arg("fecmodeplp1"),
            py::arg("constellationplp1"),
            py::arg("timodeplp1"),
+           py::arg("tidepthplp1"),
            py::arg("tiblocksplp1"),
            py::arg("tifecblocksmaxplp1"),
            py::arg("tifecblocksplp1"),
-           py::arg("plpsplit"),
+           py::arg("plpsizeplp1"),
            py::arg("llsmodeplp1"),
            py::arg("fftsize"),
            py::arg("numpayloadsyms"),

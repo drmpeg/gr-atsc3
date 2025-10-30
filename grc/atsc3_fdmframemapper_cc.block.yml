@@ -15,9 +15,23 @@ templates:
           ${constellation2.val},
           % endif
           ${timodeplp0.val},
+          % if str(framesizeplp0) == 'FECFRAME_NORMAL':
+          % if str(constellation1) != 'MOD_QPSK':
+          ${tidepthplp01.val},
+          % else:
+          ${tidepthplp02.val},
+          % endif
+          % else:
+          % if str(constellation2) != 'MOD_QPSK':
+          ${tidepthplp03.val},
+          % else:
+          ${tidepthplp04.val},
+          % endif
+          % endif
           ${tiblocksplp0},
           ${tifecblocksmaxplp0},
           ${tifecblocksplp0},
+          ${plpsizeplp0},
           ${llsmodeplp0.val},
           ${framesizeplp1.val},
           ${rateplp1.val},
@@ -28,10 +42,23 @@ templates:
           ${constellation4.val},
           % endif
           ${timodeplp1.val},
+          % if str(framesizeplp1) == 'FECFRAME_NORMAL':
+          % if str(constellation3) != 'MOD_QPSK':
+          ${tidepthplp11.val},
+          % else:
+          ${tidepthplp12.val},
+          % endif
+          % else:
+          % if str(constellation4) != 'MOD_QPSK':
+          ${tidepthplp13.val},
+          % else:
+          ${tidepthplp14.val},
+          % endif
+          % endif
           ${tiblocksplp1},
           ${tifecblocksmaxplp1},
           ${tifecblocksplp1},
-          ${plpsplit},
+          ${plpsizeplp1},
           ${llsmodeplp1.val},
           ${fftsize.val},
           ${numpayloadsyms},
@@ -125,11 +152,48 @@ parameters:
 -   id: timodeplp0
     label: Time Interleaver Mode PLP0
     dtype: enum
-    options: [TI_MODE_OFF, TI_MODE_HYBRID]
-    option_labels: [Disabled, Hybrid]
+    options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
+    option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
-        hide_tiblocks: [all, none]
-        val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
+        hide_tiblocks: [all, all, none]
+        hide_plpsize: [none, none, all]
+        val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
+-   id: tidepthplp01
+    label: Time Interleaver Depth PLP0
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
+    option_labels: [512, 724, 887, 1024]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_NORMAL' and str(constellation1) != 'MOD_QPSK' else 'all') }
+-   id: tidepthplp02
+    label: Time Interleaver Depth PLP0
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
+    option_labels: [512, 724, 887, 1024, 1254, 1448]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_NORMAL' and str(constellation1) == 'MOD_QPSK' else 'all') }
+-   id: tidepthplp03
+    label: Time Interleaver Depth PLP0
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
+    option_labels: [512, 724, 887, 1024]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_SHORT' and str(constellation2) != 'MOD_QPSK' else 'all') }
+-   id: tidepthplp04
+    label: Time Interleaver Depth PLP0
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
+    option_labels: [512, 724, 887, 1024, 1254, 1448]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp0) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp0) == 'FECFRAME_SHORT' and str(constellation2) == 'MOD_QPSK' else 'all') }
 -   id: tiblocksplp0
     label: TI Blocks PLP0
     dtype: int
@@ -145,6 +209,11 @@ parameters:
     dtype: int
     default: '14'
     hide: ${ timodeplp0.hide_tiblocks }
+-   id: plpsizeplp0
+    label: PLP Size PLP0
+    dtype: int
+    default: '0'
+    hide: ${ ('part' if plpsizeplp0 == 0 and str(timodeplp0) != 'TI_MODE_HYBRID' else timodeplp0.hide_plpsize) }
 -   id: llsmodeplp0
     label: LLS Insertion PLP0
     dtype: enum
@@ -196,11 +265,48 @@ parameters:
 -   id: timodeplp1
     label: Time Interleaver Mode PLP1
     dtype: enum
-    options: [TI_MODE_OFF, TI_MODE_HYBRID]
-    option_labels: [Disabled, Hybrid]
+    options: [TI_MODE_OFF, TI_MODE_CONVOLUTIONAL, TI_MODE_HYBRID]
+    option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
-        hide_tiblocks: [all, none]
-        val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_HYBRID]
+        hide_tiblocks: [all, all, none]
+        hide_plpsize: [none, none, all]
+        val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
+-   id: tidepthplp11
+    label: Time Interleaver Depth PLP1
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
+    option_labels: [512, 724, 887, 1024]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_NORMAL' and str(constellation3) != 'MOD_QPSK' else 'all') }
+-   id: tidepthplp12
+    label: Time Interleaver Depth PLP1
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
+    option_labels: [512, 724, 887, 1024, 1254, 1448]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_NORMAL' and str(constellation3) == 'MOD_QPSK' else 'all') }
+-   id: tidepthplp13
+    label: Time Interleaver Depth PLP1
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024]
+    option_labels: [512, 724, 887, 1024]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_SHORT' and str(constellation4) != 'MOD_QPSK' else 'all') }
+-   id: tidepthplp14
+    label: Time Interleaver Depth PLP1
+    dtype: enum
+    options: [TI_DEPTH_512, TI_DEPTH_724, TI_DEPTH_887, TI_DEPTH_1024, TI_DEPTH_1254, TI_DEPTH_1448]
+    option_labels: [512, 724, 887, 1024, 1254, 1448]
+    option_attributes:
+        val: [atsc3.TI_DEPTH_512, atsc3.TI_DEPTH_724, atsc3.TI_DEPTH_887, atsc3.TI_DEPTH_1024, atsc3.TI_DEPTH_1254, atsc3.TI_DEPTH_1448]
+    default: 'TI_DEPTH_1024'
+    hide: ${ ('none' if str(timodeplp1) == 'TI_MODE_CONVOLUTIONAL' and str(framesizeplp1) == 'FECFRAME_SHORT' and str(constellation4) == 'MOD_QPSK' else 'all') }
 -   id: tiblocksplp1
     label: TI Blocks PLP1
     dtype: int
@@ -216,11 +322,11 @@ parameters:
     dtype: int
     default: '44'
     hide: ${ timodeplp1.hide_tiblocks }
--   id: plpsplit
-    label: PLP 0/1 Size Ratio
-    dtype: float
-    default: '0.5'
-    hide: ${ ('none' if str(timodeplp0) == str(timodeplp1) == 'TI_MODE_OFF' else 'all') }
+-   id: plpsizeplp1
+    label: PLP Size PLP1
+    dtype: int
+    default: '0'
+    hide: ${ ('part' if plpsizeplp1 == 0 and str(timodeplp1) != 'TI_MODE_HYBRID' else timodeplp1.hide_plpsize) }
 -   id: llsmodeplp1
     label: LLS Insertion PLP1
     dtype: enum
