@@ -495,34 +495,45 @@ namespace gr {
       }
       else if (timodeplp0 == TI_MODE_HYBRID && (timodeplp1 == TI_MODE_OFF || timodeplp1 == TI_MODE_CONVOLUTIONAL)) {
         plp_size[0] = tifecblocksplp0 * fec_cells[0];
+        plp_size[1] = plp_size_total - plp_size[0];
         if (plpsizeplp1 != 0) {
+          if (plpsizeplp1 > plp_size[1]) {
+            throw std::runtime_error("PLP size PLP1 exceeds available cells.");
+          }
           plp_size[1] = plpsizeplp1;
-        }
-        else {
-          plp_size[1] = plp_size_total - plp_size[0];
         }
       }
       else if ((timodeplp0 == TI_MODE_OFF || timodeplp0 == TI_MODE_CONVOLUTIONAL) && timodeplp1 == TI_MODE_HYBRID) {
         plp_size[1] = tifecblocksplp1 * fec_cells[1];
+        plp_size[0] = plp_size_total - plp_size[1];
         if (plpsizeplp0 != 0) {
+          if (plpsizeplp0 > plp_size[0]) {
+            throw std::runtime_error("PLP size PLP0 exceeds available cells.");
+          }
           plp_size[0] = plpsizeplp0;
-        }
-        else {
-          plp_size[0] = plp_size_total - plp_size[1];
         }
       }
       else {
         if (plpsizeplp0 != 0 && plpsizeplp1 == 0) {
           plp_size[0] = plpsizeplp0;
+          if (plp_size[0] > plp_size_total) {
+            throw std::runtime_error("PLP size PLP0 exceeds available cells.");
+          }
           plp_size[1] = plp_size_total - plp_size[0];
         }
         else if (plpsizeplp0 == 0 && plpsizeplp1 != 0) {
           plp_size[1] = plpsizeplp1;
+          if (plp_size[1] > plp_size_total) {
+            throw std::runtime_error("PLP size PLP1 exceeds available cells.");
+          }
           plp_size[0] = plp_size_total - plp_size[1];
         }
         else if (plpsizeplp0 != 0 && plpsizeplp1 != 0) {
           plp_size[0] = plpsizeplp0;
           plp_size[1] = plpsizeplp1;
+          if ((plp_size[0] + plp_size[1]) > plp_size_total) {
+            throw std::runtime_error("Combined PLP size exceeds available cells.");
+          }
         }
         else {
           plp_size[0] = plp_size_total / 2;
