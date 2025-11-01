@@ -18,17 +18,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     framemapper_cc::sptr
-    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_lls_insertion_mode_t llsmode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc::make(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, int plpsize, atsc3_lls_insertion_mode_t llsmode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<framemapper_cc_impl>(
-        framesize, rate, fecmode, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, tiblocks, tifecblocksmax, tifecblocks, llsmode, cred, flmode, flen, tifmode, misomode, paprmode, l1bmode, l1dmode);
+        framesize, rate, fecmode, constellation, fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, pilotboost, firstsbs, fimode, timode, tidepth, tiblocks, tifecblocksmax, tifecblocks, plpsize, llsmode, cred, flmode, flen, tifmode, misomode, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, atsc3_lls_insertion_mode_t llsmode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    framemapper_cc_impl::framemapper_cc_impl(atsc3_framesize_t framesize, atsc3_code_rate_t rate, atsc3_plp_fec_mode_t fecmode, atsc3_constellation_t constellation, atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_scattered_pilot_boost_t pilotboost, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimode, atsc3_time_interleaver_mode_t timode, atsc3_time_interleaver_depth_t tidepth, int tiblocks, int tifecblocksmax, int tifecblocks, int plpsize, atsc3_lls_insertion_mode_t llsmode, atsc3_reduced_carriers_t cred, atsc3_frame_length_mode_t flmode, int flen, atsc3_time_info_flag_t tifmode, atsc3_miso_t misomode, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("framemapper_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type)))
@@ -397,11 +397,20 @@ namespace gr {
         plp_size = totalcells - l1cells - sbsnullcells;
       }
       plp_size_total = plp_size;
+      printf("PLP size total = %d\n", plp_size_total);
       if (timode == TI_MODE_HYBRID) {
         if (tifecblocks * fec_cells > plp_size_total) {
           throw std::runtime_error("Hybrid Time Interleaver PLP size exceeds available cells.");
         }
         plp_size = tifecblocks * fec_cells;
+      }
+      else {
+        if (plpsize != 0) {
+          if (plpsize > plp_size) {
+            throw std::runtime_error("PLP size exceeds available cells.");
+          }
+          plp_size = plpsize;
+        }
       }
       printf("PLP size = %d\n", plp_size);
       l1detailinit[0][0]->plp_size = plp_size;

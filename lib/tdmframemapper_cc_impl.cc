@@ -479,13 +479,12 @@ namespace gr {
       if (firstsbs == SBS_ON) {
         printf("SBS null cells = %d\n", sbsnullcells * 2);
         plp_size_total = totalcells - l1cells - (2 * sbsnullcells);
-        printf("PLP size total = %d\n", plp_size_total);
       }
       else {
         printf("SBS null cells = %d\n", sbsnullcells);
         plp_size_total = totalcells - l1cells - sbsnullcells;
-        printf("PLP size total = %d\n", plp_size_total);
       }
+      printf("PLP size total = %d\n", plp_size_total);
       if (timodeplp0 == TI_MODE_HYBRID && timodeplp1 == TI_MODE_HYBRID) {
         plp_size[0] = tifecblocksplp0 * fec_cells[0];
         plp_size[1] = tifecblocksplp1 * fec_cells[1];

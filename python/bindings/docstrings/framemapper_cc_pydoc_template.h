@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Free Software Foundation, Inc.
+ * Copyright 2025 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -19,7 +19,7 @@
  static const char *__doc_gr_atsc3_framemapper_cc = R"doc()doc";
 
 
- static const char *__doc_gr_atsc3_framemapper_cc_framemapper_cc = R"doc()doc";
+ static const char *__doc_gr_atsc3_framemapper_cc_framemapper_cc_0 = R"doc()doc";
 
 
  static const char *__doc_gr_atsc3_framemapper_cc_make = R"doc()doc";

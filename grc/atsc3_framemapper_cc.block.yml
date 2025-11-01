@@ -71,6 +71,7 @@ templates:
           ${tiblocks},
           ${tifecblocksmax},
           ${tifecblocks},
+          ${plpsize},
           ${llsmode.val},
           ${cred.val},
           ${flmode.val},
@@ -316,6 +317,7 @@ parameters:
     option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
         hide_tiblocks: [all, all, none]
+        hide_plpsize: [none, none, all]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
 -   id: tidepth1
     label: Time Interleaver Depth
@@ -368,6 +370,11 @@ parameters:
     dtype: int
     default: '14'
     hide: ${ timode.hide_tiblocks }
+-   id: plpsize
+    label: PLP Size
+    dtype: int
+    default: '0'
+    hide: ${ ('part' if plpsize == 0 and str(timode) != 'TI_MODE_HYBRID' else timode.hide_plpsize) }
 -   id: llsmode
     label: LLS Insertion
     dtype: enum
