@@ -71,6 +71,7 @@ templates:
           ${tiblockssub0},
           ${tifecblocksmaxsub0},
           ${tifecblockssub0},
+          ${plpsizesub0},
           ${llsmodesub0.val},
           ${credsub0.val},
           ${misomodesub0.val},
@@ -137,6 +138,7 @@ templates:
           ${tiblockssub1},
           ${tifecblocksmaxsub1},
           ${tifecblockssub1},
+          ${plpsizesub1},
           ${llsmodesub1.val},
           ${credsub1.val},
           ${misomodesub1.val},
@@ -381,6 +383,7 @@ parameters:
     option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
         hide_tiblocks: [all, all, none]
+        hide_plpsize: [none, none, all]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
 -   id: tidepthsub01
     label: Time Interleaver Depth Sub0
@@ -433,6 +436,11 @@ parameters:
     dtype: int
     default: '14'
     hide: ${ timodesub0.hide_tiblocks }
+-   id: plpsizesub0
+    label: PLP Size Sub 0
+    dtype: int
+    default: '0'
+    hide: ${ ('part' if plpsizesub0 == 0 and str(timodesub0) != 'TI_MODE_HYBRID' else timodesub0.hide_plpsize) }
 -   id: llsmodesub0
     label: LLS Insertion Sub0
     dtype: enum
@@ -679,6 +687,7 @@ parameters:
     option_labels: [Disabled, Convolutional, Hybrid]
     option_attributes:
         hide_tiblocks: [all, all, none]
+        hide_plpsize: [none, none, all]
         val: [atsc3.TI_MODE_OFF, atsc3.TI_MODE_CONVOLUTIONAL, atsc3.TI_MODE_HYBRID]
 -   id: tidepthsub11
     label: Time Interleaver Depth Sub1
@@ -731,6 +740,11 @@ parameters:
     dtype: int
     default: '44'
     hide: ${ timodesub1.hide_tiblocks }
+-   id: plpsizesub1
+    label: PLP Size Sub 1
+    dtype: int
+    default: '0'
+    hide: ${ ('part' if plpsizesub1 == 0 and str(timodesub1) != 'TI_MODE_HYBRID' else timodesub1.hide_plpsize) }
 -   id: llsmodesub1
     label: LLS Insertion Sub1
     dtype: enum

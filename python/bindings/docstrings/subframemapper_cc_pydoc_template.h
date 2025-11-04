@@ -19,7 +19,7 @@
  static const char *__doc_gr_atsc3_subframemapper_cc = R"doc()doc";
 
 
- static const char *__doc_gr_atsc3_subframemapper_cc_subframemapper_cc = R"doc()doc";
+ static const char *__doc_gr_atsc3_subframemapper_cc_subframemapper_cc_0 = R"doc()doc";
 
 
  static const char *__doc_gr_atsc3_subframemapper_cc_make = R"doc()doc";

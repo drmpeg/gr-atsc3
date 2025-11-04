@@ -16,17 +16,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     subframemapper_cc::sptr
-    subframemapper_cc::make(atsc3_framesize_t framesizesub0, atsc3_code_rate_t ratesub0, atsc3_plp_fec_mode_t fecmodesub0, atsc3_constellation_t constellationsub0, atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_scattered_pilot_boost_t pilotboostsub0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodesub0, atsc3_time_interleaver_mode_t timodesub0, atsc3_time_interleaver_depth_t tidepthsub0, int tiblockssub0, int tifecblocksmaxsub0, int tifecblockssub0, atsc3_lls_insertion_mode_t llsmodesub0, atsc3_reduced_carriers_t credsub0, atsc3_miso_t misomodesub0, atsc3_framesize_t framesizesub1, atsc3_code_rate_t ratesub1, atsc3_plp_fec_mode_t fecmodesub1, atsc3_constellation_t constellationsub1, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_scattered_pilot_boost_t pilotboostsub1, atsc3_frequency_interleaver_t fimodesub1, atsc3_time_interleaver_mode_t timodesub1, atsc3_time_interleaver_depth_t tidepthsub1, int tiblockssub1, int tifecblocksmaxsub1, int tifecblockssub1, atsc3_lls_insertion_mode_t llsmodesub1, atsc3_reduced_carriers_t credsub1, atsc3_miso_t misomodesub1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc::make(atsc3_framesize_t framesizesub0, atsc3_code_rate_t ratesub0, atsc3_plp_fec_mode_t fecmodesub0, atsc3_constellation_t constellationsub0, atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_scattered_pilot_boost_t pilotboostsub0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodesub0, atsc3_time_interleaver_mode_t timodesub0, atsc3_time_interleaver_depth_t tidepthsub0, int tiblockssub0, int tifecblocksmaxsub0, int tifecblockssub0, int plpsizesub0, atsc3_lls_insertion_mode_t llsmodesub0, atsc3_reduced_carriers_t credsub0, atsc3_miso_t misomodesub0, atsc3_framesize_t framesizesub1, atsc3_code_rate_t ratesub1, atsc3_plp_fec_mode_t fecmodesub1, atsc3_constellation_t constellationsub1, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_scattered_pilot_boost_t pilotboostsub1, atsc3_frequency_interleaver_t fimodesub1, atsc3_time_interleaver_mode_t timodesub1, atsc3_time_interleaver_depth_t tidepthsub1, int tiblockssub1, int tifecblocksmaxsub1, int tifecblockssub1, int plpsizesub1, atsc3_lls_insertion_mode_t llsmodesub1, atsc3_reduced_carriers_t credsub1, atsc3_miso_t misomodesub1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
     {
       return gnuradio::make_block_sptr<subframemapper_cc_impl>(
-        framesizesub0, ratesub0, fecmodesub0, constellationsub0, fftsizesub0, numpayloadsymssub0, numpreamblesyms, guardintervalsub0, pilotpatternsub0, pilotboostsub0, firstsbs, fimodesub0, timodesub0, tidepthsub0, tiblockssub0, tifecblocksmaxsub0, tifecblockssub0, llsmodesub0, credsub0, misomodesub0, framesizesub1, ratesub1, fecmodesub1, constellationsub1, fftsizesub1, numpayloadsymssub1, guardintervalsub1, pilotpatternsub1, pilotboostsub1, fimodesub1, timodesub1, tidepthsub1, tiblockssub1, tifecblocksmaxsub1, tifecblockssub1, llsmodesub1, credsub1, misomodesub1, flmode, flen, paprmode, l1bmode, l1dmode);
+        framesizesub0, ratesub0, fecmodesub0, constellationsub0, fftsizesub0, numpayloadsymssub0, numpreamblesyms, guardintervalsub0, pilotpatternsub0, pilotboostsub0, firstsbs, fimodesub0, timodesub0, tidepthsub0, tiblockssub0, tifecblocksmaxsub0, tifecblockssub0, plpsizesub0, llsmodesub0, credsub0, misomodesub0, framesizesub1, ratesub1, fecmodesub1, constellationsub1, fftsizesub1, numpayloadsymssub1, guardintervalsub1, pilotpatternsub1, pilotboostsub1, fimodesub1, timodesub1, tidepthsub1, tiblockssub1, tifecblocksmaxsub1, tifecblockssub1, plpsizesub1, llsmodesub1, credsub1, misomodesub1, flmode, flen, paprmode, l1bmode, l1dmode);
     }
 
 
     /*
      * The private constructor
      */
-    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesizesub0, atsc3_code_rate_t ratesub0, atsc3_plp_fec_mode_t fecmodesub0, atsc3_constellation_t constellationsub0, atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_scattered_pilot_boost_t pilotboostsub0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodesub0, atsc3_time_interleaver_mode_t timodesub0, atsc3_time_interleaver_depth_t tidepthsub0, int tiblockssub0, int tifecblocksmaxsub0, int tifecblockssub0, atsc3_lls_insertion_mode_t llsmodesub0, atsc3_reduced_carriers_t credsub0, atsc3_miso_t misomodesub0, atsc3_framesize_t framesizesub1, atsc3_code_rate_t ratesub1, atsc3_plp_fec_mode_t fecmodesub1, atsc3_constellation_t constellationsub1, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_scattered_pilot_boost_t pilotboostsub1, atsc3_frequency_interleaver_t fimodesub1, atsc3_time_interleaver_mode_t timodesub1, atsc3_time_interleaver_depth_t tidepthsub1, int tiblockssub1, int tifecblocksmaxsub1, int tifecblockssub1, atsc3_lls_insertion_mode_t llsmodesub1, atsc3_reduced_carriers_t credsub1, atsc3_miso_t misomodesub1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
+    subframemapper_cc_impl::subframemapper_cc_impl(atsc3_framesize_t framesizesub0, atsc3_code_rate_t ratesub0, atsc3_plp_fec_mode_t fecmodesub0, atsc3_constellation_t constellationsub0, atsc3_fftsize_t fftsizesub0, int numpayloadsymssub0, int numpreamblesyms, atsc3_guardinterval_t guardintervalsub0, atsc3_pilotpattern_t pilotpatternsub0, atsc3_scattered_pilot_boost_t pilotboostsub0, atsc3_first_sbs_t firstsbs, atsc3_frequency_interleaver_t fimodesub0, atsc3_time_interleaver_mode_t timodesub0, atsc3_time_interleaver_depth_t tidepthsub0, int tiblockssub0, int tifecblocksmaxsub0, int tifecblockssub0, int plpsizesub0, atsc3_lls_insertion_mode_t llsmodesub0, atsc3_reduced_carriers_t credsub0, atsc3_miso_t misomodesub0, atsc3_framesize_t framesizesub1, atsc3_code_rate_t ratesub1, atsc3_plp_fec_mode_t fecmodesub1, atsc3_constellation_t constellationsub1, atsc3_fftsize_t fftsizesub1, int numpayloadsymssub1, atsc3_guardinterval_t guardintervalsub1, atsc3_pilotpattern_t pilotpatternsub1, atsc3_scattered_pilot_boost_t pilotboostsub1, atsc3_frequency_interleaver_t fimodesub1, atsc3_time_interleaver_mode_t timodesub1, atsc3_time_interleaver_depth_t tidepthsub1, int tiblockssub1, int tifecblocksmaxsub1, int tifecblockssub1, int plpsizesub1, atsc3_lls_insertion_mode_t llsmodesub1, atsc3_reduced_carriers_t credsub1, atsc3_miso_t misomodesub1, atsc3_frame_length_mode_t flmode, int flen, atsc3_papr_t paprmode, atsc3_l1_fec_mode_t l1bmode, atsc3_l1_fec_mode_t l1dmode)
       : gr::block("subframemapper_cc",
               gr::io_signature::make(2, 2, sizeof(input_type)),
               gr::io_signature::make(2, 2, sizeof(output_type)))
@@ -492,15 +492,16 @@ namespace gr {
       }
       total_cells[0] = totalcells[0];
       l1detailinit[0][0]->sbs_null_cells = sbsnullcells[0] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
-      printf("PLP0 total cells = %d\n", totalcells[0]);
+      printf("SUB0 total cells = %d\n", totalcells[0]);
       if (firstsbs == SBS_ON) {
-        printf("PLP0 SBS null cells = %d\n", sbsnullcells[0] * 2);
+        printf("SUB0 SBS null cells = %d\n", sbsnullcells[0] * 2);
         plp_size_total[0] = totalcells[0] - l1cells - (2 * sbsnullcells[0]);
       }
       else {
-        printf("PLP0 SBS null cells = %d\n", sbsnullcells[0]);
+        printf("SUB0 SBS null cells = %d\n", sbsnullcells[0]);
         plp_size_total[0] = totalcells[0] - l1cells - sbsnullcells[0];
       }
+      printf("SUB0 PLP size total = %d\n", plp_size_total[0]);
       if (timodesub0 == TI_MODE_HYBRID) {
         plp_size[0] = tifecblockssub0 * fec_cells[0];
         if (plp_size[0] > plp_size_total[0]) {
@@ -508,10 +509,18 @@ namespace gr {
         }
       }
       else {
-        plp_size[0] = plp_size_total[0];
+        if (plpsizesub0 != 0) {
+          if (plpsizesub0 > plp_size_total[0]) {
+            throw std::runtime_error("PLP size Sub 0 exceeds available cells.");
+          }
+          plp_size[0] = plpsizesub0;
+        }
+        else {
+          plp_size[0] = plp_size_total[0];
+        }
       }
       l1detailinit[0][0]->plp_size = plp_size[0];
-      printf("PLP0 size = %d\n", plp_size[0]);
+      printf("SUB0 PLP size = %d\n", plp_size[0]);
 
       po = ofdm_params(fftsizesub1, guardintervalsub1, pilotpatternsub1, pilotboostsub1, credsub1);
       fftsamples[1] = po.fftsamples;
@@ -548,15 +557,16 @@ namespace gr {
       }
       total_cells[1] = totalcells[1];
       l1detailinit[1][0]->sbs_null_cells = sbsnullcells[1] = (sbs_cells - papr_cells) - (sbs_data_cells - papr_cells);
-      printf("PLP1 total cells = %d\n", totalcells[1]);
+      printf("SUB1 total cells = %d\n", totalcells[1]);
       if (first_sbs[1] == SBS_ON) {
-        printf("PLP1 SBS null cells = %d\n", sbsnullcells[1] * 2);
+        printf("SUB1 SBS null cells = %d\n", sbsnullcells[1] * 2);
         plp_size_total[1] = totalcells[1] - (2 * sbsnullcells[1]);
       }
       else {
-        printf("PLP1 SBS null cells = %d\n", sbsnullcells[1]);
+        printf("SUB1 SBS null cells = %d\n", sbsnullcells[1]);
         plp_size_total[1] = totalcells[1] - sbsnullcells[1];
       }
+      printf("SUB1 PLP size total = %d\n", plp_size_total[1]);
       if (timodesub1 == TI_MODE_HYBRID) {
         plp_size[1] = tifecblockssub1 * fec_cells[1];
         if (plp_size[1] > plp_size_total[1]) {
@@ -564,10 +574,18 @@ namespace gr {
         }
       }
       else {
-        plp_size[1] = plp_size_total[1];
+        if (plpsizesub1 != 0) {
+          if (plpsizesub1 > plp_size_total[1]) {
+            throw std::runtime_error("PLP size Sub 1 exceeds available cells.");
+          }
+          plp_size[1] = plpsizesub1;
+        }
+        else {
+          plp_size[1] = plp_size_total[1];
+        }
       }
       l1detailinit[1][0]->plp_size = plp_size[1];
-      printf("PLP1 size = %d\n", plp_size[1]);
+      printf("SUB1 PLP size = %d\n", plp_size[1]);
 
       switch(tidepthsub0) {
         case TI_DEPTH_512:
