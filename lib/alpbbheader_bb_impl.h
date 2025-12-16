@@ -45,9 +45,9 @@ namespace gr {
       unsigned short identification;
       unsigned char src_addr[sizeof(in_addr)];
       unsigned char dst_addr[sizeof(in_addr)];
-      void sendbits(unsigned char b, unsigned char *out);
+      void send_bits(unsigned char b, unsigned char *out);
       int checksum(unsigned short *, int, int);
-      void sendlls(unsigned char *out);
+      void send_lls(unsigned char *out);
 
       const static char xml[];
       const static char SLT[];

@@ -115,7 +115,7 @@ namespace gr {
     }
 
     void
-    alpbbheader_bb_impl::sendbits(unsigned char b, unsigned char *out)
+    alpbbheader_bb_impl::send_bits(unsigned char b, unsigned char *out)
     {
       for (int n = 7; n >= 0; n--) {
         *out++ = b & (1 << n) ? 1 : 0;
@@ -138,7 +138,7 @@ namespace gr {
     }
 
     void
-    alpbbheader_bb_impl::sendlls(unsigned char *out)
+    alpbbheader_bb_impl::send_lls(unsigned char *out)
     {
       struct ip *ip_ptr;
       struct udphdr *udp_ptr;
@@ -204,6 +204,8 @@ namespace gr {
       udp_ptr->check = ~csum;
     }
 
+#define sendbits(bits, out) send_bits(bits, out); out +=8; produced +=8;
+
     int
     alpbbheader_bb_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
@@ -240,8 +242,6 @@ namespace gr {
             if (j == 0) {
               bits = (bbcount & 0x7f) | 0x80;
               sendbits(bits, out);
-              out += 8;
-              produced += 8;
               if (total == NUM_PACKETS) {
                 offset = (NUM_PACKETS - 2) - segments;
                 stuffing = (total * (MPEG_PKT_LENGTH - 1)) + (offset);
@@ -256,20 +256,12 @@ namespace gr {
                 bits = (bbcount >> 5) & 0xfc;
                 bits |= 0x2; /* OFI = long extension mode */
                 sendbits(bits, out);
-                out += 8;
-                produced += 8;
                 bits = (stuffing & 0x1f) | 0xe0; /* EXT_TYPE = all padding */
                 sendbits(bits, out);
-                out += 8;
-                produced += 8;
                 bits = stuffing >> 5;
                 sendbits(bits, out);
-                out += 8;
-                produced += 8;
                 for (int n = 0; n < stuffing; n++) {
                   sendbits(0, out);
-                  out += 8;
-                  produced += 8;
                 }
                 pcount += (stuffing) + LONG_EXTENSION_BYTES;
                 j += (stuffing) + LONG_EXTENSION_BYTES;
@@ -291,20 +283,12 @@ namespace gr {
                 bits = (bbcount >> 5) & 0xfc;
                 bits |= 0x2; /* OFI = long extension mode */
                 sendbits(bits, out);
-                out += 8;
-                produced += 8;
                 bits = (stuffing & 0x1f) | 0xe0; /* EXT_TYPE = all padding */
                 sendbits(bits, out);
-                out += 8;
-                produced += 8;
                 bits = stuffing >> 5;
                 sendbits(bits, out);
-                out += 8;
-                produced += 8;
                 for (int n = 0; n < stuffing; n++) {
                   sendbits(0, out);
-                  out += 8;
-                  produced += 8;
                 }
                 pcount += (stuffing) + LONG_EXTENSION_BYTES;
                 j += (stuffing) + LONG_EXTENSION_BYTES;
@@ -315,8 +299,6 @@ namespace gr {
               else {
                 bits = (bbcount >> 5) & 0xfc;
                 sendbits(bits, out);
-                out += 8;
-                produced += 8;
               }
             }
             if (lls_send == TRUE) {
@@ -331,8 +313,6 @@ namespace gr {
               }
               bits = llstemp[lls_index++];
               sendbits(bits, out);
-              out += 8;
-              produced += 8;
             }
             else {
               if (count == 0) {
@@ -357,8 +337,6 @@ namespace gr {
                     if (packets != 0) {
                       bits = 0xe3; /* AHF - Additional Header Flag*/
                       sendbits(bits, out);
-                      out += 8;
-                      produced += 8;
                       bits = packets; /* DNP - Deleted Null Packets */
                       packets = 0;
                       segments++;
@@ -376,8 +354,6 @@ namespace gr {
                   if (packets != 0) {
                     bits = 0xe3;
                     sendbits(bits, out);
-                    out += 8;
-                    produced += 8;
                     bits = packets;
                     packets = 0;
                     segments++;
@@ -391,7 +367,7 @@ namespace gr {
                       llstemp[0] = bits;
                       bits = lls_length & 0xff;
                       llstemp[1] = bits;
-                      sendlls(&llstemp[2]);
+                      send_lls(&llstemp[2]);
                       lls_count = lls_length + ALP_HEADER_LENGTH;
                       lls_index = 0;
                       lls_send = TRUE;
@@ -413,8 +389,6 @@ namespace gr {
               count = (count + 1) % MPEG_PKT_LENGTH;
               consumed++;
               sendbits(bits, out);
-              out += 8;
-              produced += 8;
 skip:
               asm("nop");
             }
