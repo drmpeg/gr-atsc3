@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021-2023 Ron Economos.
+ * Copyright 2021-2023,2026 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -17,17 +17,17 @@ namespace gr {
     using input_type = gr_complex;
     using output_type = gr_complex;
     bootstrap_cc::sptr
-    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    bootstrap_cc::make(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_major_version_t majorversion, atsc3_bootstrap_minor_version_t minorversion, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
     {
       return gnuradio::make_block_sptr<bootstrap_cc_impl>(
-        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, flmode, flen, l1bmode, outputmode, showlevels, vclip);
+        fftsize, numpayloadsyms, numpreamblesyms, guardinterval, pilotpattern, frameinterval, flmode, flen, l1bmode, majorversion, minorversion, outputmode, showlevels, vclip);
     }
 
 
     /*
      * The private constructor
      */
-    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
+    bootstrap_cc_impl::bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_major_version_t majorversion, atsc3_bootstrap_minor_version_t minorversion, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip)
       : gr::block("bootstrap_cc",
               gr::io_signature::make(1, 1, sizeof(input_type)),
               gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -55,6 +55,7 @@ namespace gr {
       int absolute_cyclic_shift;
       int preamble_structure;
       int Nextra, Nfinal;
+      int seed;
       gr_complex phase_shift;
       gr_complex zero = gr_complex(0.0, 0.0);
       gr_complex* dst;
@@ -1093,8 +1094,76 @@ namespace gr {
           guard_interval = 192;
           break;
       }
-      init_pseudo_noise_sequence();
-      init_zadoff_chu_sequence();
+      bootstrap_version = minorversion;
+      if (majorversion == BOOTSTRAP_MAJOR_VERSION_0) {
+        switch (minorversion) {
+          case BOOTSTRAP_MINOR_VERSION_0:
+            seed = 0x19d;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_1:
+            seed = 0x0ed;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_2:
+            seed = 0x1e8;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_3:
+            seed = 0x0e8;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_4:
+            seed = 0x0fb;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_5:
+            seed = 0x021;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_6:
+            seed = 0x054;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_7:
+            seed = 0x0ec;
+            break;
+          default:
+            seed = 0x19d;
+            break;
+        }
+      }
+      else {
+        switch (minorversion) {
+          case BOOTSTRAP_MINOR_VERSION_0:
+            seed = 0xf110;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_1:
+            seed = 0x3d21;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_2:
+            seed = 0xe550;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_3:
+            seed = 0xbd49;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_4:
+            seed = 0x23cf;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_5:
+            seed = 0x0b50;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_6:
+            seed = 0x3d3c;
+            break;
+          case BOOTSTRAP_MINOR_VERSION_7:
+            seed = 0xa216;
+            break;
+          default:
+            seed = 0xf110;
+            break;
+        }
+      }
+      init_pseudo_noise_sequence(seed);
+      if (majorversion == BOOTSTRAP_MAJOR_VERSION_0) {
+        init_zadoff_chu_sequence(137);
+      }
+      else {
+        init_zadoff_chu_sequence(197);
+      }
       absolute_cyclic_shift = 0;
       pnindex = 0;
       for (int k = 0; k < NUM_BOOTSTRAP_SYMBOLS; k++) {
@@ -1248,9 +1317,9 @@ namespace gr {
     }
 
     void
-    bootstrap_cc_impl::init_pseudo_noise_sequence(void)
+    bootstrap_cc_impl::init_pseudo_noise_sequence(int init)
     {
-      int sr = 0x19d;
+      int sr = init;
 
       for (int i = 0; i < ZADOFF_CHU_LENGTH * (NUM_BOOTSTRAP_SYMBOLS / 2); i++) {
         int b = ((sr) ^ (sr >> 1) ^ (sr >> 14) ^ (sr >> 15) ^ (sr >> 16)) & 1;
@@ -1263,10 +1332,8 @@ namespace gr {
     }
 
     void
-    bootstrap_cc_impl::init_zadoff_chu_sequence(void)
+    bootstrap_cc_impl::init_zadoff_chu_sequence(int q)
     {
-      int q = 137;
-
       for (int n = 0; n < ZADOFF_CHU_LENGTH; n++) {
         zcseq[n] = std::exp(gr_complexd(0.0, 1.0) * gr_complexd(GR_M_PI * q * double(-1 * n * (n + 1)) / 1499.0, 0.0));
       }
@@ -1399,11 +1466,21 @@ namespace gr {
       for (int i = 0; i < noutput_items; i += insertion_items) {
         level = out;
         if (output_mode) {
-          memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * interpolated_items);
+          if (bootstrap_version != BOOTSTRAP_MINOR_VERSION_NULL) {
+            memcpy(out, &bootstrap_resample[0], sizeof(gr_complex) * interpolated_items);
+          }
+          else {
+            std::fill_n(out, interpolated_items, 0);
+          }
           out += interpolated_items;
         }
         else {
-          memcpy(out, &bootstrap_symbol[0], sizeof(gr_complex) * (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
+          if (bootstrap_version != BOOTSTRAP_MINOR_VERSION_NULL) {
+            memcpy(out, &bootstrap_symbol[0], sizeof(gr_complex) * (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS);
+          }
+          else {
+            std::fill_n(out, (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS, 0);
+          }
           out += (BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS;
         }
         memcpy(out, in, sizeof(gr_complex) * frame_items);

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021-2023 Ron Economos.
+ * Copyright 2021-2023,2026 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -42,8 +42,8 @@ namespace gr {
       gr_complex bootstrap_partb[4][BOOTSTRAP_FFT_SIZE];
       gr_complex bootstrap_symbol[(BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS + (PADDING_SAMPLES * 2)];
       gr_complex bootstrap_resample[((BOOTSTRAP_FFT_SIZE + B_SIZE + C_SIZE) * NUM_BOOTSTRAP_SYMBOLS * 9) / 8];
-      void init_pseudo_noise_sequence(void);
-      void init_zadoff_chu_sequence(void);
+      void init_pseudo_noise_sequence(int);
+      void init_zadoff_chu_sequence(int);
       int gray_code_cyclic_shift(int signal_bits);
       unsigned char reversebits(unsigned char b);
       std::vector<float> design_resampler_filter_float(const unsigned interpolation, const unsigned decimation, const float fractional_bw);
@@ -58,6 +58,7 @@ namespace gr {
       std::vector<gr::filter::kernel::fir_filter<gr_complex, gr_complex, gr_complex>> d_firs;
 
       int output_mode;
+      int bootstrap_version;
       int show_levels;
       float real_positive;
       float real_negative;
@@ -75,7 +76,7 @@ namespace gr {
       fft::fft_complex_rev bootstrap_fft;
 
      public:
-      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip);
+      bootstrap_cc_impl(atsc3_fftsize_t fftsize, int numpayloadsyms, int numpreamblesyms, atsc3_guardinterval_t guardinterval, atsc3_pilotpattern_t pilotpattern, atsc3_min_time_to_next_t frameinterval, atsc3_frame_length_mode_t flmode, int flen, atsc3_l1_fec_mode_t l1bmode, atsc3_bootstrap_major_version_t majorversion, atsc3_bootstrap_minor_version_t minorversion, atsc3_bootstrap_mode_t outputmode, atsc3_showlevels_t showlevels, float vclip);
       ~bootstrap_cc_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

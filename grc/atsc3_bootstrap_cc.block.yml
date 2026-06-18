@@ -4,7 +4,22 @@ category: '[ATSC3.0]'
 
 templates:
   imports: import atsc3
-  make: atsc3.bootstrap_cc(${fftsize.val}, ${numpayloadsyms}, ${numpreamblesyms}, ${guardinterval.val}, ${pilotpattern.val}, ${frameinterval.val}, ${flmode.val}, ${flen}, ${l1bmode.val}, ${outputmode.val}, ${showlevels.val}, ${vclip})
+  make: |-
+      atsc3.bootstrap_cc(
+          ${fftsize.val},
+          ${numpayloadsyms},
+          ${numpreamblesyms},
+          ${guardinterval.val},
+          ${pilotpattern.val},
+          ${frameinterval.val},
+          ${flmode.val},
+          ${flen},
+          ${l1bmode.val},
+          ${majorversion.val},
+          ${minorversion.val},
+          ${outputmode.val},
+          ${showlevels.val},
+          ${vclip})
 
 parameters:
 -   id: fftsize
@@ -65,6 +80,20 @@ parameters:
     option_labels: [Mode 1, Mode 2, Mode 3, Mode 4, Mode 5]
     option_attributes:
         val: [atsc3.L1_FEC_MODE_1, atsc3.L1_FEC_MODE_2, atsc3.L1_FEC_MODE_3, atsc3.L1_FEC_MODE_4, atsc3.L1_FEC_MODE_5]
+-   id: majorversion
+    label: Bootstrap Major Version
+    dtype: enum
+    options: [BOOTSTRAP_MAJOR_VERSION_0, BOOTSTRAP_MAJOR_VERSION_1]
+    option_labels: [0, 1]
+    option_attributes:
+        val: [atsc3.BOOTSTRAP_MAJOR_VERSION_0, atsc3.BOOTSTRAP_MAJOR_VERSION_1]
+-   id: minorversion
+    label: Bootstrap Minor Version
+    dtype: enum
+    options: [BOOTSTRAP_MINOR_VERSION_0, BOOTSTRAP_MINOR_VERSION_1, BOOTSTRAP_MINOR_VERSION_2, BOOTSTRAP_MINOR_VERSION_3, BOOTSTRAP_MINOR_VERSION_4, BOOTSTRAP_MINOR_VERSION_5, BOOTSTRAP_MINOR_VERSION_6, BOOTSTRAP_MINOR_VERSION_7, BOOTSTRAP_MINOR_VERSION_NULL]
+    option_labels: [0, 1, 2, 3, 4, 5, 6, 7, Null bootstrap]
+    option_attributes:
+        val: [atsc3.BOOTSTRAP_MINOR_VERSION_0, atsc3.BOOTSTRAP_MINOR_VERSION_1, atsc3.BOOTSTRAP_MINOR_VERSION_2, atsc3.BOOTSTRAP_MINOR_VERSION_3, atsc3.BOOTSTRAP_MINOR_VERSION_4, atsc3.BOOTSTRAP_MINOR_VERSION_5, atsc3.BOOTSTRAP_MINOR_VERSION_6, atsc3.BOOTSTRAP_MINOR_VERSION_7, atsc3.BOOTSTRAP_MINOR_VERSION_NULL]
 -   id: outputmode
     label: Output Mode
     dtype: enum

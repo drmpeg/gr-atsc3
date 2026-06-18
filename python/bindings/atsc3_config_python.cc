@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Free Software Foundation, Inc.
+ * Copyright 2026 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(atsc3_config.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(ef04e423f6a3738c3e01c85408c4ee74)                     */
+/* BINDTOOL_HEADER_FILE_HASH(fdf623d29008958d966f4ce1b0071b9a)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -282,6 +282,27 @@ void bind_atsc3_config(py::module& m)
     ;
 
     py::implicitly_convertible<int, ::gr::atsc3::atsc3_min_time_to_next_t>();
+    py::enum_<::gr::atsc3::atsc3_bootstrap_major_version_t>(m,"atsc3_bootstrap_major_version_t")
+        .value("BOOTSTRAP_MAJOR_VERSION_0", ::gr::atsc3::atsc3_bootstrap_major_version_t::BOOTSTRAP_MAJOR_VERSION_0) // 0
+        .value("BOOTSTRAP_MAJOR_VERSION_1", ::gr::atsc3::atsc3_bootstrap_major_version_t::BOOTSTRAP_MAJOR_VERSION_1) // 1
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_bootstrap_major_version_t>();
+    py::enum_<::gr::atsc3::atsc3_bootstrap_minor_version_t>(m,"atsc3_bootstrap_minor_version_t")
+        .value("BOOTSTRAP_MINOR_VERSION_0", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_0) // 0
+        .value("BOOTSTRAP_MINOR_VERSION_1", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_1) // 1
+        .value("BOOTSTRAP_MINOR_VERSION_2", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_2) // 2
+        .value("BOOTSTRAP_MINOR_VERSION_3", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_3) // 3
+        .value("BOOTSTRAP_MINOR_VERSION_4", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_4) // 4
+        .value("BOOTSTRAP_MINOR_VERSION_5", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_5) // 5
+        .value("BOOTSTRAP_MINOR_VERSION_6", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_6) // 6
+        .value("BOOTSTRAP_MINOR_VERSION_7", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_7) // 7
+        .value("BOOTSTRAP_MINOR_VERSION_NULL", ::gr::atsc3::atsc3_bootstrap_minor_version_t::BOOTSTRAP_MINOR_VERSION_NULL) // 8
+        .export_values()
+    ;
+
+    py::implicitly_convertible<int, ::gr::atsc3::atsc3_bootstrap_minor_version_t>();
     py::enum_<::gr::atsc3::atsc3_bootstrap_mode_t>(m,"atsc3_bootstrap_mode_t")
         .value("BOOTSTRAP_VALIDATION", ::gr::atsc3::atsc3_bootstrap_mode_t::BOOTSTRAP_VALIDATION) // 0
         .value("BOOTSTRAP_INTERPOLATION", ::gr::atsc3::atsc3_bootstrap_mode_t::BOOTSTRAP_INTERPOLATION) // 1

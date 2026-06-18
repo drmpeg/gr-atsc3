@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2021-2023 Ron Economos.
+ * Copyright 2021-2023,2025-2026 Ron Economos.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -219,6 +219,23 @@ namespace gr {
       MTTN_5300,
     };
 
+    enum atsc3_bootstrap_major_version_t {
+      BOOTSTRAP_MAJOR_VERSION_0 = 0,
+      BOOTSTRAP_MAJOR_VERSION_1,
+    };
+
+    enum atsc3_bootstrap_minor_version_t {
+      BOOTSTRAP_MINOR_VERSION_0 = 0,
+      BOOTSTRAP_MINOR_VERSION_1,
+      BOOTSTRAP_MINOR_VERSION_2,
+      BOOTSTRAP_MINOR_VERSION_3,
+      BOOTSTRAP_MINOR_VERSION_4,
+      BOOTSTRAP_MINOR_VERSION_5,
+      BOOTSTRAP_MINOR_VERSION_6,
+      BOOTSTRAP_MINOR_VERSION_7,
+      BOOTSTRAP_MINOR_VERSION_NULL,
+    };
+
     enum atsc3_bootstrap_mode_t {
       BOOTSTRAP_VALIDATION = 0,
       BOOTSTRAP_INTERPOLATION,
@@ -326,6 +343,8 @@ typedef gr::atsc3::atsc3_l1_select_t atsc3_l1_select_t;
 typedef gr::atsc3::atsc3_frequency_interleaver_t atsc3_frequency_interleaver_t;
 typedef gr::atsc3::atsc3_showlevels_t atsc3_showlevels_t;
 typedef gr::atsc3::atsc3_min_time_to_next_t atsc3_min_time_to_next_t;
+typedef gr::atsc3::atsc3_bootstrap_major_version_t atsc3_bootstrap_major_version_t;
+typedef gr::atsc3::atsc3_bootstrap_minor_version_t atsc3_bootstrap_minor_version_t;
 typedef gr::atsc3::atsc3_bootstrap_mode_t atsc3_bootstrap_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_mode_t atsc3_time_interleaver_mode_t;
 typedef gr::atsc3::atsc3_time_interleaver_depth_t atsc3_time_interleaver_depth_t;
